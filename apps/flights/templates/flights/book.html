@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>항공편 예약</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .flight-info {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .flight-info p {
+            margin: 5px 0;
+        }
+        .flight-info h2 {
+            margin: 10px 0;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .btn-confirm {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn-confirm:hover {
+            background-color: #0056b3;
+        }
+        .details {
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+        .details p {
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+        .passenger-info {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .passenger-info div {
+            margin-bottom: 10px;
+        }
+        .passenger-info label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .passenger-info input,
+        .passenger-info select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>예약 정보 확인</h1>
+
+        <!-- 가는편 항공권 정보 -->
+        <div class="flight-info">
+            <h2>가는편</h2>
+            <h3 id="route">{{ flight.itineraries.0.segments.0.departure.iataCode }} - {{ flight.itineraries.0.segments.0.arrival.iataCode }}</h3>
+            <p id="carrier">{{ flight.itineraries.0.segments.0.carrierCode }}</p>
+            <p id="departure">{{ flight.itineraries.0.segments.0.departure.at }}</p>
+            <p id="arrival">{{ flight.itineraries.0.segments.0.arrival.at }}</p>
+            <p class="price" id="price">{{ flight.price.total }} {{ flight.price.currency }}</p>
+        </div>
+
+        <!-- 오는편 항공권 정보 (있는 경우) -->
+        {% if flight.itineraries|length > 1 %}
+        <div class="flight-info">
+            <h2>오는편</h2>
+            <h3 id="route">{{ flight.itineraries.1.segments.0.departure.iataCode }} - {{ flight.itineraries.1.segments.0.arrival.iataCode }}</h3>
+            <p id="carrier">{{ flight.itineraries.1.segments.0.carrierCode }}</p>
+            <p id="departure">{{ flight.itineraries.1.segments.0.departure.at }}</p>
+            <p id="arrival">{{ flight.itineraries.1.segments.0.arrival.at }}</p>
+            <p class="price" id="price">{{ flight.price.total }} {{ flight.price.currency }}</p>
+        </div>
+        {% endif %}
+
+        <div class="details">
+            <p id="stop-info">{{ flight.itineraries.0.segments|length }} Stop(s)</p>
+            <p>{{ number_people }}인</p>
+        </div>
+        <form method="post" action="{% url 'flights:book_flight' %}" id="booking-form">
+            {% csrf_token %}
+            <input type="hidden" name="flight" id="flight-data">
+            <input type="hidden" name="passengers" id="passengers-data">
+            <div>
+                <label for="name">예약자 이름:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="phone_number">전화번호:</label>
+                <input type="text" id="phone_number" name="phone_number" required>
+            </div>
+            <div>
+                <label for="email">이메일:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div id="passenger-info">
+                <h3>탑승자 정보</h3>
+                <!-- 탑승자 정보는 여기에서 동적으로 생성됩니다 -->
+            </div>
+            <button type="submit" class="btn-confirm">예약 확인</button>
+        </form>
+        <div class="footer">
+            <p>세부 요금 및 조건은 항공사 정책에 따릅니다.</p>
+        </div>
+    </div>
+    
+    <!-- JSON 데이터를 안전하게 삽입하기 위해 json_script 사용 -->
+    {{ flight|json_script:"flight-data-json" }}
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const numberPeople = {{ number_people }};
+    const passengerInfoDiv = document.getElementById('passenger-info');
+
+    // JSON 데이터를 가져와서 hidden input에 설정
+    const flightData = JSON.parse(document.getElementById('flight-data-json').textContent);
+    document.getElementById('flight-data').value = JSON.stringify(flightData);
+
+    for (let i = 0; i < numberPeople; i++) {
+        const passengerDiv = document.createElement('div');
+        passengerDiv.className = 'passenger-info';
+        const travelerType = flightData.traveler_pricings[i].travelerType; // 여행자 유형 추출
+        passengerDiv.innerHTML = `
+            <h4>탑승자 ${i + 1} (${travelerType})</h4>
+            <div>
+                <label for="passenger_last_name_${i}">성:</label>
+                <input type="text" id="passenger_last_name_${i}" name="passenger_last_name_${i}" required>
+            </div>
+            <div>
+                <label for="passenger_first_name_${i}">이름:</label>
+                <input type="text" id="passenger_first_name_${i}" name="passenger_first_name_${i}" required>
+            </div>
+            <div>
+                <label for="passenger_gender_${i}">성별:</label>
+                <select id="passenger_gender_${i}" name="passenger_gender_${i}" required>
+                    <option value="남">남</option>
+                    <option value="여">여</option>
+                </select>
+            </div>
+            <div>
+                <label for="passenger_birthdate_${i}">생년월일:</label>
+                <input type="text" id="passenger_birthdate_${i}" name="passenger_birthdate_${i}"  required>
+            </div>
+            <div>
+                <label for="passenger_nationality_${i}">국적:</label>
+                <input type="text" id="passenger_nationality_${i}" name="passenger_nationality_${i}" value="대한민국" readonly required>
+            </div>
+        `;
+        passengerInfoDiv.appendChild(passengerDiv);
+    }
+
+    document.getElementById('booking-form').addEventListener('submit', function(event) {
+        const passengers = [];
+        for (let i = 0; i < numberPeople; i++) {
+            passengers.push({
+                traveler_id: flightData.traveler_pricings[i].travelerId,
+                last_name: document.getElementById(`passenger_last_name_${i}`).value,
+                first_name: document.getElementById(`passenger_first_name_${i}`).value,
+                gender: document.getElementById(`passenger_gender_${i}`).value,
+                birth_date: document.getElementById(`passenger_birthdate_${i}`).value,
+                nationality: document.getElementById(`passenger_nationality_${i}`).value,
+            });
+        }
+        document.getElementById('passengers-data').value = JSON.stringify(passengers);
+        alert('예약이 완료되었습니다');
+    });
+});
+    </script>
+</body>
+</html>

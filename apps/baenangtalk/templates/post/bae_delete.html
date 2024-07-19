@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% load static %}
+    {% block extra_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/post/delete.css' %}">
+    {% endblock %}
+
+    <div class="container text-center">
+        <h5 style="font-size: 18px; color: #4e4e4e; text-decoration: underline; margin-bottom: 50px;">게시물을 삭제하시겠습니까?</h5>
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 40px;">
+            <h2>{{ object.bae_title }}</h2>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="submit-button btn-lg">삭제</button>
+            <a href="{% url 'baenangtalk:bae_detail' baenangtalk.pk %}" class="submit-button">취소</a>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/main.css' %}">
+{% endblock %}
+<div class="container mt-3">
+    <a href="{% url 'baenangtalk:bae_main' %}">
+        <h3 class="mb-4">배낭톡</h3>
+    </a>
+    
+    <!-- 도시 선택 -->
+    <div class="btn-group" style="text-align: right;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
+            {% if county_id %}
+                <strong>{{ selected_county.city_name }}</strong>
+            {% else %}
+                도시 선택
+            {% endif %}
+        </button>
+        <div class="dropdown-menu">
+            {% for county in counties %}
+                <a class="dropdown-item" href="?county_id={{ county.id }}{% if period_id %}&period_id={{ period_id }}{% endif %}{% if subject_id %}&subject_id={{ subject_id }}{% endif %}">
+                    {{ county.city_name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 여행시기 선택 -->
+    <div class="btn-group" style="text-align: right;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
+            {% if period_id and selected_period %}
+                <strong>{{ selected_period.bae_month|date:"M" }}</strong>
+            {% else %}
+                여행시기 선택
+            {% endif %}
+        </button>
+        <div class="dropdown-menu">
+            <!-- 각 여행시기 선택 항목 -->
+            {% for period in periods %}
+                <a class="dropdown-item{% if period.id == period_id %} active{% endif %}" href="?{% if county_id %}county_id={{ county_id }}&{% endif %}period_id={{ period.id }}{% if subject_id %}&subject_id={{ subject_id }}{% endif %}">
+                    {{ period.bae_month|date:"M" }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- 주제 선택 -->
+    <div class="btn-group" style="text-align: right;">
+        <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF;">
+            {% if subject_id and selected_subject %}
+                <strong>{{ selected_subject.bae_sub_name }}</strong>
+            {% else %}
+                주제 선택
+            {% endif %}
+        </button>
+        <div class="dropdown-menu">
+            <!-- 각 주제 선택 항목 -->
+            {% for subject in subjects %}
+                <a class="dropdown-item{% if subject.id == subject_id %} active{% endif %}" href="?{% if county_id %}county_id={{ county_id }}&{% endif %}{% if period_id %}period_id={{ period_id }}&{% endif %}subject_id={{ subject.id }}">
+                    {{ subject.bae_sub_name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 배낭톡 이용규칙 & 제안하기 & 작성 -->
+    <div class="d-flex justify-content-end">
+        <!-- 배낭톡 이용규칙 -->
+        <div class="ms-3">
+            <a href="#" class="bi bi-bell" id="create-post-btn"></a>
+        </div>
+
+        <!-- 배낭톡 제안하기 -->
+        <div class="ms-3">
+            <a href="#" class="bi bi-pencil-square" id="create-post-btn"></a>
+        </div>
+
+        <!-- 배낭톡 작성 -->
+        <div class="ms-3">
+            <a href="{% url 'baenangtalk:bae_create' %}" class="bi bi-pencil" id="create-post-btn"></a>
+        </div>
+    </div>
+
+    <!-- 배낭톡 게시글 리스트 -->
+    <div class="row">
+        {% for post in posts %}
+        <div class="mb-4">
+            <div class="card">
+                <!-- 이미지 -->
+                <img src="{{ post.bae_img.url }}" class="card-img-top" style="height: 240px; object-fit: cover; object-position: center;" alt="{{ post.bae_title }}">
+                <div class="card-body">
+                    <!-- 제목 -->
+                    <h5 class="card-title">
+                        <a href="{% url 'baenangtalk:bae_detail' post.id %}">{{ post.bae_title }}</a>
+                    </h5>
+                    <!-- 내용 -->
+                    <p class="card-text">{{ post.bae_content }}</p>
+                    <!-- 좋아요 & 댓글 & 작성일 -->
+                    <p class="card-text" style="display: flex; justify-content: space-between;">
+                        <!-- 좋아요 & 댓글-->
+                        <small>
+                            <i class="bi bi-heart" style="color: red;"></i> {{ post.bae_like }}
+                            <i class="bi bi-chat-dots" style="color: rgb(70, 70, 70); margin-left: 5px;"></i> {{ post.baenangtalkcomment_set.all.count }}
+                        </small>
+                        <!-- 작성일 -->
+                        <small class="text-muted">{{ post.bae_date | date:"Y.m.d" }}</small>
+                    </p> 
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-warning" role="alert">
+                작성된 게시글이 없습니다.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

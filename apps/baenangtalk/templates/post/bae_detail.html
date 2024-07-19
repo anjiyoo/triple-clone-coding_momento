@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/post/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 게시글 본문 card 크기 -->
+        <div class="col-md-12">
+            <!-- 게시글 본문 상단 도시/주제/기간 -->
+            <div class="mb-4">
+                <div class="btn-group" style="text-align: right;">
+                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        {{ county }}
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        {{ subject }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; border-radius: 10px;">
+                        {{ period | date:"M" }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- 게시글 본문  -->
+            <div class="card mb-4">
+                <div class="card-body" style="max-height: 1600px;">
+                    <!-- 제목 -->
+                    <h3 class="card-title">{{ baenangtalk.bae_title }}</h3>
+                    <hr>
+                    <!-- 이미지 -->
+                    {% if baenangtalk.bae_img %}
+                        <img src="{{ baenangtalk.bae_img.url }}" class="card-img-top" style="height: 100%; width: 100%; object-fit: cover; object-position: center;" alt="{{ baenangtalk.bae_title }}">
+                    {% else %}
+                        <p>이미지가 없습니다.</p>
+                    {% endif %}
+                    <!-- 게시글 내용 -->
+                    <p class="card-text">{{ baenangtalk.bae_content }}</p>
+                    <hr>
+                    <!-- 게시글 -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <!-- 작성자 프로필 이미지 -->
+                        <div style="display: flex; align-items: center;">
+                            <div style="display: inline-block; overflow: hidden; border-radius: 50%; width: 50px; height: 50px; flex-shrink: 0; position: relative; margin-right: 10px;">
+                                {% if baenangtalk.user.profile %}
+                                    <img src="{{ baenangtalk.user.profile.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ baenangtalk.user.username }}'s profile picture">
+                                {% else %}
+                                    <img src="{% static 'non_profile_image.png' %}" style="width: 100%; height: 100%; object-fit: cover;" alt="Default Profile Picture">
+                                {% endif %}
+                            </div>
+                        
+                            <!-- 작성자 닉네임 & 좋아요-->
+                            <div style="display: flex; flex-direction: column;">
+                                <p style="margin-bottom: 5px;"><strong>{{ baenangtalk.user.nickname }}</strong></p>
+                                <!-- 게시글 좋아요 버튼 -->
+                                <div style="display: flex; align-items: center;">
+                                    {% if request.user %}
+                                        {% if request.user in baenangtalk.bae_like_by.all %}
+                                            <!-- 로그인 한 회원이며, 게시글을 이미 좋아요한 경우 -->
+                                            <form action="{% url 'baenangtalk:bae_unlike' baenangtalk.pk %}" method="post" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart-fill" style="color: red;"></i></button>
+                                                <span>{{ baenangtalk.bae_like }}</span>
+                                            </form>
+                                        {% else %}
+                                            <!-- 로그인 한 회원이며, 게시글을 아직 좋아요하지 않은 경우 -->
+                                            <form action="{% url 'baenangtalk:bae_like' baenangtalk.pk %}" method="post" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart" style="color: red;"></i></button>
+                                                <span>{{ baenangtalk.bae_like }}</span>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>    
+
+                        <!-- 작성일 -->
+                        <div style="margin-left: auto;">
+                            <small class="text-muted">{{ baenangtalk.bae_date | date:"Y.m.d" }}</small>
+                        </div>
+                    </div>
+                    <!-- 게시글 수정 및 삭제 링크 -->
+                    <div style="display: flex; justify-content: flex-end;">
+                        <!-- 로그인한 사용자가 작성자일 경우, 댓글 수정 및 삭제 글자 보임 -->
+                        {% if baenangtalk.user == request.user %}
+                        <div>
+                            <a href="{% url 'baenangtalk:bae_edit' baenangtalk.pk %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline;">수정</a>
+                            <a href="{% url 'baenangtalk:bae_delete' baenangtalk.pk %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline;">삭제</a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            
+            
+            <!-- 댓글 작성 -->
+            <div class="mt-4 mb-4">
+                <p class="mb-2" style="font-size: 18px;"><strong>댓글</strong></p>
+                <form method="post" action="{% url 'baenangtalk:bae_detail' pk=baenangtalk.pk %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="bae_com_content" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="submit-button btn-lg">입력</button>
+                    </div>                    
+                </form>
+            </div>
+
+
+            <!-- 댓글 리스트 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="mb-2" style="font-size: 18px;"><strong>댓글</strong></p>
+                    <ul class="list-unstyled">
+                        {% for comment in comments %}
+                        <!-- 댓글 사이 여백 -->
+                        <li style="margin-bottom: 20px; display: flex; align-items: center;">
+                            <!-- 댓글 작성자 정보 -->
+                            <div style="display: flex; align-items: center; flex-grow: 1;">
+                                <!-- 댓글 작성자 프로필 이미지 -->
+                                <div style="display: inline-block; overflow: hidden; border-radius: 50%; width: 30px; height: 30px; flex-shrink: 0; position: relative; margin-right: 10px;">
+                                    {% if comment.user.profile %}
+                                        <img src="{{ comment.user.profile.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ comment.user.username }}'s profile picture">
+                                    {% else %}
+                                        <img src="{% static 'non_profile_image.png' %}" style="width: 100%; height: 100%; object-fit: cover;" alt="Default Profile Picture">
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- 댓글 작성자 닉네임 & 버튼 -->
+                                <div>
+                                    <p style="margin-bottom: 5px;"><strong>{{ comment.user.nickname }}</strong></p>
+                                    <p style="margin-bottom: 5px;">{{ comment.bae_com_content }}</p>
+                                    <!-- 댓글 좋아요 버튼 -->
+                                    <div style="display: flex; align-items: center;">
+                                        {% if request.user %}
+                                            {% if request.user in comment.bae_com_like_by.all %}   
+                                                <!-- 로그인 한 회원이며, 댓글을 이미 좋아요한 경우 -->
+                                                <form action="{% url 'baenangtalk:com_unlike' comment.id %}" method="post" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart-fill" style="color: red;"></i></button>
+                                                    <span>{{ comment.bae_com_like }}</span>
+                                                </form>
+                                            {% else %}
+                                                <!-- 로그인 한 회원이며, 댓글을 아직 좋아요하지 않은 경우 -->
+                                                <form action="{% url 'baenangtalk:com_like' comment.id %}" method="post" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart" style="color: red;"></i></button>
+                                                    <span>{{ comment.bae_com_like }}</span>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 작성일 -->
+                            <div style="margin-left: auto; text-align: right; flex-shrink: 0;">
+                                <small class="text-muted">{{ comment.bae_com_date|date:"Y.m.d" }}</small>
+                            </div>
+
+                            <!-- 댓글 수정 및 삭제 링크 -->
+                            {% if baenangtalk.user == request.user %}
+                            <div style="margin-left: 10px;">
+                                <a href="{% url 'baenangtalk:com_edit' comment.id %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline; margin-right: 10px;">수정</a>
+                                <a href="{% url 'baenangtalk:com_delete' comment.id %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline;">삭제</a>
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <p>댓글이 작성되지 않았습니다.</p>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

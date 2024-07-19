@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'travel/home.css' %}">
+{% endblock %}
+
+<div class="container mt-3">
+    <h3 class="mb-4">국내 여행</h3>
+    <!-- 이미지 베너 -->
+    <div id="carousel-county" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            {% for county in counties %}
+            {% for img in county.countyimg_set.all %}
+            <div class="carousel-item {% if forloop.first and forloop.parentloop.first %}active{% endif %}">
+                <img src="{{ img.image.url }}" class="d-block w-100 img-thumbnail" alt="{{ img.city_name.city_name }} 이미지">
+            </div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 아이콘 -->
+    <div class="row mt-5 text-center shadow-sm">
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'flights:flight_search' %}" class="d-block">
+                <i class="bi bi-airplane" style="color: #0BD0AF; font-size: 4em;"></i>
+                <span class="d-block mt-1"><strong>항공권</strong></span>
+            </a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <a href="#" class="d-block">
+                <i class="bi bi-building" style="color: #0BD0AF; font-size: 4em;"></i>
+                <span class="d-block mt-1"><strong>숙소</strong></span>
+            </a>
+        </div>
+        <div class="col-md-4 mb-4">
+            <a href="#" class="d-block">
+                <i class="bi bi-ticket-perforated" style="color: #0BD0AF; font-size: 4em;"></i>
+                <span class="d-block mt-1"><strong>투어﹒티켓</strong></span>
+            </a>
+        </div>
+    </div>
+
+    <!-- AI일정추천 -->
+    <div class="row mt-5 text-center">
+        <div>
+            <a href="{% url 'planrecommend:select_city' %}">
+                <img src="{% static 'ai_planrecommend.png' %}" alt="AI일정추천이미지" class="ai-recommendation-image"> <!-- Added class for styling -->
+            </a>
+        </div>
+    </div>
+
+</div>
+
+{% block extra_js %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 이미지 베너 Carousel 설정
+        $('#carousel-county').carousel({
+            interval: 2000,  // 2초마다 전환
+            keyboard: true,
+            wrap: true
+        });
+    </script>
+{% endblock %}
+
+{% endblock %}

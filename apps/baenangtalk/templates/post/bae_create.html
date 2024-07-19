@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% load static %}
+    {% block extra_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/post/create.css' %}">
+    {% endblock %}
+    
+    <div class="container mt-3">
+        <h3 class="mb-4">게시글 작성</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.county.id_for_label }}">{{ form.fields.county.label }}</label>
+                {{ form.county }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.period.id_for_label }}">{{ form.fields.period.label }}</label>
+                {{ form.period }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">{{ form.fields.subject.label }}</label>
+                {{ form.subject }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.bae_title.id_for_label }}">{{ form.fields.bae_title.label }}</label>
+                {{ form.bae_title }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.bae_content.id_for_label }}">{{ form.fields.bae_content.label }}</label>
+                {{ form.bae_content }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.bae_img.id_for_label }}">{{ form.fields.bae_img.label }}</label>
+                {{ form.bae_img }}
+            </div>
+            
+            <button type="submit" class="submit-button btn-lg">작성 완료</button>
+        </form>
+    </div>
+{% endblock %}

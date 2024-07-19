@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'chatbot/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 게시글 본문 card 크기 -->
+        <div class="col-md-12">
+            <!-- 질문 예시 -->
+            <div class="mb-4">
+                <div class="btn-group" style="text-align: right;">
+                    <!-- 버튼에 onclick 이벤트 추가 -->
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('서울 지역문화에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        서울 지역문화에 대해 알려줘
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('전주 관광지에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
+                        전주 관광지에 대해 알려줘
+                    </button>
+
+                    <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('부산 지역음식에 대해 알려줘')" style="color: #0BD0AF; border-radius: 10px;">
+                        부산 지역음식에 대해 알려줘
+                    </button>
+                </div>
+            </div>
+
+            <!-- 채팅창 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- 채팅창 배경 -->
+                    <div id="chat-container" class="chat-container" style="border-radius: 10px; height: 400px;">
+                        <!-- 채팅 목록 -->
+                        <div id="chat-message-list" class="chat-message-list" style="border-radius: 10px; background-color: #f4f4f8; height: 380px; overflow-y: auto;">
+                            <!-- 질문 -->
+                            <div id="chat-messages" class="chat-messages" style="border-radius: 10px; height: auto;"></div>
+                            <!-- 응답.. -->
+                            <div id="waiting" class="waiting" style="border-radius: 10px; height: auto;" placeholder="안녕하세요!"></div>
+                        </div>
+                    </div>
+    
+                    <!-- 질문 입력창 -->
+                    <div class="input-group mt-3 mb-3">
+                        <input type="text" id="userInput" class="form-control" style="border-radius: 10px;" placeholder="지역에 대해 궁금한 내용을 입력해주세요">
+                        <div class="input-group-append" style="margin-left: 10px;">
+                            <button id="submitButton" class="submit-button btn-lg">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 작성일 -->
+            <div style="margin-left: auto; text-align: right; flex-shrink: 0;">
+                <small class="text-muted">{{ comment.bae_com_date|date:"Y.m.d" }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 페이지 내용 -->
+<script src="{% static 'chatbot/chatbot_script.js' %}"></script>
+{% endblock %}

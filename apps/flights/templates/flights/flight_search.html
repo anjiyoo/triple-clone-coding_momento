@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+
+{% block title %}항공편 검색{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f7f7f7;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 8px;
+    }
+    .tab-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+        border-bottom: 2px solid #007BFF;
+        font-weight: bold;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    input[type="text"], input[type="date"], input[type="number"], select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .checkbox-group {
+        display: flex;
+        justify-content: space-between;
+    }
+    .checkbox-group input {
+        margin-right: 10px;
+    }
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: #FFF;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .results {
+        margin-top: 20px;
+    }
+    .flight-item {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+    }
+    .flight-item .price {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .flight-item .details {
+        font-size: 14px;
+        color: #555;
+    }
+    .flight-item .view-button {
+        background-color: #007BFF;
+        color: #FFF;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .flight-item .view-button:hover {
+        background-color: #0056b3;
+    }
+    .flight-item .traveler-details {
+        font-size: 14px;
+        color: #333;
+        margin-top: 5px;
+    }
+    .selected-flight {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #e9ecef;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="tab-container">
+        <div class="tab active" id="oneWayTab" onclick="selectTab('oneWay')">편도</div>
+        <div class="tab" id="roundTripTab" onclick="selectTab('roundTrip')">왕복</div>
+    </div>
+    <!-- 검색form -->
+    <form id="flightSearchForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="origin">출발지</label>
+            <input type="text" id="origin" name="origin" required>
+        </div>
+        <div class="form-group">
+            <label for="destination">도착지</label>
+            <input type="text" id="destination" name="destination" required>
+        </div>
+        <div class="form-group">
+            <label for="departure_date">출발 날짜</label>
+            <input type="date" id="departure_date" name="departure_date" required>
+        </div>
+        <div class="form-group" id="returnDateGroup" style="display: none;">
+            <label for="return_date">귀국 날짜</label>
+            <input type="date" id="return_date" name="return_date">
+        </div>
+        <div class="form-group">
+            <label for="adults">성인</label>
+            <input type="number" id="adults" name="adults" min="1" value="1" required>
+        </div>
+        <div class="form-group">
+            <label for="children">소아</label>
+            <input type="number" id="children" name="children" min="0" value="0">
+        </div>
+        <div class="form-group">
+            <label for="infants">유아</label>
+            <input type="number" id="infants" name="infants" min="0" value="0">
+        </div>
+        <input type="hidden" id="oneWay" name="oneWay" value="true">
+        <button type="submit">항공권 검색</button>
+    </form>
+</div>
+<div class="results" id="resultsContainer"></div>
+<div class="selected-flight" id="selectedFlightContainer" style="display: none;"></div>
+
+<script>
+    // CSRF 토큰 가져오기
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    // 초기값설정
+    let selectedOutboundFlight = null;
+    let selectedReturnFlight = null;
+    // 편도/왕복 보였다 안보였다
+    function selectTab(tab) {
+        document.querySelectorAll('.tab').forEach(element => {
+            element.classList.remove('active');
+        });
+        document.getElementById(tab + 'Tab').classList.add('active');
+        
+        if (tab === 'roundTrip') {
+            document.getElementById('returnDateGroup').style.display = 'block';
+            document.getElementById('oneWay').value = 'false';
+        } else {
+            document.getElementById('returnDateGroup').style.display = 'none';
+            document.getElementById('oneWay').value = 'true';
+        }
+    }
+    // 검색입력 보내기
+    document.getElementById('flightSearchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const origin = document.getElementById('origin').value;
+        const destination = document.getElementById('destination').value;
+        const departure_date = document.getElementById('departure_date').value;
+        const return_date = document.getElementById('return_date').value;
+        const adults = document.getElementById('adults').value;
+        const children = document.getElementById('children').value;
+        const infants = document.getElementById('infants').value;
+        const oneWay = document.getElementById('oneWay').value === 'true';
+
+        const requestData = {
+            origin: origin,
+            destination: destination,
+            departure_date: departure_date,
+            oneWay: oneWay,
+            adults: adults,
+            children: children,
+            infants: infants,
+        };
+
+        if (!oneWay) {
+            requestData.return_date = return_date;
+        } else {
+            delete requestData.return_date;
+        }
+
+        console.log("Request Data:", requestData); // 전송할 데이터 확인
+
+        fetch('/flights/flights_search/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken // CSRF 토큰을 헤더에 추가
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response Data:", data); // 서버 응답 확인
+            if (oneWay) {
+                displayResults(data, 'outbound');
+            } else {
+                displayRoundTripResults(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    function displayResults(data, type) {
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.innerHTML = '';
+
+        if (Array.isArray(data.data)) {
+            data.data.forEach(flight => {
+                const flightItem = document.createElement('div');
+                flightItem.className = 'flight-item';
+                const segments = flight.itineraries[0].segments;
+                const firstSegment = segments[0];
+                const lastSegment = segments[segments.length - 1];
+                const travelerPricing = flight.travelerPricings;
+                let travelerDetails = '';
+                travelerPricing.forEach((traveler, index) => {
+                    travelerDetails += `<p class="traveler-details">Traveler ${index + 1} (${traveler.travelerType}): ${traveler.price.total} ${flight.price.currency}</p>`;
+                });
+                flightItem.innerHTML = `
+                    <div class="details">
+                        <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
+                        <p>${firstSegment.carrierCode} ${firstSegment.number}</p>
+                        <p>${segments.length > 1 ? segments.length - 1 + ' stops' : 'Non-stop'}</p>
+                    </div>
+                    <div class="price">${flight.price.total} ${flight.price.currency}</div>
+                    ${travelerDetails}
+                    <button class="view-button" onclick='selectFlight(${JSON.stringify(flight)}, "${type}")'>선택</button>
+                `;
+                resultsContainer.appendChild(flightItem);
+            });
+        } else {
+            resultsContainer.innerHTML = '<p>No flights found.</p>';
+        }
+    }
+
+    function displayRoundTripResults(data) {
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.innerHTML = '';
+
+        const departureFlights = data.departure_flights.data;
+        const returnFlights = data.return_flights.data;
+
+        let html = `<h3>출발편</h3>`;
+        departureFlights.forEach(flight => {
+            const flightItem = document.createElement('div');
+            flightItem.className = 'flight-item';
+            const segments = flight.itineraries[0].segments;
+            const firstSegment = segments[0];
+            const lastSegment = segments[segments.length - 1];
+            let travelerDetails = '';
+            flight.travelerPricings.forEach((traveler, index) => {
+                travelerDetails += `<p class="traveler-details">Traveler ${index + 1} (${traveler.travelerType}): ${traveler.price.total} ${flight.price.currency}</p>`;
+            });
+            flightItem.innerHTML = `
+                <div class="details">
+                    <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
+                    <p>${firstSegment.carrierCode} ${firstSegment.number}</p>
+                    <p>${segments.length > 1 ? segments.length - 1 + ' stops' : 'Non-stop'}</p>
+                </div>
+                <div class="price">${flight.price.total} ${flight.price.currency}</div>
+                ${travelerDetails}
+                <button class="view-button" onclick='selectFlight(${JSON.stringify(flight)}, "outbound")'>선택</button>
+            `;
+            html += flightItem.outerHTML;
+        });
+
+        html += `<h3>귀국편</h3>`;
+        returnFlights.forEach(flight => {
+            const flightItem = document.createElement('div');
+            flightItem.className = 'flight-item';
+            const segments = flight.itineraries[0].segments;
+            const firstSegment = segments[0];
+            const lastSegment = segments[segments.length - 1];
+            let travelerDetails = '';
+            flight.travelerPricings.forEach((traveler, index) => {
+                travelerDetails += `<p class="traveler-details">Traveler ${index + 1} (${traveler.travelerType}): ${traveler.price.total} ${flight.price.currency}</p>`;
+            });
+            flightItem.innerHTML = `
+                <div class="details">
+                    <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
+                    <p>${firstSegment.carrierCode} ${firstSegment.number}</p>
+                    <p>${segments.length > 1 ? segments.length - 1 + ' stops' : 'Non-stop'}</p>
+                </div>
+                <div class="price">${flight.price.total} ${flight.price.currency}</div>
+                ${travelerDetails}
+                <button class="view-button" onclick='selectFlight(${JSON.stringify(flight)}, "return")'>선택</button>
+            `;
+            html += flightItem.outerHTML;
+        });
+
+        resultsContainer.innerHTML = html;
+    }
+
+    function selectFlight(flight, type) {
+        if (type === 'outbound') {
+            selectedOutboundFlight = flight;
+            if (document.getElementById('oneWay').value === 'false') {
+                // Fetch return flights based on selected outbound flight
+                fetchReturnFlights();
+            } else {
+                displaySelectedFlight();
+            }
+        } else if (type === 'return') {
+            selectedReturnFlight = flight;
+            displaySelectedFlight();
+        }
+    }
+
+    function fetchReturnFlights() {
+        const origin = document.getElementById('destination').value;
+        const destination = document.getElementById('origin').value;
+        const return_date = document.getElementById('return_date').value;
+        const adults = document.getElementById('adults').value;
+        const children = document.getElementById('children').value;
+        const infants = document.getElementById('infants').value;
+
+        const requestData = {
+            origin: origin,
+            destination: destination,
+            departure_date: return_date,
+            oneWay: true,
+            adults: adults,
+            children: children,
+            infants: infants,
+        };
+
+        fetch('/flights/flights_search/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken // CSRF 토큰을 헤더에 추가
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Return Flight Data:", data); // 서버 응답 확인
+            displayResults(data, 'return');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function displaySelectedFlight() {
+        const selectedFlightContainer = document.getElementById('selectedFlightContainer');
+        selectedFlightContainer.innerHTML = '';
+
+        if (selectedOutboundFlight) {
+            const outboundSegments = selectedOutboundFlight.itineraries[0].segments;
+            const firstSegment = outboundSegments[0];
+            const lastSegment = outboundSegments[outboundSegments.length - 1];
+            selectedFlightContainer.innerHTML += `
+                <h3>선택된 출발편</h3>
+                <div class="details">
+                    <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
+                    <p>${firstSegment.carrierCode} ${firstSegment.number}</p>
+                    <p>${outboundSegments.length > 1 ? outboundSegments.length - 1 + ' stops' : 'Non-stop'}</p>
+                </div>
+            `;
+        }
+
+        if (selectedReturnFlight) {
+            const returnSegments = selectedReturnFlight.itineraries[0].segments;
+            const firstSegment = returnSegments[0];
+            const lastSegment = returnSegments[returnSegments.length - 1];
+            selectedFlightContainer.innerHTML += `
+                <h3>선택된 귀국편</h3>
+                <div class="details">
+                    <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
+                    <p>${firstSegment.carrierCode} ${firstSegment.number}</p>
+                    <p>${returnSegments.length > 1 ? returnSegments.length - 1 + ' stops' : 'Non-stop'}</p>
+                </div>
+            `;
+        }
+
+        if (selectedOutboundFlight || selectedReturnFlight) {
+            selectedFlightContainer.innerHTML += `
+                <button class="view-button" onclick='viewFlightDetails()'>보기</button>
+            `;
+        }
+
+        selectedFlightContainer.style.display = 'block';
+    }
+
+    function viewFlightDetails() {
+        const combinedFlight = {
+            outbound: selectedOutboundFlight,
+            return: selectedReturnFlight
+        };
+        let flightId = selectedOutboundFlight.id;
+        if (selectedReturnFlight) {
+            flightId += '-' + selectedReturnFlight.id;
+        }
+        const flightData = encodeURIComponent(JSON.stringify(combinedFlight));
+        window.location.href = `/flights/flight_details/${flightId}/?flight=${flightData}`;
+    }
+</script>
+{% endblock %}

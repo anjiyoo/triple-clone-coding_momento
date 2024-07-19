@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>항공편 상세 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto; 
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .flight-info {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .flight-info p {
+            margin: 5px 0;
+        }
+        .flight-info h2 {
+            margin: 10px 0;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .btn-book {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn-book:hover {
+            background-color: #0056b3;
+        }
+        .details {
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+        .details p {
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>선택한 항공편 정보</h1>
+        {% if flight %}
+        <div class="flight-info">
+            <h2>{{ flight.outbound.itineraries.0.segments.0.departure.iataCode }} - {{ flight.outbound.itineraries.0.segments.0.arrival.iataCode }}</h2>
+            <p>{{ flight.outbound.itineraries.0.segments.0.carrierCode }} {{ flight.outbound.itineraries.0.segments.0.number }}</p>
+            <p>출발: {{ flight.outbound.itineraries.0.segments.0.departure.at }}</p>
+            <p>도착: {{ flight.outbound.itineraries.0.segments.0.arrival.at }}</p>
+            <p class="price">{{ flight.outbound.price.total }} {{ flight.outbound.price.currency }}</p>
+            <div class="details">
+                <h3>가격 정보 (출발편)</h3>
+                {% for traveler in traveler_pricings_outbound %}
+                    <p>여행자 유형: {{ traveler.travelerType }}</p>
+                    <p>가격: {{ traveler.price.total }} {{ traveler.price.currency }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% if flight.return %}
+        <div class="flight-info">
+            <h2>{{ flight.return.itineraries.0.segments.0.departure.iataCode }} - {{ flight.return.itineraries.0.segments.0.arrival.iataCode }}</h2>
+            <p>{{ flight.return.itineraries.0.segments.0.carrierCode }} {{ flight.return.itineraries.0.segments.0.number }}</p>
+            <p>출발: {{ flight.return.itineraries.0.segments.0.departure.at }}</p>
+            <p>도착: {{ flight.return.itineraries.0.segments.0.arrival.at }}</p>
+            <p class="price">{{ flight.return.price.total }} {{ flight.return.price.currency }}</p>
+            <div class="details">
+                <h3>가격 정보 (귀국편)</h3>
+                {% for traveler in traveler_pricings_return %}
+                    <p>여행자 유형: {{ traveler.travelerType }}</p>
+                    <p>가격: {{ traveler.price.total }} {{ traveler.price.currency }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="details">
+            <p>출발 경유지: {{ stop_info_outbound }}</p>
+            {% if flight.return %}
+            <p>귀국 경유지: {{ stop_info_return }}</p>
+            {% endif %}
+            <p>성인 1인, 편도/세금포함</p>
+        </div>
+        <button class="btn-book" onclick="bookFlight()">예약하기</button>
+        {% else %}
+        <p>선택한 항공편 정보가 없습니다.</p>
+        {% endif %}
+        <div class="footer">
+            <p>세부 요금 및 조건은 항공사 정책에 따릅니다.</p>
+        </div>
+    </div>
+
+    <script>
+        function bookFlight() {
+            // 예약에 필요한 데이터를 수집
+            const flightData = {
+                itineraries: [
+                    {
+                        segments: [
+                            {
+                                departure: {
+                                    iataCode: "{{ flight.outbound.itineraries.0.segments.0.departure.iataCode }}",
+                                    at: "{{ flight.outbound.itineraries.0.segments.0.departure.at }}"
+                                },
+                                arrival: {
+                                    iataCode: "{{ flight.outbound.itineraries.0.segments.0.arrival.iataCode }}",
+                                    at: "{{ flight.outbound.itineraries.0.segments.0.arrival.at }}"
+                                },
+                                carrierCode: "{{ flight.outbound.itineraries.0.segments.0.carrierCode }}",
+                                number: "{{ flight.outbound.itineraries.0.segments.0.number }}"
+                            }
+                        ]
+                    }
+                ],
+                price: {
+                    total: "{{ flight.outbound.price.total }}",
+                    currency: "{{ flight.outbound.price.currency }}"
+                },
+                stop_info: "{{ stop_info_outbound }}",
+                traveler_pricings: {{ traveler_pricings_outbound|safe }}
+            };
+
+            {% if flight.return %}
+            flightData.itineraries.push({
+                segments: [
+                    {
+                        departure: {
+                            iataCode: "{{ flight.return.itineraries.0.segments.0.departure.iataCode }}",
+                            at: "{{ flight.return.itineraries.0.segments.0.departure.at }}"
+                        },
+                        arrival: {
+                            iataCode: "{{ flight.return.itineraries.0.segments.0.arrival.iataCode }}",
+                            at: "{{ flight.return.itineraries.0.segments.0.arrival.at }}"
+                        },
+                        carrierCode: "{{ flight.return.itineraries.0.segments.0.carrierCode }}",
+                        number: "{{ flight.return.itineraries.0.segments.0.number }}"
+                    }
+                ],
+                price: {
+                    total: "{{ flight.return.price.total }}",
+                    currency: "{{ flight.return.price.currency }}"
+                },
+                traveler_pricings: {{ traveler_pricings_return|safe }}
+            });
+            {% endif %}
+
+            const flightDataEncoded = encodeURIComponent(JSON.stringify(flightData));
+            window.location.href = `/flights/booking/?flight=${flightDataEncoded}`;
+        }
+    </script>
+</body>
+</html>

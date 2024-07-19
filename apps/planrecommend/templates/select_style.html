@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<p id="select-page" class="mb-4" style="color: #1F66F0; font-weight: bold; text-align: center;">4/5</p>
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
+    <div class="card-body">
+        <i class="bi bi-camera-fill"></i>
+        <h3 class="mt-4">내가 선호하는 여행 스타일은?</h3>
+        <p id="select-city" class="mb-4">다중 선택이 가능해요.</p>
+        
+        <!-- 스타일 선택 -->
+        <div class="center" style="display: flex; justify-content: center;">
+            <div>
+                {% for style in styles|slice:":5" %}
+                    <div id="city-box" style="margin-bottom: 10px; margin-right: 10px;">{{ style.style }}</div>
+                {% endfor %}
+            </div>
+            <div>
+                {% for style in styles|slice:"5:9" %}
+                    <div id="city-box" style="margin-bottom: 10px;">{{ style.style }}</div>
+                {% endfor %}
+            </div>
+           
+        </div>
+
+
+
+        <!-- 다음 버튼 -->
+        <div class="center mt-3 mb-3">
+            <a href="{% url 'planrecommend:select_plan' %}">
+                <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+/* h 태그 */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+/* 도시 버튼 커스텀 */
+.btn-custom {
+    color: #fff;
+    background-color: transparent;
+    border-color: #0BD0AF;
+}
+
+/* 배낭톡 작성 아이콘 */
+#create-post-btn {
+    color: #0BD0AF;
+    font-size: 1.5em;
+}
+
+#create-post-btn:hover {
+    color: #0BD0AF;
+    font-size: 1.2em;
+}

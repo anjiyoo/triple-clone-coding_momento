@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    {% load static %}
+    
+    {% block extra_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'mypage/mypage.css' %}">
+    {% endblock %}
+    
+    {% block extra-style %}
+        <style>
+            .profile-img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover; /* 이미지를 컨테이너에 맞게 조정 */
+                border-radius: 50%;
+            }
+            .profile-section {
+                display: flex;
+                align-items: center;
+                padding: 20px;
+                border: 1px solid hsla(0, 0%, 100%, .3);
+                gap: 20px; /* 프로필 사진과 나머지 요소들 사이의 간격을 설정 */
+            }
+            .icon-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .icon-container svg,
+            .icon-container i {
+                width: 60px; /* 아이콘 크기 조정 */
+                height: 60px; /* 아이콘 크기 조정 */
+                margin-bottom: 10px; /* 아이콘과 설명 사이의 공백을 설정합니다 */
+            }
+            .btn-container {
+                margin-top: 20px; /* 버튼과 프로필 사이의 간격 조정 */
+            }
+            .d-flex {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            .fixed-card {
+        width: 18rem; /* 고정된 너비 */
+        height: 25rem; /* 고정된 높이 */
+        overflow: hidden; /* 내용이 카드 범위를 넘지 않도록 숨김 처리 */
+    }
+    .card-img-top {
+        height: 10rem; /* 이미지 높이 고정 */
+        object-fit: cover; /* 이미지가 카드에 맞게 조절되도록 */
+    }
+        </style>
+    {% endblock %}
+
+    <div class="container mt-3">
+        <h1 class="fs-2 mb-4">마이페이지</h1>
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-3">프로필</h2>
+                <div class="profile-section shadow text-black rounded-2">
+                    <div class="col-md-4 text-start">
+                        <label for="id_profile" style="cursor: pointer;">
+                            <img src="{{ user.profile.url }}" alt="{{ user.username }}" class="profile-img mb-2" id="profile-preview">
+                        </label>
+                        <input class="file-input visually-hidden" type="file" name="profile" id="id_profile" accept="image/png, image/jpeg, image/gif" onchange="previewFile()">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="nickname-section">
+                            <h2 class="mb-3">현재 닉네임</h2>
+                            <p id="current-nickname" class="mb-2">{{ user.nickname }}</p>
+                            <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nicknameModal" style="background-color: #0BD0AF; border-color: #0BD0AF;">프로필 변경</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- 아이콘 -->
+        <div class="row text-center shadow-sm btn-container">
+            <div class="col-md-3 mb-3">
+                <a href="#" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M29.3147 49.2H14.55C13.7667 49.2427 13.015 49.5236 12.3958 50.0053C11.7765 50.4869 11.3192 51.1463 11.085 51.895L3.385 74.995C3 75.38 3 75.765 3 76.15C3 78.46 4.54 80 6.85 80H76.15C78.46 80 80 78.46 80 76.15C80 75.765 80 75.38 79.615 74.995L71.915 51.895C71.6808 51.1463 71.2235 50.4869 70.6042 50.0053C69.985 49.5236 69.2333 49.2427 68.45 49.2H53.6852M64.6 26.1C64.6 43.425 41.5 60.75 41.5 60.75C41.5 60.75 18.4 43.425 18.4 26.1C18.4 19.9735 20.8337 14.0979 25.1658 9.76583C29.4979 5.43374 35.3735 3 41.5 3C47.6265 3 53.5021 5.43374 57.8342 9.76583C62.1663 14.0979 64.6 19.9735 64.6 26.1ZM49.2 26.1C49.2 30.3526 45.7526 33.8 41.5 33.8C37.2474 33.8 33.8 30.3526 33.8 26.1C33.8 21.8474 37.2474 18.4 41.5 18.4C45.7526 18.4 49.2 21.8474 49.2 26.1Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>                               
+                    <span class="d-block mt-1"><strong>내 여행</strong></span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="#" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M79.5 52.5C86.205 45.93 93 38.055 93 27.75C93 21.1859 90.3924 14.8906 85.7509 10.2491C81.1094 5.60758 74.8141 3 68.25 3C60.33 3 54.75 5.25 48 12C41.25 5.25 35.67 3 27.75 3C21.1859 3 14.8906 5.60758 10.2491 10.2491C5.60758 14.8906 3 21.1859 3 27.75C3 38.1 9.75 45.975 16.5 52.5L48 84L79.5 52.5Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="d-block mt-1"><strong>내 저장</strong></span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="#" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40.5 3L52.0875 26.368L78 30.1383L59.25 48.3176L63.675 74L40.5 61.868L17.325 74L21.75 48.3176L3 30.1383L28.9125 26.368L40.5 3Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>                    
+                    <span class="d-block mt-1"><strong>내 리뷰</strong></span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                    <a href="#" class="d-block">
+                        <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 20H20.1111M3 37H20.1111M3 54H20.1111M3 71H20.1111M62.8889 3V88M20.1111 3H71.4444C76.1695 3 80 6.80558 80 11.5V79.5C80 84.1944 76.1695 88 71.4444 88H20.1111C15.386 88 11.5556 84.1944 11.5556 79.5V11.5C11.5556 6.80558 15.386 3 20.1111 3Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="d-block mt-1"><strong>내 여행기</strong></span>
+                    </a>
+            </div>
+        </div>
+    </div>
+    
+<!-- 여행 일정 -->
+<div class="container mt-3">
+    <div class="row">
+        <h2 class="mb-3">최근 여행</h2>
+        <div class="d-flex">
+            <div class="card mx-2 fixed-card">
+                <a href="여행 일정 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">여행 일정</h5>
+                    <p class="card-text">여행 일정에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="여행 일정 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">여행 일정</h5>
+                    <p class="card-text">여행 일정에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="여행 일정 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">여행 일정</h5>
+                    <p class="card-text">여행 일정에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="여행 일정 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">여행 일정</h5>
+                    <p class="card-text">여행 일정에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 내 예약 -->
+<div class="container mt-3">
+    <div class="row">
+        <h2 class="mb-3">최근 예약</h2>
+        <div class="d-flex">
+            <div class="card mx-2 fixed-card">
+                <a href="개별 예약 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">예약 장소명</h5>
+                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="개별 예약 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">예약 장소명</h5>
+                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="개별 예약 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">예약 장소명</h5>
+                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="개별 예약 페이지 링크">
+                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">예약 장소명</h5>
+                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 공지 사항 -->
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">공지 사항</h5>
+                    <p class="card-text">공지 사항에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                    <a href="공지 사항 페이지 링크" class="btn btn-primary">자세히 보기</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">고객 센터</h5>
+                    <p class="card-text">고객 센터에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                    <a href="고객 센터 페이지 링크" class="btn btn-primary">자세히 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- 닉네임 변경 모달 -->
+    <div class="modal fade" id="nicknameModal" tabindex="-1" aria-labelledby="nicknameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nicknameModalLabel">닉네임 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nickname-form" method="post" action="{% url 'mypage' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_nickname" class="form-label">새 닉네임</label>
+                            {{ form.nickname }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">저장</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewFile() {
+            const preview = document.getElementById('profile-preview');
+            const file = document.getElementById('id_profile').files[0];
+            const reader = new FileReader();
+            
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<p id="select-page" class="mb-4" style="color: #1F66F0; font-weight: bold; text-align: center;">1/5</p>
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
+    <div class="card-body">
+        <i class="bi bi-globe-asia-australia"></i>
+        <h3 class="mt-4">떠나고 싶은 도시는?</h3>
+        <p id="select-city" class="mb-4">도시 1곳을 선택해주세요.</p>
+                
+        <!-- 도시 선택 -->
+        <div class="center" style="display: flex; justify-content: center;">
+            <div>
+                {% for county in counties|slice:":6" %}
+                    <button class="city-box">{{ county.city_name }}</button>
+                {% endfor %}
+            </div>
+            <div>
+                {% for county in counties|slice:"6:11" %}
+                    <button class="city-box">{{ county.city_name }}</button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 선택된 값 -->
+        <p class="mt-2 mb-4" style="color: #000000; font-weight: bold; text-align: center;">선택</p>
+        <div id="city-selected-data" class="mt-2 mb-4" style="display: flex; justify-content: center;"></div>    
+
+        <!-- 다음 버튼 -->
+        <div class="center mt-3 mb-3">
+            <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.city-box');
+        const cityselectedDataContainer = document.getElementById('city-selected-data');
+        const nextButton = document.getElementById('next-button');
+        var selectedCity = '';
+
+        function handleCitySelection(event) {
+            // 모든 버튼에서 selected 클래스 제거
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            // 클릭된 버튼에 selected 클래스 추가
+            event.currentTarget.classList.add('selected');
+            // 선택된 도시 저장 및 표시
+            selectedCity = event.currentTarget.textContent;
+            cityselectedDataContainer.innerHTML = `<div class="city-selected-data">${selectedCity}</div>`;
+        }
+
+        function handleNextButtonClick(event) {
+            if (selectedCity) {
+                // 다음 페이지로 이동하면서 선택된 도시를 URL 파라미터로 전달
+                window.location.href = `{% url 'planrecommend:select_date' %}?city=${encodeURIComponent(selectedCity)}`;
+            } else {
+                // 선택된 도시가 없을 경우, 알림창 띄우기
+                alert('도시를 선택해주세요.');
+                // 기본 동작 방지
+                event.preventDefault();
+            }
+        }
+
+        buttons.forEach(button => button.addEventListener('click', handleCitySelection));
+        nextButton.addEventListener('click', handleNextButtonClick);
+    });
+</script>
+
+{% endblock %}

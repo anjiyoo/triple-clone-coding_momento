@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/who.css' %}">
+{% endblock %}
+
+{% block content %}
+<p id="select-page" class="mb-4" style="color: #1F66F0; font-weight: bold; text-align: center;">3/5</p>
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
+    <div class="card-body">
+        <i class="bi bi-emoji-sunglasses-fill"></i>
+        <h3 class="mt-4">누구와 떠나나요?</h3>
+        <p id="select-city" class="mb-4">동행자를 선택해주세요.</p>
+        
+        <!-- 동행자 선택 -->
+        <div class="center" style="display: flex; justify-content: center;">
+            <div>
+                {% for who in whose|slice:":4" %}
+                    <button class="who-box">{{ who.who }}</button>
+                {% endfor %}
+            </div>
+            <div>
+                {% for who in whose|slice:"4:7" %}
+                    <button class="who-box">{{ who.who }}</button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 선택된 값 -->
+        <p class="mt-2 mb-4" style="color: #000000; font-weight: bold; text-align: center;">선택</p>
+        <div id="selected-data-container" class="mt-2 mb-4" style="display: flex; justify-content: center;">
+            <div id="city-selected-data" class="selected-data"></div>   
+            <div id="date-selected-data" class="selected-data"></div>  
+            <div id="who-selected-data" class="selected-data"></div>    
+        </div>  
+
+        <!-- 다음 버튼 -->
+        <div class="center mt-3 mb-3">
+            <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.who-box');
+        const whoSelectedDataContainer = document.getElementById('who-selected-data');
+        const dateSelectedDataContainer = document.getElementById('date-selected-data');
+        const citySelectedDataContainer = document.getElementById('city-selected-data');
+        const nextButton = document.getElementById('next-button');
+        const date = new URLSearchParams(window.location.search).get('date');
+        const city = new URLSearchParams(window.location.search).get('city');
+        let selectedWho = '';
+
+        // 선택된 도시를 city-selected-data에 표시
+        citySelectedDataContainer.innerHTML = `<div class="city-selected-data">${city}</div>`;
+
+        // 선택된 여행시기를 date-selected-data에 표시
+        dateSelectedDataContainer.innerHTML = `<div class="date-selected-data">${date}</div>`;
+
+        function handleWhoSelection(event) {
+            // 모든 버튼에서 selected 클래스 제거
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            // 클릭된 버튼에 selected 클래스 추가
+            event.currentTarget.classList.add('selected');
+            // 선택된 여행일정 저장 및 표시
+            selectedWho = event.currentTarget.textContent;
+            whoSelectedDataContainer.innerHTML = `<div class="who-selected-data">${selectedWho}</div>`;
+            
+        }
+
+        function handleNextButtonClick(event) {
+            if (selectedDate) {
+                // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자를 URL 파라미터로 전달
+                window.location.href = `{% url 'planrecommend:select_style' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}&who=${encodeURIComponent(selectedWho)}`;
+            } else {
+                // 선택된 동행자가 없을 경우, 알림창 띄우기
+                alert('동행자를 선택해주세요.');
+                // 기본 동작 방지
+                event.preventDefault();
+            }
+        }
+
+        buttons.forEach(button => button.addEventListener('click', handleWhoSelection));
+        nextButton.addEventListener('click', handleNextButtonClick);
+    });
+</script>
+{% endblock %}

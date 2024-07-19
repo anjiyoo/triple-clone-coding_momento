@@ -1,0 +1,38 @@
+/* 중앙 정렬 */
+.center {
+    text-align: center;
+}
+
+/* 지도 아이콘 */
+.bi-map-fill {
+    color: #0BD0AF;
+    font-size: 50px; 
+    margin-bottom: 10px;
+}
+
+/* h 태그 */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+/* p 태그 */
+#select-city {
+    color: rgb(169, 169, 169);
+}
+
+/* 기간선택 박스 */
+#city-box {
+    border-radius: 30px;
+    background-color: #f4f4f8;
+    width: 180px;
+    height: 60px;
+    padding: 5px;
+
+    font-size: 20px;
+    color: rgb(130, 130, 130);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+}
