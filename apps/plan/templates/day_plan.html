@@ -1,0 +1,583 @@
+{% extends 'base.html' %}
+{% block content%}
+
+
+
+<style>
+      .trip-planner {
+  padding: 1rem;
+}
+
+.trip-header {
+  margin-bottom: 1rem;
+}
+
+.trip-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.edit-option {
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+
+.trip-date, .trip-type {
+  color: #666;
+}
+
+.main-actions, .secondary-actions, .day-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #333;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background-color: #f3f4f6;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.day-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.day-date {
+  color: #666;
+}
+
+.modal{
+    position:absolute;
+    display:none;
+    
+    justify-content: center;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background-color: rgba(0,0,0,0.4);
+}
+.modal_body{
+    position:absolute;
+    top:50%;  
+
+
+    width:400px;   
+    height:600px; 
+
+    padding:40px;  
+
+    text-align: center;
+
+    background-color: rgb(255,255,255); 
+    border-radius:10px;  
+    box-shadow:0 2px 3px 0 rgba(34,36,38,0.15); 
+
+    transform:translateY(-50%);
+     
+}
+#modalCloseButton{
+    border: none;
+    background-color: white;
+    position:absolute;
+    right: 15px;
+}
+.spot_btn{
+    background-color: gainsboro; 
+    border-radius: 20px;
+    font-weight: 900;
+    height: 40px;
+}
+.customoverlay {
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+.customoverlay .title {
+    font-size: 14px;
+    font-weight: bold;
+}
+</style>
+<div class="container">
+  <div class="trip-planner">
+      <!-- 여행 계획 헤더 섹션 -->
+      <div class="trip-header">
+        <!-- 여행 편집 폼 -->
+        <form action="{% url 'plan:days' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="city" value="{{new_trip.city}}">
+          <input type="hidden" name="trip" value="{{new_trip.id}}">
+          <h1 class="trip-title">{{new_trip.city}} 여행
+          <button type="submit" style="border: 0; background-color: transparent;" class="edit-option">편집</button></h1>
+        </form>
+        <!-- 여행 날짜 및 유형 표시 -->
+        <p class="trip-date">{{new_trip.start_date|date:"Y.m.d"}} ~ {{new_trip.end_date|date:"Y.m.d"}}</p>
+        <p class="trip-type">{{new_trip.who}} | {%for i in style%}{{i}}{%endfor%}</p>
+      </div>
+  
+      <!-- 메인 액션 버튼 -->
+      <div class="main-actions">
+        <button class="btn btn-primary">+ 일행과 함께 일정짜기</button>
+        <button class="btn btn-primary">% 셀프 패키지</button>
+      </div>
+  
+      <!-- 보조 액션 버튼 -->
+      <div class="secondary-actions">
+        <button class="btn btn-secondary">+ 항공편</button>
+        <button class="btn btn-secondary">+ 숙소</button>
+        <button class="btn btn-secondary">체크리스트</button>
+        <button class="btn btn-secondary">가계부</button>
+      </div>
+  
+      <!-- 카카오 지도 표시 영역 -->
+      <div id="map" style="width:500px;height:400px;"></div>
+      
+      <!-- 지도 데이터 (숨김 처리) -->
+      <div id="mapx" style="display: none;">
+        {% for i in tour_spots %}
+          {{i.id}}:{{ i.map_x }},
+        {% endfor %}
+      </div>
+      <div id="mapy" style="display: none;">
+        {% for i in tour_spots %}
+          {{i.id}}:{{ i.map_y }},
+        {% endfor %}
+      </div>
+      <div id="name" style="display: none;">
+        {% for i in tour_spots %}
+          {{i.id}}:{{ i.title }},
+        {% endfor %}
+      </div>
+  
+      <!-- 카카오 지도 API 스크립트 -->
+      <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_API_KEY }}"></script>
+      
+      <!-- 일별 계획 섹션 -->
+      {% for day,origin in days %}
+      <div class="day-planner" data-date="{{origin}}">
+        <!-- 일자 헤더 -->
+        <div class="day-header">
+          <h2 class="day-title">day {{ forloop.counter}}</h2>
+          <p class="day-date">{{day}}</p>
+        </div>
+        
+        <!-- 장소 목록 컨테이너 -->
+        <div id="spot-container">
+          {% for i in plan %}
+            {% if i.day|date:'Y-m-d' == origin %}
+              {% if i.spot %}
+              <!-- 관광 장소 항목 -->
+              <div class="d-flex align-items-center">
+              <div class="spot-counter" style="display: flex; width: 36px; height: 36px; background-color: slateblue; border: 1px; border-radius: 50%; color: white; align-items: center; justify-content: center; margin-right: 30px;">
+              </div>
+              <div id="{{i.id}}" class="mb-2 place" data-xy="{{i.spot.map_x}},{{i.spot.map_y}},{{i.spot.title}}" style="border: 1px #E2E2E2 solid; width: 460px; height: 80px; display: flex; align-items: center;">
+                <div id="add_spot" class="mt-1">
+                    <div id="{{i.spot.id}}" class="spot_id" style="font-weight: bold; font-size: 20px;">{{i.spot.title}}</div>
+                    <p>관광명소·{{i.spot.address}}</p> 
+                </div>
+                <button class="del_btn ms-auto" style="border: none; background-color: white;" onclick="del_btn(this)">X</button>
+              </div>
+              </div>
+              {% endif %}
+  
+              {% if i.memo %}
+              <!-- 메모 항목 -->
+              <div class="d-flex align-items-center">
+                <div id="{{i.id}}" class="mb-2" style="border: 1px #E2E2E2 solid; width: 460px; height: 80px; display: flex; align-items: center;">
+                  <div class="mt-1">
+                      <div style="font-weight: bold; font-size: 20px;">{{i.spot.title}}</div>
+                      <p>{{i.memo}}</p> 
+                  </div>
+                  <button class="del_btn ms-auto" style="border: none; background-color: white;" onclick="del_btn(this)">X</button>
+                </div>
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+  
+        <!-- 일자별 액션 버튼 -->
+        <div class="day-actions">
+          <button class="btn btn-secondary btn-open-modal" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="addDay('{{origin}}')">장소 추가</button>
+          <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#memo" onclick="addDay('{{origin}}')">메모 추가</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="memo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="memo_form" action="{% url 'plan:add_memo' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-body">
+          <textarea name="memo" id="" style="width: 100%; height: 400px;" placeholder="잊기 쉬운 정보들을 메모해보세요."></textarea>
+        </div>
+        <div class="modal-footer">
+          <div id="check-day">
+          
+          </div>
+          <input type="hidden" name="trip" value="{{new_trip.id}}">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">추천 관광지</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="removeDay()"></button>
+      </div>
+      
+        
+        <div class="modal-body">
+          <input type="hidden" name="trip" value="{{new_trip.id}}">
+          <div id="check-spot" class="d-flex">
+            
+          </div>
+          <p>
+            {% for spot in tour_spots %}
+            <div class="d-flex" id="modal-{{spot.id}}">
+              <img src="{{spot.image_url}}" alt="" style="height: 50px; width: 50px;">
+              {{spot.title}}
+              <button type="button" class="btn ms-auto spot_btn" data-content-id="{{spot.content_id}}" onclick="addSpot('{{spot.image_url}}', '{{spot.title}}', '{{spot.content_id}}')">선택</button>
+            </div>
+            {% endfor %}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="removeDay()">Close</button>
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="addPlan()">Save changes</button>
+        </div>
+  
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script defer>
+
+  // 여행지 추가 함수
+  function addSpot(imageUrl, title, contentId) {
+      const checkSpot = document.getElementById('check-spot');
+      if (document.querySelector(`#check-spot input[value="${contentId}"]`)) {
+          alert('이미 선택된 여행지입니다')
+      } else {
+          // 새로운 여행지 요소 생성 및 추가
+          const spotElement = document.createElement('div');
+          spotElement.classList.add('d-flex', 'align-items-center', 'mb-2');
+          spotElement.innerHTML = `
+              <img src="${imageUrl}" alt="" style="height: 30px; width: 30px;">
+              <button type="button" class="btn-close" style='width:10px; height:10px' onclick="removeSpot(this)"></button>
+              <input type="hidden" name="add_spot" value="${contentId}">
+          `;
+          spotElement.setAttribute('data-content-id', contentId);
+          checkSpot.appendChild(spotElement);
+      }
+  }
+
+  // 여행지 제거 함수
+  function removeSpot(button) {
+      const spotElement = button.parentElement;
+      spotElement.remove();
+  }
+
+  // 날짜 추가 함수
+  function addDay(day){
+      const checkDay = document.getElementById('check-day');
+      checkDay.innerHTML = '';
+      const dayElement = document.createElement('div');
+      dayElement.id='day';
+      dayElement.innerHTML=`
+      <input type="hidden" name="add_day" value="${day}">
+      `
+      checkDay.appendChild(dayElement);
+      console.log(1)
+      
+      // 이미 추가된 여행지 제거
+      addSpotList=document.querySelectorAll('#spot-container .spot_id')
+      addSpotList.forEach(spot => {
+          console.log(spot.id)
+          aa = document.getElementById(`modal-${spot.id}`);
+          console.log(aa)
+          if(aa){
+              aa.remove();
+          }
+      })  
+  }
+
+  // 날짜 제거 함수
+  function removeDay() {
+      const dayElement = document.getElementById('day');
+      dayElement.remove();
+      const check_spot_remove = document.getElementById('check-spot')
+      check_spot_remove.innerHTML=''
+      console.log('close')
+  }
+
+  // 계획 추가 함수 (비동기)
+  async function addPlan(){
+      console.log(12);
+      const day = document.querySelector('input[name="add_day"]');
+      
+      const dayValue = day ? day.value : null;
+      const spot = document.querySelectorAll('input[name="add_spot"]');
+      
+      const spotValues = Array.from(spot).map(spot => spot.value);
+      const trip = '{{new_trip.id}}'
+      const baseUrl ='{% url "plan:add_plan" %}?ajax=true&day='+dayValue + '&trip_id=' + trip +'&spot_content='+spotValues;
+      response = await fetch(baseUrl)
+      if(response.ok){
+          window.location.reload();
+      }
+  }
+
+  // 계획 삭제 함수 (비동기)
+  async function del_btn(event) {
+      const boxToRemove = event.closest('.mb-2');
+      if (boxToRemove) {
+          dayPlan_id = boxToRemove.id
+          const trip = '{{new_trip.id}}'
+          const baseUrl ='{% url "plan:del_plan" %}?ajax=true'+'&trip_id=' + trip + '&dayPlan_id=' + dayPlan_id;
+          response = await fetch(baseUrl)
+          if (response.ok){
+              boxToRemove.remove();
+              window.location.reload();
+          }
+      }
+  };
+</script>
+
+<script>
+  // 마커 이미지 생성 함수
+  function createMarkerImage(number) {
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      canvas.width = 36;
+      canvas.height = 36;
+
+      // 원 그리기
+      context.beginPath();
+      context.arc(18, 18, 18, 0, 2 * Math.PI);
+      context.fillStyle = 'slateblue';
+      context.fill();
+
+      // 텍스트 추가
+      context.font = 'bold 14px Arial';
+      context.fillStyle = 'white';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(number, 18, 18);
+
+      return canvas.toDataURL();
+  }
+
+  // 카카오맵 초기화
+  var container = document.getElementById('map');
+  var options = {
+      center: new kakao.maps.LatLng( 37.715133, 126.734086),
+      level: 13
+  };
+
+  var map_xy = new Array();
+  var list_name = new Array();
+  
+  // 지도에 표시할 장소 데이터 수집
+  document.querySelectorAll('.place').forEach(xy => {
+      console.log(xy.dataset['xy'].split(','))
+      map_xy.push(xy.dataset['xy'].split(','))
+  })
+  console.log(map_xy)
+  
+  var map = new kakao.maps.Map(container, options);
+  // 지도에 교통정보를 표시
+  map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);   
+
+  var xy = new Array();
+
+  // 마커 생성 및 표시
+  for(var idx=0; idx<map_xy.length; idx++){
+      var x = map_xy[idx][0];
+      var y = map_xy[idx][1];
+      xy.push(new kakao.maps.LatLng(y,x));
+  }
+
+  for(var idx=0; idx<xy.length; idx++){
+      var markerImage = new kakao.maps.MarkerImage(
+          createMarkerImage(idx + 1),
+          new kakao.maps.Size(36, 36),
+          {offset: new kakao.maps.Point(18, 18)}
+      );
+      var marker = new kakao.maps.Marker({
+          map: map,
+          position: xy[idx],
+          title: map_xy[idx][2],
+          image: markerImage,
+      })
+  }
+  
+  // 카카오 네비게이션 API를 사용한 경로 표시 함수
+  async function getCarDirection() {
+      const REST_API_KEY = '{{REST_API_KEY}}';
+      const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+      for(var idx=0; idx<map_xy.length-1; idx++){
+          const origin = `${map_xy[idx][0]},${map_xy[idx][1]}`
+          const destination = `${map_xy[idx+1][0]},${map_xy[idx+1][1]}`
+          // 요청 헤더 설정
+          const headers = {
+              Authorization: `KakaoAK ${REST_API_KEY}`,
+              'Content-Type': 'application/json'
+          };
+          // 요청 파라미터 설정
+          const queryParams = new URLSearchParams({
+              origin: origin,
+              destination: destination
+          });
+          const requestUrl = `${url}?${queryParams}`;
+          console.log(requestUrl)
+          try {
+              const response = await fetch(requestUrl, {
+                  method: 'GET',
+                  headers: headers
+              });
+
+              if (!response.ok) {
+                  throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+
+              const data = await response.json();
+              console.log(data)
+
+              // 경로 좌표 추출 및 폴리라인 생성
+              const linePath = [];
+              data.routes[0].sections[0].roads.forEach(router => {
+                  router.vertexes.forEach((vertex, index) => {
+                      if (index % 2 === 0) {
+                          linePath.push(new kakao.maps.LatLng(router.vertexes[index + 1], router.vertexes[index]));
+                      }
+                  });
+              });
+              var polyline = new kakao.maps.Polyline({
+                  path: linePath,
+                  strokeWeight: 5,
+                  strokeColor: '#000000',
+                  strokeOpacity: 0.7,
+                  strokeStyle: 'solid'
+              }); 
+              polyline.setMap(map);
+
+              // 경로 길이 계산 및 표시
+              var lengthInMeters = polyline.getLength();
+              var lengthInKm = (lengthInMeters / 1000).toFixed(2);
+          
+              console.log("길이: " + lengthInMeters.toFixed(2) + " 미터");
+              console.log("길이: " + lengthInKm + " 킬로미터");
+
+              // 경로의 중간 지점에 거리 정보 표시
+              var middleIndex = Math.floor(linePath.length / 2);
+              var middlePosition = linePath[middleIndex];
+
+              var content = '<div class="customoverlay">' +
+                          '  <span class="title">' + lengthInKm + ' km</span>' +
+                          '</div>';
+
+              var customOverlay = new kakao.maps.CustomOverlay({
+                  map: map,
+                  position: middlePosition,
+                  content: content,
+                  yAnchor: 1 
+              });
+          } catch (error) {
+              console.error('Error:', error);
+          }
+      }
+  }
+  
+  getCarDirection();
+  
+  marker.setMap(map);
+</script>
+
+<script>
+  // 메모 추가 폼 제출 이벤트 리스너
+  document.getElementById('memo_form').addEventListener('submit', async function(e) {
+      e.preventDefault();  // 기본 폼 제출 동작 방지
+
+      const formData = new FormData(this);
+      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      const response = await fetch("{% url 'plan:add_memo' %}", {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrftoken
+          }
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }else{
+          // 성공 시 페이지 새로고침
+          window.location.reload();
+      }
+  });
+</script>
+
+<script>
+  // 페이지 로드 시 여행지 번호 매기기
+  document.addEventListener('DOMContentLoaded', function() {
+      let counter = 1;
+      document.querySelectorAll('.spot-counter').forEach(function(el) {
+          el.textContent = counter++;
+      });
+  });
+</script>
+{% endblock %}
