@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'customer_service/inquiry_detial.css' %}">
+    
+{% endblock %}
+{% block content %}
+<div class="inquiry-detail-container">
+    <div class="inquiry-header">
+        <h2 class="inquiry-title">{{ faq.faq_title }}</h2>
+    </div>
+    <div class="inquiry-body">
+        <p>{{ faq.faq_answer|linebreaksbr }}</p>
+    </div>
+
+</div>
+{% endblock %}
