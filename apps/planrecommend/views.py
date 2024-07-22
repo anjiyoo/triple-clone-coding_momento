@@ -31,10 +31,11 @@ class SelectWhoListView(View):
     template_name = 'select_who.html'
 
     def get(self, request, *args, **kwargs):
-        counties = County.objects.all()
-        dates = TripDate.objects.all() 
-        whose = TripWho.objects.all() 
-        context = {'counties': counties, 'whose': whose} 
+        context = {
+            'counties': County.objects.all(),
+            'dates': TripDate.objects.all(),
+            'whose': TripWho.objects.all() 
+        } 
         return render(request, self.template_name, context)
 
 # style
@@ -42,11 +43,12 @@ class SelectStyleListView(View):
     template_name = 'select_style.html'
 
     def get(self, request, *args, **kwargs):
-        counties = County.objects.all()
-        dates = TripDate.objects.all() 
-        whose = TripWho.objects.all() 
-        styles = TripStyle.objects.all() 
-        context = {'counties': counties, 'styles': styles} 
+        context = {
+            'counties': County.objects.all(),
+            'dates': TripDate.objects.all(),
+            'whose': TripWho.objects.all(),
+            'styles': TripStyle.objects.all() 
+        } 
         return render(request, self.template_name, context)
     
 # plan
@@ -54,10 +56,11 @@ class SelectPlanListView(View):
     template_name = 'select_plan.html'
 
     def get(self, request, *args, **kwargs):
-        counties = County.objects.all()
-        dates = TripDate.objects.all() 
-        whose = TripWho.objects.all() 
-        styles = TripStyle.objects.all() 
-        plans = TripPlan.objects.all() 
-        context = {'counties': counties, 'plans': plans} 
+        context = {
+            'counties': County.objects.all(),
+            'dates': TripDate.objects.all(),
+            'whose': TripWho.objects.all(),
+            'styles': TripStyle.objects.all(), 
+            'plans': TripPlan.objects.all() 
+        } 
         return render(request, self.template_name, context)
