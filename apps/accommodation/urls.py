@@ -12,7 +12,7 @@ urlpatterns = [
     path('detail/<int:accommodation_pk>/room/<int:room_pk>/', RoomDetailView.as_view(), name='room_detail'),
     path('detail/<int:pk>/map/', my_view, name='map'),
     path('reservation/<int:accommodation_pk>/room/<int:room_pk>/', make_reservation, name='create_reservation'),
-    path('reservation/success/', reservation_success, name='reservation_success'),
+    path('reservation/success/<int:reservation_id>/', reservation_success, name='reservation_success'),
     path('detail/<int:pk>/create_review/', CreateReview.as_view(), name='create_review'),
     path('detail/<int:accommodation_pk>/review/<int:review_pk>/', ReviewDetailView.as_view(), name='review_detail'),
     path('detail/<int:accommodation_pk>/review/<int:review_pk>/update/', UpdateReview.as_view(), name='update_review'),
@@ -24,9 +24,6 @@ urlpatterns = [
     path('detail/<int:accommodation_pk>/like/', like_accommodation, name='like_accommodation'),
     path('detail/<int:accommodation_pk>/unlike/', unlike_accommodation, name='unlike_accommodation'),
     path('search_accommodations/', search_accommodations, name='search_accommodations'),
-    # path('api/check_availability/', CheckAvailabilityAPI.as_view(), name='check_availability'),
-    # path('search/', search_accommodations, name='accommodation_search'),
-
     
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

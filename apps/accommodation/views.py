@@ -91,7 +91,7 @@ def reservation_success(request):
     return render(request, 'accommodation/reservation_success.html')
 
 
-@method_decorator(login_required, name='dispatch')
+@login_required
 def make_reservation(request, accommodation_pk, room_pk):
 
     if request.method == 'POST':
@@ -129,7 +129,7 @@ def make_reservation(request, accommodation_pk, room_pk):
                 pass
             reservation.save()
 
-            return redirect('accommodation:reservation_success')  # Redirect to a success page
+            return redirect('accommodation/reservation_success.html', reservation_id=reservation.id)  # Redirect to a success page
         else:
              # 폼 유효성 검사 실패 시 오류 메시지 출력
             print("Reservation Form Errors:", reservation_form.errors)
@@ -635,3 +635,13 @@ def check_availability(accommodation_id, start_date, end_date, room_pk):
         return False  # 예약 불가능: 이미 예약된 객실이 있는 경우
     else:
         return True   # 예약 가능: 예약된 객실이 없는 경우
+    
+
+def reservation_success(request, reservation_id):
+    # 예약 정보를 데이터베이스에서 가져옵니다.
+    # 예시로, reservation_id를 사용하여 예약 정보를 조회한다고 가정합니다.
+    reservation = get_object_or_404(Reservation, pk=reservation_id)
+    
+    # 예약 정보를 템플릿에 전달합니다.
+    context = {'reservation': reservation}
+    return render(request, 'accommodation/reservation_success.html', context)

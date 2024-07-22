@@ -68,6 +68,9 @@ class GuestInfo(models.Model):
     birth_date = models.DateField()
     gender = models.CharField(max_length=10, choices=(('male', '남성'), ('female', '여성')))
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 # 예약 페이지에서 작성할 교통편 정보 모델
 class TransportationInfo(models.Model):

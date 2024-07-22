@@ -4,9 +4,25 @@
 {% block title %}Reservation Success{% endblock %}
 
 {% block content %}
+<style>
+        .container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+        }
+</style>
 
-<h1>Reservation Successful!</h1>
-<p>Your reservation has been successfully completed.</p>
-<a href="{% url 'accommodation:accommodation_home' %}">Go back to home</a>
-
+<h1>예약이 성공적으로 완료되었습니다!</h1>
+<div class="container mt-4">
+    <p>예약 상세</p>
+    <ul>
+        <li>체크인 {{ reservation.check_in|date:"Y-m-d" }}</li>
+        <li>체크아웃 {{ reservation.check_out|date:"Y-m-d" }}</li>
+        <li>Guests: {{ reservation.guest_info.name }}</li>
+    </ul>
+    <a href="{% url 'accommodation:accommodation_home' %}">Go back to home</a>
+</div>
 {% endblock %}
