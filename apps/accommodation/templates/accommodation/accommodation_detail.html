@@ -1,0 +1,1061 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+{% block title %}{{ accommodation.name }} 상세 페이지 {% endblock %}
+{% block content %}
+  
+    <style>
+        .container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+        }
+        .image-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+        }
+        #image-container {
+            position: relative;
+            width: 100%;
+            height: 66.67vh; /* 화면 높이의 2/3 */
+            overflow: hidden;
+        }
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .overlay-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            /* color: black; */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #prev-button {
+            left: 10px;
+        }
+        #next-button {
+            right: 10px;
+        }
+        .star-rating {
+            display: inline-block;
+            font-size: 0;
+           
+        }
+        .star-rating .star {
+            font-size: 20px;
+            color: #ddd; 
+        }
+        .star-rating .star.filled {
+            color: #f5c518; 
+        }
+        .like-container {
+            display: flex;
+            align-items: center;
+           
+        }
+        .like-container .like-count {
+            margin-left: 5px; /* 아이콘과 숫자 사이의 간격 */
+        }
+        .custom-button {
+            background-color: white;
+            border: 1px solid gray;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 2px;
+        }
+        .custom-button:hover {
+            background-color: #f0f0f0; /* 호버 시 약간 어두운 색 */
+        }
+        .custom-button:active,
+        .custom-button:focus {
+            outline: none; /* 눌렀을 때 아웃라인 없애기 */
+            box-shadow: none; /* 눌렀을 때 그림자 없애기 */
+            background-color: white; /* 눌렀을 때 배경색 유지 */
+        }
+        .button-container {
+            margin-left: 50px; /* 컨테이너에 왼쪽 여백 추가 */
+        }
+
+        .button-container .custom-button + .custom-button {
+            margin-left: 5px; /* 두 버튼 사이의 간격 */
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }ㅣ
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 0;
+            margin: 0 5px;
+        }
+
+        .icon-button:focus {
+            outline: none;
+        } 
+        /* 모달 스타일 */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .horizontal-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .horizontal-input-group button {
+            margin: 0 5px;
+        }
+
+        .horizontal-input-group input {
+            margin: 0 5px;
+            width: 50px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            padding: 0
+        }
+        .counter {
+            display: flex;
+            align-items: center;
+            margin-left: 90px; 
+        }
+        .room-item {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* 이미지가 맨 오른쪽에 위치하도록 설정 */
+            margin-bottom: 20px;
+        }
+
+        .room-details {
+            flex:1;
+        }
+     
+        .room-header {
+            display: flex;
+            align-items: center;
+        }
+        .room-name {
+            margin-right: 20px; /* h3 요소와 이미지 사이의 간격 */
+        }
+        .room-capacity {
+        margin-right: 20px; /* 최대 인원 정보와 이미지 사이의 간격 */
+        }
+        .room-info-card {
+            position: relative;
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            margin-bottom: 20px;
+            padding-top: 30px;
+
+        }
+
+        .room-info-card h3 {
+            margin: 0;
+            padding-bottom: 10px;
+        }
+
+        .room-info-card p {
+            margin: 0;
+            padding-bottom: 10px;
+
+        }
+
+        .room-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            position: absolute;
+            top:10px;
+            right: 45px;
+
+        }
+        .room-card {
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            margin-top: 10px;
+            margin-right: 40px;
+            position: relative;
+        }
+        .select-button {
+            position: absolute;
+            right: 20px; /* 오른쪽 끝에서 20px 떨어진 위치 */
+            bottom: 20px; /* 아래쪽 끝에서 20px 떨어진 위치 */
+            width: 100px;
+
+        }
+        .card {
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-right: 40px;
+            position: relative;
+        }
+        #lowest_price:hover {
+            color: gray;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .center-button button {
+            background-color: #ffffff; /* 파란색 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .center-button button:hover {
+            background-color: #0056b3; /* 호버 시 더 진한 파란색 */
+        }
+        .select-button:hover {
+            background-color: #0056b3; /* 호버 시 더 진한 파란색 */
+        }
+        #image-container {
+            position: relative;
+            width: 100%;
+            height: 66.67vh; /* 화면 높이의 2/3 */
+            overflow: hidden;
+        }
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .reviews-header {
+            display: flex;
+            align-items: center;
+        }
+        .reviews-header h5 {
+            margin-left: 30px;
+            font-weight: bold;
+        }
+        .reviews-header .reviews-count {
+            margin-left: 5px;
+            margin-bottom: 10px;
+            color:#007bff;
+            font-size: 20px;
+            font-weight: bold;
+
+        }
+        .star-ratingg {
+            font-size: 1em;
+            color: #f5b301;
+            margin: 20px 20px;
+        }
+        .dropdown-content {
+            width: 150px; /* 드롭다운 메뉴의 너비 조정 */
+            padding: 5px; /* 드롭다운 메뉴의 패딩 조정 */
+            box-shadow: none !important;
+            border: gray !important;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            box-shadow: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+            box-shadow: none;
+        }
+        .custom-dropdown-button {
+            background-color: white; /* 버튼 배경색 변경 */
+            color: gray; /* 버튼 텍스트 색상 변경 */
+            border: none; /* 버튼 테두리 제거 */
+            border-radius: 4px; /* 버튼 모서리 둥글게 */
+            padding: 5px 15px; /* 버튼 패딩 조정 */
+            font-size: 15px; /* 버튼 폰트 크기 조정 */
+            cursor: pointer; /* 커서 모양 변경 */
+            transition: background-color 0.3s ease; /* 배경색 전환 효과 추가 */
+            margin-left:5px;
+}
+
+        .custom-dropdown-button:hover {
+            background-color: #b0b0b1; /* 버튼 호버 시 배경색 변경 */
+        }
+        .custom-dropdown-button:active {
+        background-color: white; /* 버튼 눌렀을 때 배경색 변경 */
+        }
+
+        .custom-dropdown-button i {
+            margin-right: 5px; /* 아이콘과 텍스트 사이 간격 조정 */
+        }
+        .heart {
+        color: black; /* 기본 하트 색 */
+        }
+        .heart-fill {
+            color: red; /* 좋아요 상태일 때 하트 색 */
+ 
+        }
+        .button-save {
+            background-color: white; /* 기본 버튼 배경 */
+            padding: 5px 10px; /* 버튼 패딩 */
+            cursor: pointer;
+        }
+        .button-cancel {
+            color: black; /* 텍스트 색 */
+        }
+    </style>
+</head>
+
+    <div class="container mt-4">
+        
+        <div style="display: flex; justify-content: center; align-items: center;">
+
+            <div id="roomImagesCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" id="image-container">
+                    {% for image in images %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{MEDIA_URL}}{{ image.images }}" class="d-block w-100" alt="Accommodaiton Image">
+                        </div>
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#roomImagesCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#roomImagesCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 숙소 이름 -->
+        <h1 style="margin-left: 70px; margin-top: 30px; font-weight: bold;">{{ accommodation.name }}</h1>
+
+        <!-- 저장 수 -->
+        <div style="display: flex; align-items: center; margin-left: 70px;">
+            
+                <div class="like-container">
+                    <i class="bi bi-heart-fill"style="color: red;"></i>
+                    <span class="like-count">{{ likes_count }}</span>
+                </div>
+        
+
+        <!-- 별점 -->
+        <div style="display: flex; align-items: center; margin-right: 10px;margin-left: 10px">
+
+            <div class="star-rating" id="star-rating" style="margin-right: 10px;">
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+            <span class="star"><i class="fas fa-star"></i></span>
+        </div>
+    
+        <!-- 리뷰 수  -->
+        <p style= "margin-top: 15px;">{{ reviews_count }}</p>
+        
+        <a  style="margin-left: 8px; color: blue; text-decoration: none;" onclick="scrollToReviews()">리뷰 보기 ></a>
+
+        <!-- 리뷰 끝 -->
+    </div>
+    </div>
+    <div style="display: flex; align-items: center; margin-left:70px">
+        <i class="bi bi-geo-alt-fill"></i>
+        <p style="margin-left: 10px; margin-top: 15px;">{{ accommodation.city.city_name }}</p>
+        <a href="{% url 'accommodation:map' pk=accommodation.pk %}" style="margin-left: 8px; color: blue;text-decoration: none;">지도 보기 ></a>
+    </div>
+
+    <!-- 구분선 -->
+    <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+
+    <!-- 버튼들 -->
+    <div class="d-flex justify-content-center"  style="display: flex; justify-content: center; gap: 150px;">
+        <div style="text-align: center;">
+            <i class="bi bi-heart {% if is_liked %}heart-fill{% else %}heart{% endif %}" id="save-button" style="display: block; font-size: 24px; cursor: pointer;"></i>
+            <span id="save-text" class="{% if is_liked %}button-cancel{% else %}button-save{% endif %}">
+                {% if is_liked %}저장취소{% else %}저장하기{% endif %}
+            </span>
+        </div>
+
+        <div style="text-align: center;">
+            <i class="bi bi-calendar-plus" style="display: block; font-size: 24px;"></i>
+            <span>일정추가</span>
+        </div>
+
+            <a href="{% url 'accommodation:create_review' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                <div style="text-align: center;">
+                    <i class="bi bi-star" style="display: block; font-size: 24px;"></i>
+                    <span>리뷰 쓰기</span>
+                </div>
+            </a>
+
+    </div>
+
+    <!-- 구분선 -->
+
+    {% if min_price %}
+    <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
+
+    <!-- 최저가 예약 / 객실 중 제일 싼 가격 띄우기 -->
+    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 40px; margin-bottom: 40px;">최저가 예약</h2>
+
+        {% csrf_token %}
+        <div style="text-align: center;">
+                <input type="text" 
+                       name="datefilter" 
+                       class="daterange" 
+                       style="margin-left: 50px; height: 38px; text-align: center; font-size: 16px;"  
+                       placeholder="날짜 선택"/> 
+                   
+
+                 <input type="text" 
+                       name="guestcount" 
+                       class="guestcount" 
+                       style="margin-left: 10px; height: 38px; text-align: center; font-size: 16px; width: 200px;"  
+                       placeholder="성인 2" readonly onclick="openGuestModal()"/>           
+            </div>
+   
+             <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 70px;">
+                <div style="margin-left: 150px;">
+                    <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                    <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>                
+                </div>  
+                <!-- <p id="lowest_price" style="font-size: 24px; font-weight: bold; text-align: right; margin-right: 90px;">{{ min_price|floatformat:0 }}원 ></p> -->
+                <p id="lowest_price" 
+                    style="font-size: 24px; font-weight: bold; text-align: right; margin-right: 90px; cursor: pointer;" 
+                    data-cheapest-room-id="{{ min_price_room_id }}"
+                    onclick="scrollToRoom()">
+                    {{ min_price|floatformat:0|intcomma }}원 >
+                </p>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+
+{% endif %}
+           
+    
+        <!-- 모달 창 -->
+        <div style="text-align: center;">
+            <div id="guestModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeGuestModal()">&times;</span>
+                    <h2 style = "margin-left: 30px">인원 선택</h2>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+                <div class="horizontal-input-group">
+                        <label for="adultCount" style="font-size: 18px; font-weight: bold;">성인</label>
+                        <div class="counter">
+                 
+                                <button class="icon-button" onclick="decreaseCount('adultCount')"><i class="bi bi-dash"></i></button>
+                                <input type="number" id="adultCount" min="1" value="2" readonly>
+                                <button class="icon-button" onclick="increaseCount('adultCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                <br>
+
+                <div class="horizontal-input-group">
+                    <label for="childCount" style="font-size: 18px; font-weight: bold;">아동</label>
+                         <div class="counter">
+                            <button class="icon-button" onclick="decreaseCount('childCount')"><i class="bi bi-dash"></i></button>
+                            <input type="number" id="childCount" min="0" value="0" readonly>
+                            <button class="icon-button" onclick="increaseCount('childCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                </div>
+                <br>
+            
+
+            <!-- 구분선 -->
+
+
+            <div class="center-button">
+                <button onclick="applyGuestCount()">선택 완료</button>
+            </div>
+        </div>  
+        </div>
+    </div>
+    <!-- </div> -->
+<!-- </div> -->
+
+
+    <!-- 구분선 -->
+    <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
+
+
+    <h2 style="font-weight: bold; margin-left: 50px; margin-top: 60px;">객실 목록</h2>
+
+    <div class="button-container">
+        <button id="includeBreakfastRoomsBtn" class="custom-button">조식 포함</button>
+        <button id="freeCancellationRoomsBtn" class="custom-button">무료 취소</button>
+    </div>
+    
+    <!-- 객실 목록 -->
+    <div id="rooms">
+        <div id="roomsList" style="margin-left: 50px;">
+            {% if accommodation.rooms.all %}
+                {% for room in accommodation.rooms.all %}
+                    <div id="room-{{ room.id }}" class="room">
+                        <div class="room-item" data-free-cancellation="{{ room.is_free_cancellation }}" data-include-breakfast="{{ room.includes_breakfast }}">
+                            <div class="room-details">
+                                <div class="room-info-card">
+                                    <h3>{{ room.name }}</h3>
+                                    <p>
+                                        <i class="bi bi-person"></i> 최대 {{ room.capacity }}인
+                                    </p>
+                                    <p class="partial-cancellation" style="display: none; color: rgb(0, 113, 218);">
+                                        부분 환불
+                                    </p>
+                                    
+                                    {% if room_images %}
+                                        {% for image in room_images %}
+                                            <img src="{{MEDIA_URL}}{{image.images}}" alt="{{ room.name }}" class="room-image">
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+    
+                                <div class="room-card">
+                                    <p>
+                                        <i class="bi bi-person"></i> 2인 기준/ 최대 {{ room.capacity }}인
+                                    </p>
+                                    <p style="font-size: 1.5em; font-weight: bold;">
+                                        {{ room.price|floatformat:0| intcomma}}원
+                                    </p>
+                                    <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}" class="btn btn-primary mt-4 select-button">선택</a>
+                                </div>
+                                <hr class="breakfastRoomsSeparator" style="border: 0; border-top: 1px solid #ccc; margin: 20px 0;">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card" style=" text-align:center; margin-bottom: 50px; margin-top: 30px;">
+                    <p>현재 예약 가능한 방이 없습니다.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div id="noBothConditionsRoomsMessage" class="card" style="display:none; text-align:center; margin-bottom: 50px;">
+        조식 포함, 무료 취소 가능한 숙소가 없습니다.
+    </div>
+
+    <div id="noBreakfastRoomsMessage" class="card" style="display: none; text-align:center;  margin-bottom: 50px;">
+        <p>조식 포함된 객실이 없습니다.</p>
+    </div>
+
+        
+    <div id="noFreeCancellationRoomsMessage" class="card" style="display: none; text-align:center; margin-bottom: 50px;">
+        <p>무료 취소 가능한 숙소가 없습니다.</p>
+    </div>
+
+
+</div>
+<!-- <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;"> -->
+
+<div class="container">
+    <div class="reviews-header"  id="reviewsSection">
+        <h5>리뷰</h5>
+        <span class="reviews-count">{{ reviews_count }}</span>
+    </div>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <a  href="{% url 'accommodation:review_detail' accommodation_pk=accommodation.pk review_pk=review.pk %}">
+                <li style="list-style: none; margin-bottom: 20px;">
+                    <div style="border: 1px solid #e7e7e7; border-radius: 10px; padding: 15px; box-shadow: none; border: none; position: relative;">
+                        <div style="display: flex; align-items: center;">
+                            <img src="{{ MEDIA_URL }}{{ review.user.profile }}" alt="{{ review.user.username }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+                            <div>
+                                <p style="margin: 0; font-size: 15px; font-weight: bold;">{{ review.user.username }}</p>
+                                <p style="margin: 0; font-size: 0.8em; color: #909090;">{{ review.user.review_set.count }}개의 리뷰</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                            <div class="star-ratingg">
+                                {% for i in "12345" %}
+                                    {% if i|add:0 <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if review.travel_date %}
+                                <div style="font-size: 1em; color: #909090;">
+                                    {{ review.travel_date }} 여행
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span>{{ review.content }}</span>
+                        </div>
+                        {% if review.image_url %}
+                            <div style="margin-top: 10px;">
+                                <img src="{{ MEDIA_URL }}{{ review.image_url }}" alt="Review Image" style="max-width: 100%; border-radius: 10px;">
+                            </div>
+                        </a>
+                        {% endif %}
+                        <div style="position: absolute; right: 15px; font-size: 0.8em; color: #909090; margin-right:30px; margin-top:10px;">
+                            {{ review.created_at }}
+                            <div class="dropdown" style="display: inline-block; position: relative;">
+                                <button class="btn btn-secondary dropdown-toggle custom-dropdown-button" type="button" id="dropdownMenuButton" aria-expanded="false" onclick="toggleMenu(this)">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <div class="dropdown-content" style="display: none; position: absolute; right: 0; background-color: white; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;">
+                                    {% if user == review.user %}
+                                        <a href="{% url 'accommodation:update_review' accommodation_pk=accommodation.pk review_pk=review.pk %}">수정하기</a>
+                                        <a onclick="deleteReview({{ review.pk }}, {{ accommodation.pk }})">삭제하기</a>
+                                    {% else %}
+                                        <a href="#" onclick="reportReview({{ review.id }})">신고하기</a>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+    <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 20px;">
+
+                </li>
+
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="text-align: center; margin: 20px 0 font-weight: bold;">아직 작성된 리뷰가 없습니다. </p>
+    {% endif %}
+</div>
+
+ <!-- jQuery 라이브러리 로드 -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <!-- Moment.js 및 DateRangePicker 라이브러리 로드 -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    
+    function deleteReview(reviewId, accommodationId) {
+        if (confirm("정말로 이 리뷰를 삭제하시겠습니까?")) {
+            fetch(`/accommodation/detail/${accommodationId}/review/${reviewId}/delete/`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("리뷰 삭제에 실패했습니다.");
+                }
+            });
+        }
+    }
+    function scrollToReviews() {
+        var reviewsSection = document.getElementById("reviewsSection");
+        reviewsSection.scrollIntoView({ behavior: "smooth" });
+    }
+    // 최저가 방으로 스크롤
+    function scrollToRoom() {
+            var roomId = document.getElementById('lowest_price').getAttribute('data-cheapest-room-id');
+            var roomElement = document.getElementById('room-' + roomId);
+            if (roomElement) {
+                roomElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    function toggleMenu(button) {
+        var dropdownContent = button.nextElementSibling;
+        if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
+            dropdownContent.style.display = "block";
+        } else {
+            dropdownContent.style.display = "none";
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
+
+            const starRating = document.getElementById('star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
+                } else {
+                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
+                }
+            }
+        });
+        
+        
+    
+    $(document).ready(function() {
+        var startDate = moment();
+        var endDate = moment().add(1, 'days');
+
+    $('input[name="datefilter"]').daterangepicker({
+        autoUpdateInput: false,
+        minDate: moment(),
+        startDate: startDate,
+        endDate: endDate,
+        locale: {
+            format: 'MM.DD',
+            cancelLabel: 'Clear'
+        }
+    });
+
+
+    $('input[name="datefilter"]').val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+    $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+        $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+        $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+
+         // 선택한 날짜 서버로 전송
+        var start_date = picker.startDate.format('YYYY-MM-DD');
+        var end_date = picker.endDate.format('YYYY-MM-DD');
+        checkAvailability(start_date, end_date);
+    });
+
+    $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+        $('#check_in').val('');
+        $('#check_out').val('');
+    });
+   
+
+    
+    
+    
+    // 게스트 수 모달
+    function openGuestModal() {
+            document.getElementById('guestModal').style.display = 'block';
+        }
+
+        function closeGuestModal() {
+            document.getElementById('guestModal').style.display = 'none';
+        }
+
+        function applyGuestCount() {
+            var adultCount = document.getElementById('adultCount').value;
+            var childCount = document.getElementById('childCount').value;
+            var guestCountInput = document.getElementsByName('guestcount')[0];
+            guestCountInput.value = '성인 ' + adultCount + ', 아동 ' + childCount;
+            closeGuestModal();
+        }
+
+        // 성인 및 아동 수 증가/감소
+        function increaseCount(id) {
+            var input = document.getElementById(id);
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseCount(id) {
+            var input = document.getElementById(id);
+            if (input.value > input.min) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        
+        // 버튼 클릭 이벤트 핸들러
+        $('#includeBreakfastRoomsBtn, #freeCancellationRoomsBtn').click(function() {
+            $(this).toggleClass('active');
+            updateRoomVisibility();
+            updateButtonStyle($(this));
+        });
+
+        // 버튼 스타일 업데이트 함수
+        function updateButtonStyle(button) {
+            if (button.hasClass('active')) {
+                button.css({
+                    'background-color': '#3F80E0',
+                    'color': '#FFFFFF',
+                    'border-color': '#3F80E0'
+                });
+            } else {
+                button.css({
+                    'background-color': '',
+                    'color': '',
+                    'border-color': ''
+                });
+            }
+        }
+
+        // 방 가시성 업데이트 함수
+        function updateRoomVisibility() {
+            var showBreakfast = $('#includeBreakfastRoomsBtn').hasClass('active');
+            var showFreeCancellation = $('#freeCancellationRoomsBtn').hasClass('active');
+
+            var hasBreakfastRooms = false;
+            var hasFreeCancellationRooms = false;
+            var hasBothConditionsRooms = false;
+
+            $('#roomsList .room-item').each(function() {
+                var isIncludeBreakfast = $(this).data('include-breakfast') === "True";
+                var isFreeCancellation = $(this).data('free-cancellation') === "True";
+
+                var showRoom = true;
+
+                if (showBreakfast && !isIncludeBreakfast) {
+                    showRoom = false;
+                }
+
+                if (showFreeCancellation && !isFreeCancellation) {
+                    showRoom = false;
+                }
+
+                if (showRoom) {
+                    $(this).show();
+                    if (isIncludeBreakfast) {
+                        hasBreakfastRooms = true;
+                    }
+                    if (isFreeCancellation) {
+                        hasFreeCancellationRooms = true;
+                    }
+                    if (isIncludeBreakfast && isFreeCancellation) {
+                        hasBothConditionsRooms = true;
+                    }
+                } else {
+                    $(this).hide();
+                }
+            });
+
+           
+            if (showBreakfast && showFreeCancellation && !hasBothConditionsRooms) {
+                $('#noBothConditionsRoomsMessage').show();
+                $('#noBreakfastRoomsMessage').hide();
+                $('#noFreeCancellationRoomsMessage').hide();
+            } else {
+                $('#noBothConditionsRoomsMessage').hide();
+                if (showBreakfast && !hasBreakfastRooms) {
+                    $('#noBreakfastRoomsMessage').show();
+                } else {
+                    $('#noBreakfastRoomsMessage').hide();
+                }
+                if (showFreeCancellation && !hasFreeCancellationRooms) {
+                    $('#noFreeCancellationRoomsMessage').show();
+                } else {
+                    $('#noFreeCancellationRoomsMessage').hide();
+                }
+            }
+                    }
+
+        // 이미지 전환 기능
+        var currentIndex = 0;
+        var images = [
+            {% for image in images %}
+                "{{ MEDIA_URL }}{{ image.images }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        function showImage(index) {
+            $('#image-container img').attr('src', images[index]);
+        }
+
+        $('#next-button').click(function() {
+            currentIndex = (currentIndex + 1) % images.length;
+            showImage(currentIndex);
+        });
+
+        $('#prev-button').click(function() {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            showImage(currentIndex);
+        });
+
+
+
+        // 부분 취소 문구 표시
+        const dateInput = $('input[name="datefilter"]');
+        const partialCancellationElements = document.querySelectorAll('.partial-cancellation');
+
+        dateInput.val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+        dateInput.on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+            $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+
+            const checkInDate = new Date(picker.startDate.format('YYYY-MM-DD'));
+            const today = new Date();
+            const timeDifference = checkInDate - today;
+            const dayDifference = timeDifference / (1000 * 3600 * 24);
+
+            if (dayDifference <= 3) {
+                partialCancellationElements.forEach(element => element.style.display = 'block');
+            } else {
+                partialCancellationElements.forEach(element => element.style.display = 'none');
+            }
+        });
+
+        dateInput.on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            $('#check_in').val('');
+            $('#check_out').val('');
+            partialCancellationElements.forEach(element => element.style.display = 'none');
+        });
+
+
+    document.getElementById('save-button').addEventListener('click', function() {
+        var isLiked = this.classList.contains('heart-fill');
+        var url = isLiked ? '/accommodation/detail/{{ accommodation.pk }}/unlike/' : '/accommodation/detail/{{ accommodation.pk }}/like/';
+    
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 'accommodationId': '{{ accommodation.pk }}' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                window.location.reload();
+                if (isLiked) {
+                    // 좋아요 취소 처리
+                    this.classList.remove('heart-fill');
+                    document.getElementById('save-text').textContent = '저장하기';
+                    document.getElementById('save-text').className = 'button-save';
+                } else {
+                    // 좋아요 처리
+                    this.classList.add('heart-fill');
+                    document.getElementById('save-text').textContent = '저장취소';
+                    document.getElementById('save-text').className = 'button-cancel';
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+    const likeContainer = document.querySelector('.like-container');
+    likeContainer.addEventListener('click', function() {
+        const accommodationId = this.dataset.accommodationId; // 숙소 ID를 data 속성에서 가져옴
+        let action = likeContainer.classList.contains('liked') ? 'unlike' : 'like'; // 좋아요 상태에 따라 액션 결정
+
+        fetch(`/accommodations/${accommodationId}/${action}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-CSRFToken': getCookie('csrftoken'), // CSRF 토큰 추가
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'ok') {
+                const likeCountElement = document.querySelector('.like-count');
+                let likesCount = parseInt(likeCountElement.innerText);
+                window.location.reload();
+                if(action === 'like') {
+                    likesCount++;
+                    likeContainer.classList.add('liked');
+                    
+                } else {
+                    likesCount--;
+                    likeContainer.classList.remove('liked');
+        
+                }
+                likeCountElement.innerText = likesCount; // 좋아요 개수 업데이트
+            } else {
+                // 사용자에게 에러 메시지 표시 (예시)
+                alert('An error occurred. Please try again.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            // 사용자에게 에러 메시지 표시 (예시)
+            alert('An error occurred. Please try again.');
+        });
+    });
+
+    // CSRF 토큰 가져오는 함수
+    // function getCookie(name) {
+    //     let cookieValue = null;
+    //     if (document.cookie && document.cookie !== '') {
+    //         const cookies = document.cookie.split(';');
+    //         for (let i = 0; i < cookies.length; i++) {
+    //             const cookie = cookies[i].trim();
+    //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+    //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     return cookieValue;
+    // }
+});
+
+        });
+
+</script>
+{% endblock %}

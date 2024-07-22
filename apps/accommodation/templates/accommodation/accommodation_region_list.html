@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .container {
+        width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+    }
+    .star-rating {
+            display: inline-block;
+            font-size: 0;
+            margin-left: -10px;
+           
+    }
+    .star-rating .star {
+            font-size: 15px;
+            color: #ddd; 
+    }
+    .star-rating .star.filled {
+            color: #f5c518; 
+    }
+    .card{
+        border: none;
+    }
+    .card:hover {
+        background-color: #f0f0f0;
+    }
+    .fixed-inputs {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: white;
+        z-index: 1000;
+        text-align: center;
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .fixed-inputs input {
+        margin: 5px;
+        height: 38px;
+        text-align: center;
+        font-size: 16px;
+    }
+    .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 0;
+            margin: 0 5px;
+        }
+
+        .icon-button:focus {
+            outline: none;
+        } 
+    /* 모달 스타일 */
+    .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .horizontal-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .horizontal-input-group button {
+            margin: 0 5px;
+        }
+
+        .horizontal-input-group input {
+            margin: 0 5px;
+            width: 50px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            padding: 0
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .center-button button {
+            background-color: #1178ff; /* 파란색 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .center-button button:hover {
+            background-color: #0056b3; /* 호버 시 더 진한 파란색 */
+        }
+    
+    
+</style>
+
+
+        <h4 style=" font-weight: bold; margin-left: 150px; margin-bottom: 50px;">{{ accommodation_type_name }} | {{ city_name }}</h4>
+
+        <div class="container">
+            
+            {% if accommodations %}
+                <ul>
+                    {% for accommodation in accommodations %}
+                    <h4 style="font-weight: bold;"> 날짜, 인원수 선택</h4>
+                    <div style="text-align: center;">
+                        <input type="text" 
+                               name="datefilter" 
+                               class="daterange" 
+                               style="margin-left: 50px; height: 38px; text-align: center; font-size: 16px;"  
+                               placeholder="날짜 선택"/>
+                               
+        
+                         <input type="text" 
+                               name="guestcount" 
+                               class="guestcount" 
+                               style="margin-left: 10px; height: 38px; text-align: center; font-size: 16px; width: 200px;"  
+                               placeholder="성인 2" onclick="openGuestModal()"/>           
+                </div>
+
+                 <!-- 모달 창 -->
+        <div style="text-align: center;">
+            <div id="guestModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeGuestModal()">&times;</span>
+                    <h2 style = "margin-left: 30px">인원 선택</h2>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+                <div class="horizontal-input-group">
+                        <label for="adultCount" style="font-size: 18px; font-weight: bold;">성인</label>
+                        <div class="counter">
+                 
+                                <button class="icon-button" onclick="decreaseCount('adultCount')"><i class="bi bi-dash"></i></button>
+                                <input type="number" id="adultCount" min="1" value="2" readonly>
+                                <button class="icon-button" onclick="increaseCount('adultCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                    </div>
+                <br>
+
+                <div class="horizontal-input-group">
+                    <label for="childCount" style="font-size: 18px; font-weight: bold;">아동</label>
+                         <div class="counter">
+                            <button class="icon-button" onclick="decreaseCount('childCount')"><i class="bi bi-dash"></i></button>
+                            <input type="number" id="childCount" min="0" value="0" readonly>
+                            <button class="icon-button" onclick="increaseCount('childCount')"><i class="bi bi-plus"></i></button>
+                        </div>
+                </div>
+                <br>
+            
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
+
+            <div class="center-button">
+                <button onclick="applyGuestCount()">선택 완료</button>
+            </div>
+        </div>  
+        </div>
+    </div>
+
+                <hr style="border: 0; border-top: 20px solid #868686d8; margin: 30px 0;">
+
+                   
+                          
+                    <div class="card" style="width: 1100px; margin-bottom: 20px; margin-top: 20px;">
+                        <a href="{% url 'accommodation:accommodation_detail' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                            {% if accommodation.images.all %}
+                                <img src="{{ accommodation.images.first.images.url }}" class="card-img-top" alt="{{ accommodation.name }}" style="height: 500px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h4 class="card-title" style="font-weight: bold;">{{ accommodation.name }}</h4>
+                                <p class="card-text" style="font-weight: bold; color: #5a5a5a;">{{ accommodation.description }}</p>
+                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <div class="star-rating" id="star-rating" style="margin-right: 10px;">
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                    </div>
+                                    <p style="margin: 0; color: gray;">({{ reviews_count }})</p>
+                                    <p style="margin: 5px; color: gray;"> · 저장 {{ likes_count }}</p>
+                                    <span style="color: gray; font-size: 15px;"> · {{accommodation.city.city_name}} {{accommodation.city.first_town_name}}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                                        <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>
+                                    </div>
+                                    <p style="font-weight: bold; font-size: 35px;">{{ accommodation.price|floatformat:0|intcomma }}원</p>
+                                </div>
+                            </div>
+                        </a>
+                </div>
+                <hr style="border: 0; border-top: 20px solid #868686d8; margin: 30px 0;">
+
+
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>해당 지역에 숙소가 없습니다.</p>
+            {% endif %}
+
+    </div>
+    <script>
+        // 날짜 선택 기능
+        var startDate = moment();
+        var endDate = moment().add(1, 'days');
+
+        $('input[name="datefilter"]').daterangepicker({
+            autoUpdateInput: false,
+            minDate: moment(),
+            startDate: startDate,
+            endDate: endDate,
+            locale: {
+                format: 'MM.DD',
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('input[name="datefilter"]').val(startDate.format('MM.DD') + ' - ' + endDate.format('MM.DD'));
+
+        $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM.DD') + ' - ' + picker.endDate.format('MM.DD'));
+            $('#check_in').val(picker.startDate.format('YYYY-MM-DD'));
+            $('#check_out').val(picker.endDate.format('YYYY-MM-DD'));
+        });
+
+        $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+            $('#check_in').val('');
+            $('#check_out').val('');
+        });
+
+        // 게스트 수 모달
+            function openGuestModal() {
+                document.getElementById('guestModal').style.display = 'block';
+            }
+
+            function closeGuestModal() {
+                document.getElementById('guestModal').style.display = 'none';
+            }
+
+            function applyGuestCount() {
+                var adultCount = document.getElementById('adultCount').value;
+                var childCount = document.getElementById('childCount').value;
+                var guestCountInput = document.getElementsByName('guestcount')[0];
+                guestCountInput.value = '성인 ' + adultCount + ', 아동 ' + childCount;
+                closeGuestModal();
+            }
+
+            // 성인 및 아동 수 증가/감소
+        function increaseCount(id) {
+            var input = document.getElementById(id);
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseCount(id) {
+            var input = document.getElementById(id);
+            if (input.value > input.min) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
+
+            const starRating = document.getElementById('star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
+                } else {
+                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
+                }
+            }
+        });
+</script>
+ 
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .city-container {
+        display: inline-block;
+        text-align: center;
+        margin: 20px;
+    }
+    .city-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .city-name {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+</style>
+
+
+
+<div class="container">
+    <div style="text-align: center;">
+        <h1><strong>호텔부터 펜션까지</strong></h1>
+        <h1><strong>최저가 숙소 예약</strong></h1>
+     
+        <a href="/accommodation/search_accommodations/" style="display: flex; justify-content: center; align-items: center; margin: 20px;">
+            <input class="form-control mr-sm-2" type="search" placeholder="검색어를 입력하세요" aria-label="Search" name="q" style="width: 800px; height:43px; border-color: rgb(16, 179, 144); margin-right: 10px;">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="background-color: rgb(16, 179, 144); color: white; border: none; padding: 10px 20px;">검색</button>
+        </a>
+
+        <div style="display: flex; justify-content: center; align-items: center; margin: 20px;">
+            <div id="slideshow" style="position: relative; width: 890px; height: 400px;">
+                {% for image in random_images %}
+                        <img src="{{MEDIA_URL}}{{ image.image}}" alt="{{ image.accommodation.name }}" class="slide" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1s;">
+            {% endfor %}
+            </div>
+        </div>
+        
+        <div style="display: inline-block; text-align: center; margin-right: 200px; cursor: pointer;" onclick="location.href='/accommodation/list/pension_pool_vila/'">
+            <i class="fa-solid fa-hotel" style="color: #63E6BE; font-size: 4.5em; margin-top: 20px;"></i>
+            <span style="display: block; margin-top: 10px;">펜션</span>
+            <span style="display: block; margin-top: 0px;">풀빌라</span>
+        </div>
+        <div style="display: inline-block; text-align: center; margin-right: 200px; cursor: pointer;" onclick="location.href='/accommodation/list/camping_glamping/'">
+            <i class="fa-solid fa-campground" style="color: #63E6BE; font-size: 4.5em;"></i>
+            <span style="display: block; margin-top: 10px;">캠핑</span>
+            <span style="display: block; margin-top: 0px;">글램핑</span>
+        </div>
+        <div style="display: inline-block; text-align: center; cursor: pointer;" onclick="location.href='/accommodation/list/boutique_motel/'">
+            <i class="fa-solid fa-bed" style="color: #63E6BE; font-size: 4.5em;"></i>
+            <span style="display: block; margin-top: 10px;">부티크</span>
+            <span style="display: block; margin-top: 0px;">모텔</span>
+        </div>
+
+    <hr style="border: 0; border-top: 2px solid #8a8989; margin: 30px 100px;">
+
+        
+    </div>
+    <div style="margin-top: 20px;">
+        <h4 style="font-weight: bold; display: inline-block; margin-left:200px;">추천 여행지</h4>
+        <a href="{% url 'accommodation:region_select' %}" style="color: blue; float: right; margin-top: 10px; margin-right: 200px;">전체도시</a>
+    </div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; margin-left: 200px; margin-top: 20px;">
+    {% for county in counties %}
+        <div style="display: inline-flex; align-items: center; justify-content: center; 
+            margin-bottom: 20px; padding: 10px 20px; 
+            height: 50px; border-radius: 50px; 
+            background-color: #ffffff; border: 1px solid #bcbbbb; overflow: hidden;"
+            onclick="window.location.href='{% url 'accommodation:accommodation_filter' 'county' county.id %}';">
+            {% for image in county_images %}
+                {% if image.city_name.id == county.id %}
+                    <div style="width: 40px; height: 40px; overflow: hidden; border-radius: 50%; margin-right: 10px;">
+                        <img src="{{ image.image.url }}" alt="{{ county.city_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <h2 style="margin: 0; font-size: 22px; font-weight: bold;">{{ county.city_name }}</h2>
+        </div>
+    {% endfor %}
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let slides = document.querySelectorAll('#slideshow .slide');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.opacity = i === index ? '1' : '0';
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        showSlide(currentSlide);
+        setInterval(nextSlide, 3000); // 3초마다 다음 슬라이드로 넘어감
+    });
+</script>
+
+{% endblock %}
