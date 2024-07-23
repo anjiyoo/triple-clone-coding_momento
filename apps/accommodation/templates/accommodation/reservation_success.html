@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Reservation Success{% endblock %}
+{% block title %}{{reservation.guest_info.name}}님의 예약 상세{% endblock %}
 
 {% block content %}
 <style>
@@ -13,16 +13,119 @@
             border-radius: 10px; /* 모서리 둥글게 */
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
         }
+        .label {
+            display: inline-block;
+            width: 550px; /* 라벨의 너비를 고정 */
+        }
+        .labell {
+            display: inline-block;
+            width: 460px; /* 라벨의 너비를 고정 */
+        }
+        .value {
+            display: inline-block;
+        }
+        .valuee {
+            display: inline-block;
+        }
+        .cancel-button {
+            display: block; 
+            margin: 0 auto;
+            background-color:#0400ff;
+            color: white; 
+            padding: 15px 90px;
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 25px;
+        }
+        .cancel-button:hover {
+            background-color: #3136ab;
+        }
 </style>
 
-<h1>예약이 성공적으로 완료되었습니다!</h1>
+<h1 style="text-align: center; font-weight: bold;">예약이 성공적으로 완료되었습니다!</h1>
 <div class="container mt-4">
-    <p>예약 상세</p>
-    <ul>
-        <li>체크인 {{ reservation.check_in|date:"Y-m-d" }}</li>
-        <li>체크아웃 {{ reservation.check_out|date:"Y-m-d" }}</li>
-        <li>Guests: {{ reservation.guest_info.name }}</li>
-    </ul>
-    <a href="{% url 'accommodation:accommodation_home' %}">Go back to home</a>
+    <h4 style="margin-left: 25px;">예약 정보</h4>
+    <br>
+    <div style="display: flex;">
+
+        <div style = "margin-left: 30px;">
+            {% for image in accommodation_images %}
+                <img src="{{ image.images.url }}" alt="숙소 이미지" style="width: 100px; height: auto; margin-right: 20px;">
+            {% endfor %}
+        </div>
+
+        <div>
+            <h4 style="font-weight:bold;">{{ reservation.accommodation.name }}</h4>
+            <p style="color: gray;">{{ reservation.room.name }}</p>
+            <div style="display: flex;">
+                <p style="margin-right: 20px; color: gray;">
+                    <span>체크인 {{reservation.room.check_in_time}}</span>  |
+                    <span>체크아웃 {{reservation.room.check_out_time }}</span>
+                </p>
+            </div>
+            <div style="display: flex; ">
+                <p style="margin-right: 20px; color: gray;">
+                    <span>{{ reservation.check_in|date:"Y-m-d" }}</span>  |
+                    <span>{{ reservation.check_out|date:"Y-m-d" }}</span>
+                </p>
+            </div>
+            
+
+        </div>
+    </div>
+    <div style="text-align: right; margin-right: 80px; margin-bottom: 30px; font-weight: bold; font-size: 30px;">
+        <span>{{ reservation.total_amount|floatformat:0|intcomma }}원</span>
+    </div>
+        <hr>
+        <h4 style="margin-left: 25px; margin-bottom: 30px; margin-top: 30px;">예약자 정보</h4>
+        <div style="margin-left: 25px;">
+            <p><span class="label">이름</span><span class="value">{{ reservation.guest_info.name }}</span></p>
+            <p><span class="label">휴대폰 번호</span><span class="value">{{ reservation.telnum }}</span></p>
+            <p><span class="label">인원</span><span class="value">성인 {{ reservation.guests_adult }} 아동 {{ reservation.guests_child }}</span></p>
+        </div>
+        <hr>
+        <h4 style="margin-left: 25px; margin-bottom: 30px; margin-top: 30px;">투숙객 정보</h4>
+        <div style="margin-left: 25px;">
+            <p><span class="label">이름</span><span class="value">{{ reservation.reservation_holder_info.user.username }}</span></p>
+            <p><span class="labell">이메일</span><span class="valuee">{{ reservation.reservation_holder_info.user.email }}</span></p>
+        </div>
+        <hr>
+        <h4 style="margin-left: 25px; margin-bottom: 30px; margin-top: 30px;">결제 정보</h4>
+
+        <div style="margin-left: 25px;">
+            <p><span class="label">결제 금액</span><span class="value" style="font-weight: bold;">{{ reservation.total_amount|floatformat:0|intcomma }}원</span></p>
+        </div>
+        <input type="hidden" id="reservationPk" value="{{ reservation.pk }}">
+        <button type="button" class="cancel-button" onclick="cancelReservation()">예약 취소</button>
 </div>
+{% csrf_token %}
+<script>
+    function cancelReservation() {
+        const reservationPk = document.getElementById('reservationPk').value; // 예약 ID 값을 가져옴
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        fetch(`/accommodation/reservation/${reservationPk}/delete`, { // reservationId는 적절한 예약 ID로 대체해야 합니다.
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}) // 필요한 경우 추가 데이터를 JSON 형식으로 전송
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('예약이 취소되었습니다.');
+                window.location.href = '/accommodation/';
+
+
+            }
+            throw new Error('Network response was not ok.');
+        })
+        // .then(data => {
+        // })
+        .catch(error => console.error('There was a problem with your fetch operation:', error));
+    }
+</script>
 {% endblock %}

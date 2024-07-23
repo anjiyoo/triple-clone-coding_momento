@@ -12,6 +12,7 @@ urlpatterns = [
     path('detail/<int:accommodation_pk>/room/<int:room_pk>/', RoomDetailView.as_view(), name='room_detail'),
     path('detail/<int:pk>/map/', my_view, name='map'),
     path('reservation/<int:accommodation_pk>/room/<int:room_pk>/', make_reservation, name='create_reservation'),
+    path('reservation/<int:reservation_pk>/delete', delete_reservation, name='delete_reservation'),
     path('reservation/success/<int:reservation_id>/', reservation_success, name='reservation_success'),
     path('detail/<int:pk>/create_review/', CreateReview.as_view(), name='create_review'),
     path('detail/<int:accommodation_pk>/review/<int:review_pk>/', ReviewDetailView.as_view(), name='review_detail'),

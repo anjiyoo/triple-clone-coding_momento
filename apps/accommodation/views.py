@@ -129,7 +129,7 @@ def make_reservation(request, accommodation_pk, room_pk):
                 pass
             reservation.save()
 
-            return redirect('accommodation/reservation_success.html', reservation_id=reservation.id)  # Redirect to a success page
+            return redirect('accommodation:reservation_success', reservation_id=reservation.id)  # Redirect to a success page
         else:
              # 폼 유효성 검사 실패 시 오류 메시지 출력
             print("Reservation Form Errors:", reservation_form.errors)
@@ -164,8 +164,19 @@ def make_reservation(request, accommodation_pk, room_pk):
 
     return render(request, 'accommodation/create_reservation.html', context)
 
+from django.http import HttpResponse,HttpResponseRedirect
+from django.views.decorators.http import require_POST
 
+@require_POST
+def delete_reservation(request, reservation_pk):
+    # 예약 정보를 데이터베이스에서 가져옵니다.
+    reservation = get_object_or_404(Reservation, pk=reservation_pk)
+    if request.user != reservation.user:
+        return HttpResponse("예약을 삭제할 권한이 없습니다.", status=403)
+    # 예약을 데이터베이스에서 삭제합니다.
+    reservation.delete()
 
+    return HttpResponseRedirect(reverse('accommodation:accommodation_home'))
 
 
 # 지도 띄우기
@@ -641,7 +652,11 @@ def reservation_success(request, reservation_id):
     # 예약 정보를 데이터베이스에서 가져옵니다.
     # 예시로, reservation_id를 사용하여 예약 정보를 조회한다고 가정합니다.
     reservation = get_object_or_404(Reservation, pk=reservation_id)
+     # 해당 숙소와 연결된 모든 이미지를 가져옵니다.
+    accommodation_images = AccommodationImage.objects.filter(accommodation=reservation.accommodation)
     
     # 예약 정보를 템플릿에 전달합니다.
-    context = {'reservation': reservation}
+    context = {
+        'reservation': reservation,
+        'accommodation_images': accommodation_images}
     return render(request, 'accommodation/reservation_success.html', context)
