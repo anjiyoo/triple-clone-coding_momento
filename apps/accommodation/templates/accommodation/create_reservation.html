@@ -1,0 +1,717 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}Create Reservation{% endblock %}
+
+{% block content %}
+<style>
+    .container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+    
+    }
+    .center-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .inline-block {
+        display: inline-block;
+        margin: 10px 100px; 
+    }
+    .blue-text {
+            color: blue; /* 파란색 텍스트 */
+        }
+        .black-text {
+            color: black; /* 검정색 텍스트 */
+            font-weight: bold;
+        }
+        .gray-text {
+            color: gray; /* 회색 텍스트 */
+        }
+        .room-card a {
+            text-decoration: none;
+            color: inherit;
+           
+        }
+        .room-card h2 {
+            margin-left: 10px;
+        }
+        .room-card p {
+            margin-left: 10px;
+        }
+        .room-card:hover {
+            background-color: #e1e1e1;
+            border-radius: 8px;
+            margin-bottom: 0px;
+        }
+        .flex-container {
+            display: flex;
+            align-items: center;
+        }
+        .flex-container h2 {
+            margin-right: 300px; /* 간격 조정 */
+        }
+        .horizontal-container {
+            /* max-width: 800px; */
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-left: 50px;
+            /* margin-right: 10px; */
+        }
+        .horizontal-container span {
+            margin-right: 150px; /* 간격 조정 */
+            margin-left: 100px;
+        }
+        h2 {
+            /* font-size: 30px; */
+            font-weight: bold;
+        }
+        .custom-select {
+            margin-left: 10px;
+            padding: 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px 16px;
+            width: 670px; 
+        }
+        .custom-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .gender-container {
+            display: flex;
+            gap: 0px;
+        }
+
+        .gender-button {
+            padding: 7px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .gender-button.selected {
+            background-color: #ffffff;
+            color: #007bff;
+            border-color: #007bff;
+        }
+        .custom-input {
+            margin-bottom: 20px;
+            margin-left: 10px;
+            height: 40px;
+            text-align: center;
+            font-size: 16px;
+            width: 230px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            box-shadow:  none;
+        }
+
+        .custom-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .styled-input {
+            height: 40px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            width: 200px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 5px;
+            /* margin-bottom:10px; */
+
+        }
+
+        .styled-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .custom-checkbox {
+            display: none;
+
+        }
+
+
+    .custom-label {
+        position: relative;
+        padding-left: 30px;
+        cursor: pointer;
+        user-select: none;
+        margin-right: 10px;
+    }
+
+    .custom-label::before {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        content: '\2714';
+        color: #ccc;
+    }
+    
+    .custom-checkbox:checked + .custom-label {
+        /* background-color: #4CAF50;  */
+        color: black; 
+        border-radius: 4px; 
+    }
+
+    .custom-checkbox:checked + .custom-label::before {
+        background-color: rgb(145, 145, 145);
+        border-color: rgb(61, 132, 199);
+        color: white;
+    }
+    .custom-checkbox:checked + .custom-label::after {
+        content: '\2713';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: white;
+    }
+    #submit-button {
+        background-color: #cccccc; /* 비활성화 상태의 배경색 */
+        color: #ffffff; /* 글꼴 색상 */
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px; /* 패딩 */
+        font-size: 16px; /* 글꼴 크기 */
+        cursor: not-allowed; /* 비활성화 상태의 커서 */
+        width: 800px;
+    }
+
+    #submit-button:enabled {
+        background-color: rgb(36, 98, 231);
+        border: 1px solid rgb(36, 98, 231);
+        border-radius: 8px;
+        color: white; /* 글꼴 색상 */
+        cursor: pointer; /* 활성화 상태의 커서 */
+        width: 800px;
+    }
+    .button-container {
+        display: flex;
+        justify-content: center; /* 수평 중앙 정렬 */
+        align-items: center; /* 수직 중앙 정렬 */
+        /* width: 80%; */
+
+    }
+    .form-control::placeholder {
+        color: gray; /* 원하는 색상으로 변경 */
+        opacity: 1; /* IE에서의 투명도 문제를 해결하기 위해 */
+    }
+
+
+
+
+</style>
+<div class="container mt-4">
+        <h1 style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
+        <div style="display: flex; margin-left: 40px; color: gray;">
+            <i class="bi bi-geo-alt-fill"></i>
+            <p style="margin-left: 10px;">{{ accommodation.city.city_name }}</p>
+            <p style="margin-left: 3px;">{{ accommodation.city.first_town_name }}</p>
+        </div>
+        {% if accommodation_image %}
+            <img src="{{ MEDIA_URL }}{{ accommodation_image.images }}" class="d-block w-100" alt="Accommodation Image" style="height: 80px; border-radius: 8px;">
+        {% endif %}
+        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+
+        <div class="room-card">
+            <a href="{% url 'accommodation:room_detail' accommodation_pk=accommodation.pk room_pk=room.pk %}">
+
+            <div class="flex-container">
+                <h2 style="margin-left: 150px;">{{room.name}}</h2>
+                <i class="bi bi-chevron-right"></i>
+            </div>
+
+            <div class="horizontal-container">
+                <span style="color: gray;">수용 인원</span>
+                <span style="font-weight: bold;"> {{ room.capacity }}명</span>
+                
+            </div>
+            <div class="horizontal-container">
+                <span style="color: gray;">조식 포함</span>
+                <span style="font-weight: bold;">
+                    {% if includes_breakfast %}
+                        조식 포함
+                    {% else %}
+                        조식 불포함
+                    {% endif %} 
+                </span>   
+            </div>
+            </a>
+
+        <!-- </div> -->
+
+    <!-- </div> -->
+        <div class="center-container"> 
+            <p class="inline-block">
+                <span class="blue-text">체크인</span> <br>
+                <!-- <span class="black-text" id="check-in-display">{{ check_in }}</span><br> -->
+                <span class="gray-text">{{room.check_in_time}} - 자정</span></p>
+            <p class="inline-block"><span class="blue-text">체크아웃</span> <br>
+                <!-- <span class="black-text" id="check-out-display">{{ check_out }}</span><br> -->
+                <span class="gray-text">{{room.check_out_time}}</span>
+            </p>
+        </div>
+    
+    </div>
+                    
+    <form method="POST">
+        {% csrf_token %}
+    
+          <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
+          <div class="form-group" style="margin-top: 20px; display: flex; align-items: center; justify-content: center;">
+            <input type="text" 
+                   name="datefilter" 
+                   class="daterange custom-input" 
+                   placeholder="날짜 선택"
+                   onchange="fillDateFields()"/>
+
+            <input type="hidden" id="check_in" name="check_in">
+            <input type="hidden" id="check_out" name="check_out">
+
+            <input type="text" 
+                   name="guestcount" 
+                   class="guestcount custom-input" 
+                   placeholder="성인 2" readonly onclick="openGuestModal()">
+
+           
+        </div>
+         <!-- 모달 -->
+         <div id="guestModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeGuestModal()">&times;</span>
+                <h2>인원 선택</h2>
+
+                <hr style="border: 0; border-top: 2px solid #9c9c9cd8; margin: 30px 0;">
+
+                <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <label for="adultCount">성인:</label>
+                    <input type="number" id="adultCount" name="guests_adult" class="styled-input" min="1" max="10" value="2">
+                </div>
+                <br>
+                <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <label for="childCount">아동:</label>
+                    <input type="number" id="childCount" name="guests_child" class="styled-input" min="0" max="10" value="0">
+                </div>
+
+                <hr style="border: 0; border-top: 2px solid #9c9c9cd8; margin: 30px 0;">
+
+                <div style="text-align: center;">
+                    <button onclick="saveGuestCount()" style="width: 300px; height: 50px; background-color: #2168F7; color: white; border: none; border-radius: 8px; margin-top: 20px;">저장</button>
+                </div>
+            </div>
+        </div>
+                   
+
+    <div style="margin-left: 40px; margin-right: 40px;" >
+        <h2>예약자 정보</h2>
+        <div class="form-group" style="margin-top: 20px;" >
+            <label for="username">이름:</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{ holder_form.username.value }}">
+        </div>
+         
+        <!-- Email -->
+        <div class="form-group"  style="margin-top: 20px;">
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ holder_form.email.value }}">
+        </div>
+        
+        <!-- Telnum -->
+        <div class="form-group"  style="margin-top: 20px;"s>
+            <label for="telnum">전화번호:</label>
+            <input type="tel" id="telnum" name="telnum" class="form-control" placeholder=" '-' 제외하고 입력">
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
+
+    <div style="margin-left: 40px; margin-right: 40px;">
+        <h2>투숙객 정보</h2>
+        <div class="form-group"  style="margin-top: 20px;">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="홍길동">
+        </div>
+        <div class="form-group" style="margin-top: 20px; display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <label for="birth_date">생년월일:</label>
+                <input type="text" id="birth_date" name="birth_date" class="form-control" placeholder="YYYYMMDD" oninput="formatDate(this)">
+            </div>
+            <div style="flex: 1;">
+                <label>성별</label>
+                <div class="gender-container">
+                    <div id="male-button" class="gender-button" onclick="selectGender('male')">남성</div>
+                    <div id="female-button" class="gender-button" onclick="selectGender('female')">여성</div>
+                </div>
+                <input type="hidden" id="gender" name="gender">
+            </div>
+        </div>
+    </div>    
+
+    <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
+    
+
+    <div style="margin-left: 40px; margin-right: 40px;">
+        <h2>교통편 정보</h2>
+        
+        <label for="transportation-select" style="font-size: 12px; margin-left: 10px; font-weight: bold;">숙소 이동 방법</label>
+        <select id="transportation-select" name="transportation" class="custom-select" required>
+            <option value="public_transport" {% if transportation_form.public_transport.value %}selected{% endif %}>대중교통 이용</option>
+            <option value="walking" {% if transportation_form.walking.value %}selected{% endif %}>도보 이동</option>
+            <option value="personal_car" {% if transportation_form.personal_car.value %}selected{% endif %}>자가용 이동</option>
+        </select>
+        
+        <p style="font-size:12px; font-weight: bold; margin-left: 10px; margin-top: 30px;">픽업 안내</p>
+        <p style="font-size: 12px; color: gray; margin-left: 10px; margin-top:-10px;">픽업 서비스를 제공하지 않는 숙소입니다. 숙소까지 이동방법을 미리 점검해주세요.</p>
+            
+
+    </div>
+
+    <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
+    <div style="margin-left: 40px; margin-right: 40px;">
+        <h2 >결제 내역 안내</h2>
+        <div style="display: flex; justify-content: space-between; margin-top:50px; margin-left: 80px; margin-right: 80px;">
+            <span style = "font-size: 15px; ">예약 금액( 세금 포함 )</span>
+            <span style = "font-size: 15px; font-weight: bold; color: gray;" >{{ room.price|floatformat:0|intcomma }}원</span>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+        <div style="display: flex; justify-content: space-between; margin-left: 80px; margin-right: 80px;">
+            <span style = "font-size: 20px; font-family:  Arial;">총 결제 금액</span>
+            <span style = "font-size: 30px; font-weight: bold;" >{{ room.price|floatformat:0|intcomma }}원</span>
+        </div>
+    </div>
+    <!-- 숨겨진 input 필드 추가 -->
+    <input type="hidden" name="reservation_amount" value="{{ room.price|floatformat:0|intcomma }}">
+    <input type="hidden" name="total_amount" value="{{ room.price|floatformat:0|intcomma }}">
+
+
+    <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
+
+    <div style="margin-left: 40px; margin-right: 40px;">
+        <h2>취소 정책 및 이용</h2>
+        
+    
+        <div style="margin-left: 40px; margin-top: 20px;">
+            <input type="checkbox" id="cancellation_policy_agreed" name="cancellation_policy_agreed" class="custom-checkbox">
+            <label for="cancellation_policy_agreed" class="custom-label"></label>
+            <a id="openNewModal" style="cursor: pointer; text-decoration: underline;">취소/이용 규정 동의</a>
+        </div>
+        <div style="margin-left: 40px; margin-top: 20px;">
+            <input type="checkbox" id="terms_and_conditions_agreed" name="terms_and_conditions_agreed" class="custom-checkbox">
+            <label for="terms_and_conditions_agreed" class="custom-label"></label>
+            <a id="openTwoModal" style="cursor: pointer; text-decoration: underline;">취소 정책 안내</a>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+        <p style="color: gray; margin-left: 30px; margin-right:30px;">(주)인터파크모먼트는 통신 판매 중개자로서, 통신 판매의 당사자가 아닙니다. 
+            본 예약의 정보, 거래에 관한 의무와 책임은 공급사에게 있습니다.</p>
+
+    </div>
+    <!-- 동의 모달  -->
+    <div id="newModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="font-weight: bold; margin: 30px 10px">취소 / 이용 규정 </h2>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 10px;">
+            
+            <p style= "margin:30px 10px">{{ cancellationpolicy.agree_text }}</p>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 10px;">
+            
+            <!-- 동의합니다 버튼 추가 -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="agreeButton2" 
+                    style=
+                    "padding: 10px 20px; 
+                    font-size: 16px; 
+                    background-color: rgb(36, 98, 231); 
+                    color: white; 
+                    width: 300px;
+                    border: none;
+                    border-radius: 8px;
+                    ">동의합니다</button>
+            </div>
+    
+        </div>
+    </div>
+    <!-- 개인 정보 동의 모달  -->
+    <div id="twoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="font-weight: bold; margin: 30px 10px">취소 정책 안내 </h2>
+
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 10px;">
+            
+            <p style= "margin:30px 10px">{{ cancellationpolicy.policy_text }}</p>
+
+             <!-- 구분선 -->
+             <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 10px;">
+            
+            <!-- 동의합니다 버튼 추가 -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="agreeButton1" 
+                    style=
+                    "padding: 10px 20px; 
+                    font-size: 16px; 
+                    background-color: rgb(36, 98, 231); 
+                    color: white; 
+                    width: 300px;
+                    border: none;
+                    border-radius: 8px;
+                    ">동의합니다</button>
+            </div>
+    
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button type="submit" class="custom-button" id="submit-button" disabled>예약하기</button>
+    </div>
+
+    </form>
+</div>
+<script>
+
+    function formatDate(input) {
+        var date = input.value;
+        // 숫자만 입력되었는지 확인하고, 8자리인 경우 처리
+        if (date.length == 8 && !isNaN(date)) {
+            // 연, 월, 일로 분리하여 '-'로 연결
+            input.value = date.slice(0, 4) + '-' + date.slice(4, 6) + '-' + date.slice(6, 8);
+        }
+    }
+
+    function fillDateFields() {
+        var dateRange = document.getElementsByName("datefilter")[0].value;
+        var dates = dateRange.split(" ~ ");
+        
+        if (dates.length === 2) {
+            var checkIn = dates[0];
+            var checkOut = dates[1];
+            
+            document.getElementById("check_in").value = checkIn;
+            document.getElementById("check_out").value = checkOut;
+        } else {
+            alert("날짜 범위를 올바르게 입력해주세요.");
+        }
+}
+    function selectGender(gender) {
+        document.getElementById('gender').value = gender;
+        document.getElementById('male-button').classList.remove('selected');
+        document.getElementById('female-button').classList.remove('selected');
+        if (gender === 'male') {
+            document.getElementById('male-button').classList.add('selected');
+        } else {
+            document.getElementById('female-button').classList.add('selected');
+        }
+    }
+      $(function() {
+            $('input[name="datefilter"]').daterangepicker({
+                locale: {
+                    format: 'YYYY-MM-DD',
+                    separator: ' ~ ',
+                    applyLabel: '적용',
+                    cancelLabel: '취소',
+                    fromLabel: '시작',
+                    toLabel: '종료',
+                    customRangeLabel: '사용자 정의',
+                    weekLabel: 'W',
+                    daysOfWeek: ['일', '월', '화', '수', '목', '금', '토'],
+                    monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                    firstDay: 1
+                },
+                startDate: moment().startOf('day'),
+                endDate: moment().startOf('day').add(1, 'days'),
+                minDate: moment().startOf('day')
+            });
+        });
+    // 모달 열기
+    function openGuestModal() {
+        document.getElementById("guestModal").style.display = "block";
+    }
+
+    // 모달 닫기
+    function closeGuestModal() {
+        document.getElementById("guestModal").style.display = "none";
+    }
+
+
+    function saveGuestCount() {
+        event.preventDefault();
+        var adultCount = document.getElementById("adultCount").value;
+        var childCount = document.getElementById("childCount").value;
+        document.getElementsByName("guestcount")[0].value = "성인 " + adultCount + " 아동 " + childCount;
+
+        // NodeList의 첫 번째 요소에 접근하여 값 설정
+        document.getElementsByName('guests_adult')[0].value = adultCount;
+        document.getElementsByName('guests_child')[0].value = childCount;
+
+        closeGuestModal();
+    }
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        var modal = document.getElementById("guestModal");
+        var newModal = document.getElementById("newModal");
+        var twoModal = document.getElementById("twoModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        if (event.target == newModal) {
+            newModal.style.display = "none";
+        }
+        if (event.target == twoModal) {
+            twoModal.style.display = "none";
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal1 = document.getElementById('twoModal');
+        const modal2 = document.getElementById('newModal');
+        const agreeButton1 = document.getElementById('agreeButton1');
+        const agreeButton2 = document.getElementById('agreeButton2');
+        const checkbox1 = document.getElementById('terms_and_conditions_agreed');
+        const checkbox2 = document.getElementById('cancellation_policy_agreed');
+        const openModalLink1 = document.getElementById('openTwoModal');
+        const openModalLink2 = document.getElementById('openNewModal');
+        const closeModal1 = document.querySelector('#twoModal .close');
+        const closeModal2 = document.querySelector('#newModal .close');
+        const submitButton = document.getElementById('submit-button');
+
+        // 모달 열기
+        openModalLink1.addEventListener('click', function() {
+            modal1.style.display = 'block';
+        });
+
+        openModalLink2.addEventListener('click', function() {
+            modal2.style.display = 'block';
+        });
+
+        // 모달 닫기
+        closeModal1.addEventListener('click', function() {
+            modal1.style.display = 'none';
+        });
+        
+        closeModal2.addEventListener('click', function() {
+            modal2.style.display = 'none';
+        });
+
+        // "동의합니다" 버튼 클릭 시 체크박스 체크
+        agreeButton1.addEventListener('click', function(event) {
+            event.preventDefault();
+            checkbox1.checked = true;
+            modal1.style.display = 'none';
+            checkBothCheckboxes();
+        });
+
+        agreeButton2.addEventListener('click', function(event) {
+            event.preventDefault();
+            checkbox2.checked = true;
+            modal2.style.display = 'none';
+            checkBothCheckboxes();
+        });
+         // 모달 외부 클릭 시 닫기
+         window.addEventListener('click', function(event) {
+            if (event.target == modal1) {
+                modal1.style.display = 'none';
+            }
+            if (event.target == modal2) {
+                modal2.style.display = 'none';
+            }
+        });
+
+        // 두 체크박스가 모두 체크되었는지 확인
+        function checkBothCheckboxes() {
+            if (checkbox1.checked && checkbox2.checked) {
+                submitButton.disabled = false;
+                submitButton.style.backgroundColor = 'rgb(36, 98, 231)';
+            }
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitButton = document.getElementById('submit-button');
+        const checkboxes = document.querySelectorAll('.custom-checkbox');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                submitButton.disabled = !(
+                    document.getElementById('cancellation_policy_agreed').checked &&
+                    document.getElementById('terms_and_conditions_agreed').checked
+                );
+            });
+        });
+    });
+</script>
+{% endblock %}

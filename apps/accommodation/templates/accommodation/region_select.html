@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+    }
+    .city-list, .town-list, .accommodation-list {
+        flex: 1;
+    }
+    .city-list ul, .town-list ul, .accommodation-list ul {
+        list-style: none;
+        padding: 0;
+    }
+    .city-list li, .town-list li, .accommodation-list li {
+        padding: 10px;
+        margin-bottom: 5px;
+        border-radius: 0px;
+        cursor: pointer;
+    }
+    .city-list li {
+        background-color: #f0f0f0;
+    }
+    .city-list li:hover {
+        background-color: #e0e0e0;
+    }
+    .city-list li.selected {
+        background-color: #ffffff;
+        color: #0000ff;
+    }
+    .town-list li:hover, .accommodation-list li:hover {
+        background-color: #f0f0f0;
+    }
+    .town-list li.selected {
+        background-color: #d0e0f0;
+    }
+    .accommodation-list {
+        margin-left: 20px;
+    }
+    .accommodation-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        /* width: 400px; */
+    }
+    .accommodation-card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: none;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+    }
+    .accommodation-card img {
+        max-width: 100%;
+        border-radius: 5px;
+    }
+    .star-rating {
+            display: inline-block;
+            font-size: 0;
+            margin-left: -10px;
+           
+        }
+        .star-rating .star {
+            font-size: 15px;
+            color: #ddd; 
+        }
+        .star-rating .star.filled {
+            color: #f5c518; 
+        }
+</style>
+
+<div class="container">
+    <div class="city-list">
+        <form id="city-form" method="POST" action="{% url 'accommodation:region_select' %}">
+            {% csrf_token %}
+            <input type="hidden" name="city_name" id="selected-city-input">
+            <ul>
+                {% for city in cities %}
+                    <li data-city="{{ city }}" class="{% if selected_city == city %}selected{% endif %}">{{ city }}</li>
+                {% endfor %}
+            </ul>
+        </form>
+    </div>
+
+    <div class="town-list">
+        {% if towns %}
+            <form id="town-form" method="POST" action="{% url 'accommodation:region_select' %}">
+                {% csrf_token %}
+                <input type="hidden" name="city_name" value="{{ selected_city }}">
+                <input type="hidden" name="first_town_name" id="selected-town-input">
+                <ul>
+                    {% for town in towns %}
+                        <li data-town="{{ town.first_town_name }}" class="{% if selected_town == town.first_town_name %}selected{% endif %}">{{ town.first_town_name }}</li>
+                    {% endfor %}
+                </ul>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    <div class="accommodation-list">
+        {% if accommodations %}
+            <ul>
+                {% for accommodation in accommodations %}
+                    <li>
+                        <a href="{% url 'accommodation:accommodation_detail' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                        <div class="accommodation-card">
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-left: 50px;">
+                                <div>
+                                    <h4 style="font-weight: bold;">{{ accommodation.name }}</h4>
+                                    <span style="font-weight: bold; color: #5a5a5a;">{{ accommodation.description }}</span>
+                                    <div style="display: flex; align-items: center; margin-right: 10px; margin-left: 10px;">
+                                        <div class="star-rating" id="star-rating" style="margin-right: 10px;">
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                        </div>
+                                        <p style="margin: 0; color: gray;">({{ reviews_count }})</p>
+                                        <p style="margin: 5px; color: gray;"> · 저장 {{ likes_count }}</p>
+
+
+                                    </div>
+                                    <span style="color: gray; font-size: 15px;">{{accommodation.city.city_name}} {{accommodation.city.first_town_name}}</span>
+
+                                </div>
+                                {% if accommodation.images.all %}
+                                    <img src="{{ accommodation.images.first.images.url }}" alt="{{ accommodation.name }}" style="width: 200px; height: 200px; margin-right:30px;">
+                                {% endif %}
+
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; ">
+                                <div style="margin-left: 50px;">
+                                    <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                                    <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>
+                                </div>
+                                <p style="font-weight: bold; font-size: 35px; margin-right: 50px;">{{ accommodation.price|floatformat:0|intcomma }}원</p>
+                            </div>
+                        </div>
+                    </a>
+                    </li>
+                 <hr style="border: 0; border-top: 20px solid #868686d8; margin: 30px 0;">
+
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.city-list li').forEach(function(city) {
+        city.addEventListener('click', function() {
+            document.getElementById('selected-city-input').value = this.getAttribute('data-city');
+            document.getElementById('city-form').submit();
+        });
+    });
+
+    document.querySelectorAll('.town-list li').forEach(function(town) {
+        town.addEventListener('click', function() {
+            document.getElementById('selected-town-input').value = this.getAttribute('data-town');
+            document.getElementById('town-form').submit();
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+            const averageRating = Math.floor(parseFloat("{{ average_rating|default:0 }}")); // 소수점 이하 제거
+
+            const starRating = document.getElementById('star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled'); // 평균 별점만큼 별 색칠
+                } else {
+                    stars[i].classList.remove('filled'); // 나머지는 색칠하지 않음
+                }
+            }
+        });
+</script>
+{% endblock %}

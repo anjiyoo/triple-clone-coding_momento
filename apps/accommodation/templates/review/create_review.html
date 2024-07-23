@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}{{accommodation.name}} 리뷰 작성{% endblock %}
+
+{% block content %}
+    <style>
+        .container {
+            max-width: 800px; 
+            margin: 30px auto;
+            padding: 30px 20px; 
+            background-color: #ffffff; 
+            border-radius: 10px; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); 
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 2em;
+            color: #ddd;
+            cursor: pointer;
+        }
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #f5b301;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f5b301;
+        }
+        .rating-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .submit-button {
+            cursor: pointer;
+            color: blue;
+            border: none;
+            background-color: white;
+        }
+        .form-group {
+            text-align: center;
+        }
+        .no-border {
+            border: none;
+            box-shadow: none;
+        }
+        #travel_date:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .image-upload-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            background-color: #f0f0f0;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+        .image-upload-wrapper input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .image-upload-wrapper .plus-icon {
+            font-size: 48px;
+            color: #ccc;
+        }
+        .back-button {
+            font-size: 24px;
+            margin-top: -10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="header">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-x back-button"></i>
+                <h5 style="margin-left: 10px; font-weight: bold;">{{ accommodation.name }}</h5>
+            </div>
+            <button type="submit" class="submit-button" style="margin-right: 10px;">완료</button>
+
+        </div>
+
+        <form id="review-form" method="post" enctype="multipart/form-data" action="{% url 'accommodation:create_review' accommodation.pk %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5"><label for="star5" class="fas fa-star"></label>
+                    <input type="radio" id="star4" name="rating" value="4"><label for="star4" class="fas fa-star"></label>
+                    <input type="radio" id="star3" name="rating" value="3"><label for="star3" class="fas fa-star"></label>
+                    <input type="radio" id="star2" name="rating" value="2"><label for="star2" class="fas fa-star"></label>
+                    <input type="radio" id="star1" name="rating" value="1"><label for="star1" class="fas fa-star"></label>
+                </div>
+                <div class="rating-text" id="rating-text"></div>
+            </div>
+    
+            <!-- 구분선 -->
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
+
+                 <div class="form-group" style="display: flex; align-items: center;">
+                    <i class="bi bi-calendar4"style="margin-left: 40px;"></i>
+                    <input type="date" class="form-control no-border" id="travel_date" name="travel_date" style="width: 300px; outline: none; box-shadow: none;" placeholder="언제 다녀오셨어요?(선택)">
+                </div>
+
+    
+            <textarea id="content" name="content" class="form-control" style=" width: 700px; height: 100px; outline: none; box-shadow: none; border: none; margin-left: 30px;" 
+                placeholder="· 직접 경험한 솔직한 리뷰를 남겨주세요.
+· 사진을 첨부할 수 있어요" required></textarea>
+
+            <div class="form-group" style="display: flex; align-items: center;">
+                <div class="image-upload-wrapper" style="margin-left: 30px; display: flex; align-items: center;">
+                    <span class="plus-icon" style="cursor: pointer;">+</span>
+                    {{ form.image_url }}
+                </div>
+               
+                <div id="image-container" style="position: relative; display: none; margin-left: 10px;">
+                    <img id="image-preview" src="#" alt="Image Preview" style="width: 150px; height: 150px;" />
+                    <button id="remove-image" style="position: absolute; top: 0; right: 0; background: rgba(255, 255, 255, 0.7); color: rgb(0, 0, 0); border: none; cursor: pointer;  border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">X</button>
+                </div>
+            </div>
+    
+        </form>
+    </div>
+
+        
+    <script>
+    $(document).ready(function(){
+            $('#travel_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minYear: 1901,
+                maxYear: parseInt(moment().format('YYYY'),10),
+                autoUpdateInput: false,
+                locale: {
+                    format: 'YYYY-MM-DD'
+                },
+                maxDate: moment().subtract(1, 'days') // 오늘 이전 날짜만 선택 가능
+
+                
+        });
+       
+         // 날짜 선택 시 입력 필드 업데이트
+        $('#travel_date').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+
+    });
+    document.querySelector('.back-button').addEventListener('click', function() {
+        window.location.href = "{% url 'accommodation:accommodation_detail' accommodation.pk %}";
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.querySelector('input[name="image_url"]');
+            const imagePreview = document.getElementById('image-preview');
+            const imageContainer = document.getElementById('image-container');
+            const removeImageButton = document.getElementById('remove-image');
+            const plusIcon = document.querySelector('.plus-icon');
+
+            plusIcon.addEventListener('click', function() {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imageContainer.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            removeImageButton.addEventListener('click', function() {
+                event.preventDefault(); // 기본 동작 막기
+                imagePreview.src = '#';
+                imageContainer.style.display = 'none';
+                imageInput.value = ''; // x 표시 누르면 사진 없애기
+        });
+        });
+
+        const ratingText = document.getElementById('rating-text');
+        
+        ratingText.textContent = '별점을 선택하세요!';
+        ratingText.style.color = 'grey';
+        const ratingLabels = {
+            1: '별로예요',
+            2: '조금 아쉬워요',
+            3: '괜찮아요',
+            4: '추천할 만 곳이에요',
+            5: '정말 휼륭한 숙소예요'
+        };
+
+        document.querySelectorAll('.star-rating input').forEach(input => {
+            input.addEventListener('change', function() {
+                ratingText.textContent = ratingLabels[this.value];
+                ratingText.style.color = 'initial'; 
+            });
+        });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const submitButton = document.querySelector('.submit-button');
+
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            const form = document.getElementById('review-form');
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url; // 성공 시 리디렉션
+                } else {
+                    // 에러 처리
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+
+    </script>
+{% endblock %}
