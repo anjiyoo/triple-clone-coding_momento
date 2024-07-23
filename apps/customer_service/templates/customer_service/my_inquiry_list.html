@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'customer_service/my_inquiry_list.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>내 문의 내역</h2>
+    <ul class="inquiry-list">
+        {% for inquiry in my_inquiries %}
+        <li class="inquiry-list-item">
+            <a href="{% url 'customer_service:post_detail' inquiry.pk %}" class="inquiry-title">{{ inquiry.inquiry_title }}</a>
+            <small class="text-muted">{{ inquiry.created_at|date:"Y.m.d H:i" }}</small>
+            <p>
+                {% if inquiry.answer_status %}
+                    <span class="badge badge-success">답변 완료</span>
+                {% else %}
+                    <span class="badge badge-warning">답변 대기중</span>
+                {% endif %}
+            </p>
+        </li>
+        {% empty %}
+        <li>
+            <div class="alert alert-warning" role="alert">
+                작성된 문의가 없습니다.
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="pagination">
+        {% if my_inquiries.has_previous %}
+            <a href="?page=1">&laquo; 처음</a>
+            <a href="?page={{ my_inquiries.previous_page_number }}">&lt; 이전</a>
+        {% endif %}
+
+        {% for page_num in my_inquiries.paginator.page_range %}
+            {% if page_num == my_inquiries.number %}
+                <strong>{{ page_num }}</strong>
+            {% else %}
+                <a href="?page={{ page_num }}">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if my_inquiries.has_next %}
+            <a href="?page={{ my_inquiries.next_page_number }}">다음 &gt;</a>
+            <a href="?page={{ my_inquiries.paginator.num_pages }}">마지막 &raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% if is_paginated %}
+<ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+            tabindex="-1">이전</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1">이전</a>
+    </li>
+    {% endif %}
+
+    {% for page in page_range %}
+    <li class="page-item {% if page == page_obj.number %} activate {% endif %}">
+        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+    </li>
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+        <a class="page-link"
+            href="?page={{ page_obj.next_page_number }}">다음</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" href="#">다음</a>
+    </li>
+    {% endif %}
+</ul>
+{% endif %}
+{% endblock %}

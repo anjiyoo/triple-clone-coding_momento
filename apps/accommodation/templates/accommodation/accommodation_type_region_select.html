@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- <h1>{{ accommodation_type }} in {{ city_name }}</h1> -->
+    <div class="row">
+                {% for county_image in county_images %}
+                <div class="col-md-6 mb-4">
+                    <div class="d-flex flex-row align-items-center county-item" data-county="{{ county_image.city_name }}">
+                        <img class="rounded-circle" src="{{ county_image.image.url }}" alt="{{ county_image.city_name }}" style="width: 50px; height: 50px; object-fit: cover;">
+                        <div style="margin-left: 15px;">
+                            <h5 class="card-title">{{ county_image.city_name }}</h5>
+                        </div>
+                    </div>
+                    <hr style="width: 100%; border-top: 1px solid #676767;">
+                </div>
+            {% endfor %}
+    </div>
+
+
+
+    <!-- 숙소 뜨는 거 -->
+    <!-- <div class="row">
+        {% for accommodation in accommodations %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img class="card-img-top" src="{{ accommodation.image.url }}" alt="{{ accommodation.name }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ accommodation.name }}</h5>
+                        <p class="card-text">{{ accommodation.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <a href="{% url 'accommodation:accommodation_detail' accommodation.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                            </div>
+                            <small class="text-muted">{{ accommodation.price }}원</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div> -->
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countyItems = document.querySelectorAll('.county-item');
+        countyItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const countyName = this.getAttribute('data-county');
+                const accommodationType = "{{ accommodation_type }}"; // 현재 선택된 숙소 유형
+    
+                // 선택한 지역과 숙소 유형을 URL 파라미터로 전달하여 리디렉션
+                window.location.href = `/accommodation/list/${accommodationType}/${countyName}/`;
+            });
+        });
+    });
+    </script>
+{% endblock %}

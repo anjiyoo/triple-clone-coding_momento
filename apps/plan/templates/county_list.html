@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% block content%}
+    <style>
+        .county_name{
+            font-weight: 900;
+        }
+        .county_sub_name{
+            color: #B3B3B3;
+
+        }
+        .btn{
+            background-color: gainsboro; 
+            border-radius: 20px;
+            font-weight: 900;
+            height: 40px;
+        }
+    </style>
+    <div class="container">
+    <h3>국내도시</h3>
+    <div class="county_name">
+        {% for county in county_list %}
+            <form action="{% url 'plan:days' %}" method="POST">
+                {% csrf_token %}
+                <div class="d-flex my-4">
+                <img class="mr-3 rounded-circle" src="{{county.title_image.url}}" style="width: 50px; height: 50px;"  alt="">
+                <div class="ms-3">    
+                    {{county.city_name}}<br>
+                    {% if county.first_town_name %}
+                    <span class="county_sub_name">{{county.first_town_name}}</span>
+                    {% endif %}
+                    {% if county.second_town_name %}
+                    <span class="county_sub_name">{{county.second_town_name}}</span>
+                    {% endif %}
+                    {% if county.third_town_name %}
+                    <span class="county_sub_name">{{county.third_town_name}}</span>
+                    {% endif %}
+                </div>
+                <input type="hidden" name="city" value="{{county}}">
+                <button type="submit" class="btn ms-auto">선택</button>
+                </div>
+            </form>
+        {% endfor %}
+    </div>
+    </div>
+    {% endblock %}
+</body>
+</html>

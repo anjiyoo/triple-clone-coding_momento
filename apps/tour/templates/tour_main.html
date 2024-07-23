@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tour/main.css' %}">
+{% endblock %}|
+
+{% block content %}
+            <div class="card mb-4">
+                <h1>투어부터 패키지까지<br>여행에 필요한 모든 것</h1>
+                <!--질문 입력창 -->
+                <div class="card-body">
+                    <form id="search-form" method="get" action="{% url 'search' %}">
+                        <div class="input-group mt-3 mb-3">
+                            <input type="text" id="search-input" name="title" class="form-control" style="border-radius: 10px;" placeholder="어디로 떠나시나요?">
+                            <div class="input-group-append" style="margin-left: 10px;">
+                                <button type="submit" id="submitButton" class="btn btn-primary" style="background-color: #0BD0AF; border-color: #0BD0AF;">검색</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 국내 추천 투어&티켓 -->
+<div class="container mt-3">
+    <div class="row">
+        <h2 class="mb-3">국내 추천 투어&티켓</h2>
+        <div class="d-flex">
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- 국내 인기 투어&티켓 -->
+<div class="container mt-3">
+    <div class="row">
+        <h2 class="mb-3">국내 인기 투어&티켓</h2>
+        <div class="d-flex">
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="card mx-2 fixed-card">
+                <a href="투어 상품 페이지">
+                    <img src="대표이미지 주소" class="card-img-top" alt="여행 일정 이미지">
+                </a>
+                <div class="card-body">
+                    <p class="card-text">상품에 대한 간단한 설명이 들어갈 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+document.getElementById("search-form").addEventListener('submit', function (event) {
+    event.preventDefault();
+    const search_name_value = document.getElementById('search-input').value;
+    const display_content = document.getElementById('item-container');
+    axios({
+        method: 'post',
+        url: '{% url "search" %}',
+        data: JSON.stringify({
+            title: search_name_value
+        }),
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+        .then(response => {
+            console.log(response);
+            if (response.data.success === 'true') {
+                display_content.innerHTML = response.data.data;
+            } else {
+                display_content.textContent = response.data.message;
+            }
+        })
+        .catch(error => console.log(error));
+});
+</script>
+
+{% endblock %}

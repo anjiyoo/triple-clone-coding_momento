@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tour/main.css' %}">
+{% endblock %}|
+
+{% block extra-style %}
+
+{% block content %}
+<div class="container">
+    <div class="row" style="border-radius: 20px;">
+        <!-- 이미지 -->
+        <div class="col-md-4 text-center " style="margin-left: 20%;">
+            {% thumbnail tour.thumbnail "300x300" crop="center" as thumb %}
+            <img src="{{ thumb.url }}" alt="{{ tour.title }}" class="rounded-2 "
+                style="max-width: 100%; height: auto; border: 1px solid hsla(0, 0%, 100%, .3);">
+            {% endthumbnail %}
+        </div>
+        <!-- 특정 투어 제목 및 투어 설명 -->
+        <!--좋아요 수, 투어 위치(도시)-->
+        <div class="col-md-8">
+            <h1>{{ tour.title }}</h1>
+            <p>{{ tour.description }}</p>
+            <p>위치: {{ tour.location }}</p>
+            <p>좋아요 수: {{ tour.likes }}</p>
+        </div>
+    </div>
+    <!--저장하기, 일정추가, 리뷰쓰기 공유하기-->
+        <div class="row text-center shadow-sm btn-container">
+            <div class="col-md-3 mb-3">
+                <a href="#" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M79.5 52.5C86.205 45.93 93 38.055 93 27.75C93 21.1859 90.3924 14.8906 85.7509 10.2491C81.1094 5.60758 74.8141 3 68.25 3C60.33 3 54.75 5.25 48 12C41.25 5.25 35.67 3 27.75 3C21.1859 3 14.8906 5.60758 10.2491 10.2491C5.60758 14.8906 3 21.1859 3 27.75C3 38.1 9.75 45.975 16.5 52.5L48 84L79.5 52.5Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="d-block mt-1"><strong>저장하기</strong></span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="#" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M35.4395 3V17.4375M80.5459 3V17.4375M7.24805 31.8751H108.737M41.0778 53.5314L52.3544 60.7501L74.9076 46.3126M18.5246 10.2188H97.4608C103.689 10.2188 108.737 13.4507 108.737 17.4375V67.9689C108.737 71.9557 103.689 75.1877 97.4608 75.1877H18.5246C12.2967 75.1877 7.24805 71.9557 7.24805 67.9689V17.4375C7.24805 13.4507 12.2967 10.2188 18.5246 10.2188Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>    
+                    <span class="d-block mt-1"><strong>일정추가</strong></span>
+                </a>
+            </div>
+            <!--리뷰쓰기 버튼 누르면 자동으로 후기칸으로 내려가기-->
+            <div class="col-md-3 mb-3">
+                <a href="#reviews" class="d-block">
+                    <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40.5 3L52.0875 26.368L78 30.1383L59.25 48.3176L63.675 74L40.5 61.868L17.325 74L21.75 48.3176L3 30.1383L28.9125 26.368L40.5 3Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>                    
+                    <span class="d-block mt-1"><strong>리뷰쓰기</strong></span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                    <a href="#" class="d-block">
+                        <svg width="97" height="86" viewBox="0 0 97 86" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g filter="url(#filter0_d_35_812)">
+                            <path d="M6.50977 39.0938V67.9689C6.50977 69.8834 7.61047 71.7196 9.56975 73.0733C11.529 74.4271 14.1864 75.1877 16.9572 75.1877H79.6418C82.4126 75.1877 85.0699 74.4271 87.0292 73.0733C88.9885 71.7196 90.0892 69.8834 90.0892 67.9689V39.0938M69.1943 17.4375L48.2995 3M48.2995 3L27.4046 17.4375M48.2995 3V49.922" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                            
+                        <span class="d-block mt-1"><strong>공유하기</strong></span>
+                    </a>
+            </div>
+        </div>
+    <!-- 최저가 옵션 중 최저 가격 -->
+    <div class="row">
+        <div class="col-md-12">
+            <p>최저가: {{ tour.lowest_price }} 원</p>
+        </div>
+    </div>
+
+    <!-- 날짜별 가격 기능 -->
+    <div class="row">
+        <div class="col-md-12">
+            <h3>날짜별 가격</h3>
+            <div class="btn-group" role="group" aria-label="Date selection">
+                {% for date_price in date_prices %}
+                    <button type="button" class="btn btn-secondary date-btn" data-date="{{ date_price.date }}">
+                        {{ date_price.date }}
+                    </button>
+                {% endfor %}
+                <button type="button" class="btn btn-secondary" id="calendar-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6M18 2V6M3 10H21M5 6H19C20.1046 6 21 6.89543 21 8V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V8C3 6.89543 3.89543 6 5 6Z" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="price-options" class="mt-3">
+                <!-- 여기에 날짜별 가격 옵션이 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 달력 팝업 -->
+    <div id="calendar-popup" style="display: none;">
+        <input type="text" id="datepicker" readonly>
+    </div>
+</div>
+
+
+    <!-- 상세 설명 -->
+    <div class="row">
+        <div class="col-md-12">
+            <h3>상세 설명</h3>
+            <p>{{ tour.detailed_description }}</p>
+        </div>
+    </div>
+    <!-- 후기(리뷰) -->
+    <div class="row" id="reviews">
+        <div class="col-md-12">
+            <h3>후기</h3>
+            <ul>
+                {% for review in tour.reviews %}
+                    <li>{{ review.user }}: {{ review.content }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'path/to/your/datepicker/js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 날짜 버튼 클릭 이벤트
+        document.querySelectorAll('.date-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const selectedDate = this.getAttribute('data-date');
+                fetchPriceOptions(selectedDate);
+            });
+        });
+
+        // 달력 버튼 클릭 이벤트
+        document.getElementById('calendar-btn').addEventListener('click', function() {
+            document.getElementById('calendar-popup').style.display = 'block';
+        });
+
+        // 날짜 선택 이벤트
+        $('#datepicker').datepicker({
+            dateFormat: 'yy-mm-dd',
+            onSelect: function(dateText) {
+                document.getElementById('calendar-popup').style.display = 'none';
+                updateDateButtons(dateText);
+                fetchPriceOptions(dateText);
+            }
+        });
+
+        // 날짜별 가격 옵션 가져오기
+        function fetchPriceOptions(date) {
+            // Ajax를 통해 서버에서 날짜별 가격 옵션을 가져옵니다.
+            // 예시 URL: /get-price-options/?date=YYYY-MM-DD
+            fetch(`/get-price-options/?date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    const priceOptionsContainer = document.getElementById('price-options');
+                    priceOptionsContainer.innerHTML = '';
+
+                    data.forEach(option => {
+                        const optionElement = document.createElement('div');
+                        optionElement.className = 'price-option';
+                        optionElement.innerHTML = `
+                            <p>옵션: ${option.name}</p>
+                            <p>가격: ${option.price} 원</p>
+                        `;
+                        priceOptionsContainer.appendChild(optionElement);
+                    });
+                });
+        }
+
+        // 날짜 버튼 업데이트
+        function updateDateButtons(selectedDate) {
+            const dates = generateDateRange(selectedDate);
+            const btnGroup = document.querySelector('.btn-group');
+            btnGroup.innerHTML = '';
+
+            dates.forEach(date => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-secondary date-btn';
+                button.setAttribute('data-date', date);
+                button.innerText = date;
+                button.addEventListener('click', function() {
+                    fetchPriceOptions(date);
+                });
+                btnGroup.appendChild(button);
+            });
+
+            const calendarBtn = document.createElement('button');
+            calendarBtn.type = 'button';
+            calendarBtn.className = 'btn btn-secondary';
+            calendarBtn.id = 'calendar-btn';
+            calendarBtn.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 2V6M18 2V6M3 10H21M5 6H19C20.1046 6 21 6.89543 21 8V20C21 21.1046 20.1046 22 19 22H5C3.89543 22 3 21.1046 3 20V8C3 6.89543 3.89543 6 5 6Z" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+            calendarBtn.addEventListener('click', function() {
+                document.getElementById('calendar-popup').style.display = 'block';
+            });
+            btnGroup.appendChild(calendarBtn);
+        }
+
+        // 날짜 범위 생성
+        function generateDateRange(selectedDate) {
+            const dates = [];
+            const selected = new Date(selectedDate);
+            for (let i = -2; i <= 2; i++) {
+                const date = new Date(selected);
+                date.setDate(selected.getDate() + i);
+                dates.push(date.toISOString().slice(0, 10));
+            }
+            return dates;
+        }
+    });
+</script>

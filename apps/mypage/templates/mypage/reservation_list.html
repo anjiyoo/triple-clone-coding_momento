@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Reservations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .back {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .tabs {
+            display: flex;
+            margin-top: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tabs .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .tabs .tab.active {
+            border-bottom: 2px solid #007bff;
+            font-weight: bold;
+        }
+        .message {
+            text-align: center;
+            margin: 50px 0;
+        }
+        .contact {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ccc;
+            text-align: center;
+        }
+        .contact p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="back" onclick="history.back();">&larr;</div>
+            <h1>내 예약</h1>
+        </div>
+        <div class="tabs">
+            <div class="tab active">항공</div>
+            <div class="tab">숙소</div>
+            <div class="tab">투어·티켓</div>
+        </div>
+        <div class="message">
+            {% if reservations %}
+                <ul>
+                    {% for reservation in reservations %}
+                        <li>
+                            <strong>예약날짜:</strong> {{ reservation.reservation_date }}<br>
+                            <strong>예약자 성함:</strong> {{ reservation.BookerInfo.name }}<br>
+                            <strong>가는편:</strong> {{ reservation.departure_airport }} ->{{ reservation.arrival_airport }} <br>
+                            {% if reservation.return_departure_airport %}
+                            <strong>오는편:</strong> {{ reservation.return_departure_airport }} -> {{ reservation.return_arrival_airport }}<br>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>예약 내역이 없습니다.</p>
+                <div>
+                    <strong>국내선 결항 대처 방법 안내</strong><br>
+                    예약한 국내선이 결항되었나요?
+                </div>
+            {% endif %}
+        </div>
+        <div class="contact">
+            <p>예약 내역을 찾을 수 없나요? 다른 계정으로 로그인해보세요. <a href="#">자세히 보기</a></p>
+            <p>도움이 필요하신가요? <strong>1588-2539</strong></p>
+            <p>해외에서 <strong>+82-2-1588-2539</strong></p>
+            <p>오전 9시 - 오후 6시 (한국시간 기준, 주말/공휴일 제외)</p>
+            <p>탑승관련 긴급문의 카카오톡 @트리플서비스</p>
+        </div>
+    </div>
+</body>
+</html>

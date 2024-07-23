@@ -55,10 +55,10 @@ class TripRecommend(models.Model):
 # 관광지
 class CitySpotRecommend(models.Model):
     city_name = models.ForeignKey(County, on_delete=models.CASCADE, related_name='rec_tour_spots')  # 도시 외부키 참조
+    content_id = models.IntegerField(unique=True)  # 관광지 고유 id
     title = models.CharField(max_length=50)  # 관광지
     address = models.TextField()  # 주소
     img = models.ImageField(upload_to='planrecommend/img', blank=True, null=True)  # 이미지
-    content_id = models.IntegerField(unique=True)  # 관광지 고유 id
     map_x = models.FloatField(default=0.0)  # 경도
     map_y = models.FloatField(default=0.0)  # 위도
 

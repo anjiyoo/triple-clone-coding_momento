@@ -1,0 +1,172 @@
+{% extends 'base.html'%}
+
+{% load humanize %}
+
+{% block content %}
+
+    <style>
+        .container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+        }
+        #image-container {
+            position: relative;
+            width: 100%;
+            height: 66.67vh; /* 화면 높이의 2/3 */
+            overflow: hidden;
+        }
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .room-info-card {
+            position: relative;
+            padding: 20px;
+            border: 1px solid #ffffff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            margin-bottom: 20px;
+            padding-top: 30px;
+            margin-top: 20px; /* 위 간격 */
+            margin-left: 20px; /* 왼쪽 간격 */
+
+        }
+        .room-info-card p {
+            margin: 0;
+            padding-bottom: 10px;
+
+        }
+        .fixed-footer {
+            /* position: fixed; */
+            bottom: 0;
+            left:50%;
+            transform: translateX(-50%);
+            width: 100%;
+            background-color: #fff;
+            max-width: 800px;
+            /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); */
+            padding: 10px 0;
+            text-align: center;
+            z-index: 1000;
+            border-radius: 8px;
+            margin-left: 380px;
+            margin-top: 20px;
+        }
+        .fixed-footer .btn {
+            padding: 15px 300px; /* 버튼 크기 키우기 */
+            border-radius: 10px; /* 버튼 둥글게 */
+            font-size: 18px; /* 글자 크기 키우기 */
+            /* margin-left: 200px; */
+        }
+         
+        .room-card {
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            margin-top: 10px;
+            margin-right: 40px;
+            margin-left: 40px;
+            position: relative;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #5e5e5e;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a> -->
+    <div class="container mt-4">
+            <!-- 이미지 슬라이더 시작 -->
+            <div id="roomImagesCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" id="image-container">
+                    {% for image in room_images %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{MEDIA_URL}}{{ image.images }}" class="d-block w-100" alt="Room Image">
+                        </div>
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#roomImagesCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#roomImagesCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+            <!-- 이미지 슬라이더 끝 -->
+
+                <div class="room-info-card">
+                    <h1>{{ room.name }}</h1>
+                    <p> 
+                        <i class="bi bi-person"></i> 최대 {{ room.capacity }}인
+                    </p>
+                </div>
+
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 20px 40px;">
+
+            <div style="display: flex; justify-content: center; align-items: center; margin: 20px 70px;">
+                <div style="margin-left: 40px;">
+                    <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                    <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>                
+                </div>  
+                <p style="font-size: 1.5em; font-weight: bold; margin-top: 20px; margin-left: 180px">
+                    {{ room.price|floatformat:0|intcomma }}원
+                </p>
+                
+            </div> 
+
+            <hr style="border: 0; border-top: 20px solid #e7e7e7d8; margin: 30px 0;">
+
+            <!-- 체크인/체크아웃 시간 표 -->
+            <div style="margin: 20px 70px;">
+                <h3 style="text-align: left; font-weight: bold; font-size: 1.2em; margin-bottom: 30px; margin-top: 30px;">체크인/체크아웃 시간</h3>
+                <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                    <tr>
+                        <th style=" padding: 10px; background-color: #bcbcbc; border-top-left-radius: 10px; ">체크인</th>
+                        <th style=" padding: 10px; background-color: #bcbcbc; border-top-right-radius: 10px;">체크아웃</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #f0f0f0; padding: 10px; background-color: #f0f0f0; border-bottom-left-radius: 10px; ">{{ room.check_in_time }}</td>
+                        <td style="border: 1px solid #f0f0f0; padding: 10px; background-color: #f0f0f0; border-bottom-right-radius: 10px;">{{ room.check_out_time }} 이전</td>
+                    </tr>
+                </table>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 40px 40px;">
+
+            <h3 style="text-align: left; font-weight: bold; font-size: 1.2em; margin-bottom: 30px; margin-top: 20px; margin-left: 70px;">이용 안내</h3>
+            <div class="room-card">
+                <p class="card-text" style="white-space: pre-wrap;">{{ room.description }}</p>
+            </div>
+
+            
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 40px 40px;">
+
+            <h3 style="text-align: left; font-weight: bold; font-size: 1.2em; margin-bottom: 30px; margin-top: 20px; margin-left: 70px;">예약 공지</h3>
+            <div class="room-card">
+                <p class="card-text" style="white-space: pre-wrap;">{{ room.guide}}</p>
+            </div>
+
+
+            <div class="fixed-footer">
+                <a href="{% url 'accommodation:create_reservation' accommodation_pk=accommodation.pk room_pk=room.pk%}" class="btn btn-primary">예약하기</a>
+            </div> 
+            
+    </div>
+    
+{% endblock %}

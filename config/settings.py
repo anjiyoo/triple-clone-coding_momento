@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     # allauth
     'allauth',
     'allauth.account',
@@ -77,6 +78,9 @@ INSTALLED_APPS = [
     'apps.planrecommend',
     'apps.customer_service',
     'corsheaders',
+    'apps.accommodation',
+    'apps.mypage',
+    'apps.tour',
 ]
 
 MIDDLEWARE = [

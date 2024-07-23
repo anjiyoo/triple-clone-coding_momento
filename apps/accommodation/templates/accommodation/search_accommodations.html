@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+
+{% block title %}Accommodation Search{% endblock %}
+
+
+{% block content %}
+<style>
+    .img-responsive {
+    width: 80px; /* 원하는 너비로 설정 */
+    height: 80px; /* 높이를 자동으로 조절하여 비율 유지 */
+    border-radius: 8px;
+}
+.search-result-item {
+    display: flex; /* Flexbox 레이아웃 활성화 */
+    align-items: center; /* 항목들을 세로 방향으로 중앙 정렬 */
+    gap: 20px; /* 이름과 사진 사이의 간격 */
+    margin-bottom: 20px;
+    padding: 10px;
+    list-style-type: none; /* 기본 리스트 스타일 제거 */
+    margin-top: 10px;
+}
+.text-container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+input[type="text"] {
+    width: 700px; /* 전체 너비 사용 */
+    padding: 10px; /* 내부 패딩 */
+    margin: 8px 0; /* 위아래 마진 */
+    box-sizing: border-box; /* 패딩과 테두리가 너비에 포함되도록 */
+    border: none; /* 테두리 색상 */
+    border-radius: 4px; /* 둥근 테두리 */
+    background-color: #f8f8f8; /* 배경색 */
+    font-size: 16px; /* 폰트 크기 */
+    color: #333; /* 폰트 색상 */
+}
+
+input[type="text"]:focus {
+    border-color: #4A90E2; /* 포커스 시 테두리 색상 변경 */
+    outline: none; /* 기본 아웃라인 제거 */
+}
+.search-container {
+    display: flex; /* Flexbox 레이아웃 활성화 */
+    align-items: center; /* 버튼과 입력 필드를 세로 중앙 정렬 */
+    gap: 10px; /* 버튼과 검색창 사이의 간격 */
+}
+
+button {
+    padding: 5px 10px; /* 버튼 내부 패딩 */
+    cursor: pointer; /* 마우스 오버 시 커서 변경 */
+    font-size: 16px; /* 폰트 크기 */
+}
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#clear-search {
+    position: absolute;
+    right: 5px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+}
+.container {
+            max-width: 800px; /* 최대 너비 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            padding: 30px 20px; /* 내부 여백 설정 */
+            background-color: #ffffff; /* 박스 배경색 */
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* 그림자 */
+        }
+</style>
+<h2 style="font-weight: bold; margin-left: 400px;"> 숙소 검색 </h2>
+
+<div class="container mt-4">
+<div class="search-container">
+    <a href="{% url 'accommodation:accommodation_home' %}" class="btn">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <form action="" method="get">
+        <div class="search-box">
+            <input type="text" name="q" id="search-input" placeholder="국내 도시, 숙소 검색" aria-label="Search" value="{{ query }}">
+            <button type="button" id="clear-search" aria-label="Clear search">&times;</button>
+        </div>
+    </form>
+</div>
+
+<div id="search-results">
+    {% if query %}
+    {% if results %}
+    <ul>
+        {% for result in results %}
+        <a href="{% url 'accommodation:accommodation_detail' result.id %}">
+            <li class="search-result-item"> 
+                {% if result.first_image_file %}
+                    <img src="{{ result.first_image_file }}" alt="{{ result.name }} Image" class="img-responsive">
+                    <div class="text-container"> 
+                        <h5 style="font-weight: bold;">{{ result.name }}</h5>
+                        <p style="font-weight: bold; color: gray;">{{ result.location }}</p>
+                    </div>
+
+                {% else %}
+                    <p>No image available</p>
+                {% endif %}
+            </li>
+        </a>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>검색 결과가 없습니다.</p>
+{% endif %}
+{% endif %}
+</div>
+
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        
+        searchInput.addEventListener('input', function() {
+            const query = this.value;
+            
+            fetch(`/accommodation/search_accommodations/?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultList = document.createElement('ul');
+                    data.results.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item.name;
+                        resultList.appendChild(li);
+                    });
+                    const oldResults = document.querySelector('ul');
+                    if (oldResults) {
+                        oldResults.parentNode.replaceChild(resultList, oldResults);
+                    } else {
+                        searchInput.parentNode.appendChild(resultList);
+                    }
+                });
+        });
+    });
+    document.getElementById('clear-search').addEventListener('click', function() {
+        document.getElementById('search-input').value = ''; // 검색 필드 비우기
+    });
+    </script>
+
+
+{% endblock %}
