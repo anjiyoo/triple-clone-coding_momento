@@ -34,7 +34,7 @@ urlpatterns = [
     path('chatbot/', include('apps.chatbot.urls')),
     path('plan/', include('apps.plan.urls')),
     path('planrecommend/', include('apps.planrecommend.urls')),
-    # path('tour/', include('apps.tour.urls')),
+    path('tour/', include('apps.tour.urls')),
     path('customer_service/', include('apps.customer_service.urls')),
     path('accommodation/', include("apps.accommodation.urls")),
 
