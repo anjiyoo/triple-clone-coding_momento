@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% block content%}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+        
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+</head>
+<body>
+    <style>
+        .input-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        input[name="datefilter"] {
+            padding-right: 30px;
+        }
+
+        .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        
+        margin-bottom: 1.5rem;
+        }
+
+        .section {
+        width: 100%;
+        margin-bottom: 1rem;
+        }
+
+        .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        }
+
+        .badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        }
+
+        .btn{
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            white-space: nowrap;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.2s;
+            background-color: var(--color-secondary);
+            color: var(--color-secondary-foreground);
+        }
+
+        .badge:hover {
+        background-color: var(--color-secondary-hover);
+        }
+
+        .badge:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--color-ring), 0 0 0 4px var(--color-background);
+        }
+
+        .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        height: 2.5rem;
+        padding: 0 1rem;
+        width: 100%;
+        transition: background-color 0.2s;
+        }
+
+        .button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--color-ring), 0 0 0 4px var(--color-background);
+        }
+
+        .button-primary {
+        background-color: #e6f2ff;
+        color: #0066cc;
+        }
+
+        .button-primary:hover {
+        background-color: #cce5ff;
+        }
+
+        .button-secondary {
+        color: var(--color-muted-foreground);
+        }
+
+        .button-secondary:hover {
+        background-color: var(--color-accent);
+        color: var(--color-accent-foreground);
+        }
+
+        .space-y-6 > * + * {
+        margin-top: 1.5rem;
+        }
+
+        .space-y-4 > * + * {
+        margin-top: 1rem;
+        }
+        :root {
+        --color-secondary: #e2e8f0;
+        --color-secondary-foreground: #1a202c;
+        --color-secondary-hover: #cbd5e0;
+        --color-ring: #4299e1;
+        --color-background: #ffffff;
+        --color-muted-foreground: #718096;
+        --color-accent: #edf2f7;
+        --color-accent-foreground: #2d3748;
+        }
+    </style>
+    
+    <div class="container">
+        <form action="{% url 'plan:day_plan' city.area_code city.cigungu1|default:0 city.cigungu2|default:0 city.cigungu3|default:0 %}" method="POST">
+            {% csrf_token %}
+            <h1 class="title">여행일정 등록</h1>
+            <h2 class="section-title">기간</h2>
+            <div class="input-container">
+                <input type="text" name="datefilter" value="" placeholder="날짜 선택" style="width: 220px; height: 50px; border-radius: 10px; background-color: whitesmoke; cursor: pointer;" />
+            <i class="fa-regular fa-calendar calendar-icon"></i>
+        </div>
+        <div class="space-y-6 mt-5" >
+            <h1 class="title">어떤 스타일의 여행을 할 계획인가요?</h1>
+            <div class="section space-y-4">
+                <div>
+                    <h2 class="section-title">누구와</h2>
+                <div class="badge-container">
+                    
+                    <input type="checkbox" class="btn-check badge" id="btn-check-alone" name="who" value="혼자" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-alone">혼자</label><br>
+                    <input type="checkbox" class="btn-check" id="btn-check-friend" name="who" value="친구와" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-friend">친구와</label><br>
+                    <input type="checkbox" class="btn-check" id="btn-check-family" name="who" value="부모님과" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-family">부모님과</label><br>
+                    <input type="checkbox" class="btn-check" id="btn-check-lover" name="who" value="연인과" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="btn-check-lover">연인과</label><br>
+                  <input type="checkbox" class="btn-check" id="btn-check-life_partner" name="who" value="배우자와" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="btn-check-life_partner">배우자와</label><br>
+                  <input type="checkbox" class="btn-check" id="btn-check-kid" name="who" value="아이와" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="btn-check-kid">아이와</label><br>
+                  <input type="checkbox" class="btn-check" id="btn-check-etc" name="who" value="기타" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="btn-check-etc">기타</label><br>
+                  <!-- 다른 배지들... -->
+                </div>
+            </div>
+            <div>
+                <h2 class="section-title">여행 스타일</h2>
+                <div class="badge-container">
+                    <input type="checkbox" class="btn-check badge" id="btn-check-activity" name="style" value="체험·액티비티" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-activity">체험·액티비티</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-sns" name="style" value="SNS 핫플레이스" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-sns">SNS 핫플레이스</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-nature" name="style" value="자연과 함께" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-nature">자연과 함께</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-famous" name="style" value="유명 관광지는 필수" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-famous">유명 관광지는 필수</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-healing" name="style" value="여유롭게 힐링" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-healing">여유롭게 힐링</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-culture" name="style" value="문화·예술·역사" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-culture">문화·예술·역사</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-travel" name="style" value="여행지 느낌 물씬" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-travel">여행지 느낌 물씬</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-shopping" name="style" value="쇼핑은 열정적으로" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-shopping">쇼핑은 열정적으로</label><br>
+                    <input type="checkbox" class="btn-check badge" id="btn-check-food" name="style" value="관광보다 먹방" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-food">관광보다 먹방</label><br>
+                    <!-- 다른 배지들... -->
+                </div>
+            </div>
+            </div>
+            <input type="hidden" name="city" value="{{city}}">
+            <input type="hidden" name="trip" value="{{trip.id}}">
+            <button type="submit" class="button button-primary">완료</button>
+        </form>
+            <button class="button button-secondary">다음에 하기</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+    $(function() {
+
+$('input[name="datefilter"]').daterangepicker({
+    autoUpdateInput: false,
+    locale: {
+        "separator": " ~ ", // 시작일시와 종료일시 구분자
+        "format": 'YYYY-MM-DD HH:mm:ss',    // 일시 노출 포맷
+        "applyLabel": "확인",   // 확인 버튼 텍스트
+        "cancelLabel": "취소",  // 취소 버튼 텍스트
+        "daysOfWeek": ["일", "월", "화", "수", "목", "금", "토"],
+        "monthNames": ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+
+    }
+});
+
+$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+});
+
+$('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+    $(this).val('');
+});
+$('input[name="datefilter"]').on('show.daterangepicker', function (ev, picker) {
+    $(".yearselect").css("float", "left");
+    $(".monthselect").css("float", "right");
+    $(".cancelBtn").css("float", "right");
+});
+
+
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const aloneCheckbox = document.getElementById('btn-check-alone');
+    const friendCheckbox = document.getElementById('btn-check-friend');
+    const familyCheckbox = document.getElementById('btn-check-family');
+    const loverCheckbox = document.getElementById('btn-check-lover');
+    const life_partnerCheckbox = document.getElementById('btn-check-life_partner');
+    const kidCheckbox = document.getElementById('btn-check-kid');
+    const etcCheckbox = document.getElementById('btn-check-etc');
+    aloneCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            friendCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            kidCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    });
+
+    friendCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            aloneCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            kidCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    });
+
+    familyCheckbox.addEventListener('change',function(){
+        if (this.checked){
+            friendCheckbox.checked = false;
+            aloneCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            kidCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    })
+
+    loverCheckbox.addEventListener('change',function(){
+        if (this.checked){
+            aloneCheckbox.checked = false;
+            friendCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            kidCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    })
+
+    life_partnerCheckbox.addEventListener('change',function(){
+        if (this.checked){
+            aloneCheckbox.checked = false;
+            friendCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            kidCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    })
+    kidCheckbox.addEventListener('change',function(){
+        if (this.checked){
+            aloneCheckbox.checked = false;
+            friendCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            etcCheckbox.checked = false;
+        }
+    })
+    etcCheckbox.addEventListener('change',function(){
+        if (this.checked){
+            aloneCheckbox.checked = false;
+            friendCheckbox.checked = false;
+            familyCheckbox.checked = false;
+            loverCheckbox.checked = false;
+            life_partnerCheckbox.checked = false;
+            kidCheckbox.checked = false;
+        }
+    })
+});
+
+</script>
+    
+</body>
+</html>
+{% endblock %}
