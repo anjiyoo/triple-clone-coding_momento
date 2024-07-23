@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'apps.planrecommend',
     'apps.customer_service',
     'apps.accommodation',
+    'apps.mypage',
     'apps.tour',
 ]
 
@@ -116,7 +117,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DB postgresql 설정
+# # DB postgresql 설정
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
