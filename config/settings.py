@@ -76,7 +76,8 @@ INSTALLED_APPS = [
     'apps.plan',
     'apps.planrecommend',
     'apps.customer_service',
-    'apps.tour'
+    'apps.mypage',
+    'apps.tour',
 ]
 
 MIDDLEWARE = [
