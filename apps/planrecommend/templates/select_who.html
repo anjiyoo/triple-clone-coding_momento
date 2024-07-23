@@ -11,7 +11,7 @@
     <div class="card-body">
         <i class="bi bi-emoji-sunglasses-fill"></i>
         <h3 class="mt-4">누구와 떠나나요?</h3>
-        <p id="select-city" class="mb-4">동행자를 선택해주세요.</p>
+        <p id="select-who" class="mb-4">동행자를 선택해주세요.</p>
         
         <!-- 동행자 선택 -->
         <div class="center" style="display: flex; justify-content: center;">
@@ -71,9 +71,9 @@
         }
 
         function handleNextButtonClick(event) {
-            if (selectedDate) {
+            if (selectedWho) {
                 // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자를 URL 파라미터로 전달
-                window.location.href = `{% url 'planrecommend:select_style' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}&who=${encodeURIComponent(selectedWho)}`;
+                window.location.href = `{% url 'planrecommend:select_style' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(selectedWho)}`;
             } else {
                 // 선택된 동행자가 없을 경우, 알림창 띄우기
                 alert('동행자를 선택해주세요.');

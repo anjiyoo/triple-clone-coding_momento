@@ -10,7 +10,7 @@ from apps.userinfo.models import User
 class TripDate(models.Model):
     date = models.CharField(max_length=30)  # 여행기간
 
-    def str(self):
+    def __str__(self):
         return self.date
 
     
@@ -18,7 +18,7 @@ class TripDate(models.Model):
 class TripWho(models.Model):
     who = models.CharField(max_length=30)  # 동행자
 
-    def str(self):
+    def __str__(self):
         return self.who
     
 
@@ -26,7 +26,7 @@ class TripWho(models.Model):
 class TripStyle(models.Model):
     style = models.CharField(max_length=30)  # 여행스타일
 
-    def str(self):
+    def __str__(self):
         return self.style    
 
 
@@ -34,13 +34,12 @@ class TripStyle(models.Model):
 class TripPlan(models.Model):
     plan = models.CharField(max_length=30)  # 여행일정
 
-    def str(self):
+    def __str__(self):
         return self.plan    
 
 
 # 일정추천
 class TripRecommend(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # 유저 모델 외부키
     city_name = models.ForeignKey(County, on_delete=models.SET_NULL, null=True)  # 도시 외부키 참조
     date = models.ForeignKey(TripDate, on_delete=models.CASCADE, null=True)  # 여행기간 외부키 참조
     who = models.ForeignKey(TripWho, on_delete=models.CASCADE, null=True)  # 동행자 외부키 참조
@@ -48,7 +47,7 @@ class TripRecommend(models.Model):
     plan = models.ForeignKey(TripPlan, on_delete=models.CASCADE, null=True)  # 여행일정 외부키 참조
     created_at = models.DateTimeField(auto_now_add=True)  # 생성일
 
-    def str(self):
+    def __str__(self):
         return self.city_name.name
     
 
@@ -63,7 +62,7 @@ class CitySpotRecommend(models.Model):
     map_x = models.FloatField(default=0.0)  # 경도
     map_y = models.FloatField(default=0.0)  # 위도
 
-    def str(self):
+    def __str__(self):
         return self.title
 
 
@@ -73,5 +72,5 @@ class DayPlanRecommend(models.Model):
     spot = models.ForeignKey(CitySpotRecommend,on_delete=models.CASCADE)  # 관광지 외부키 참조
     day = models.DateField()  # 일자
 
-    def str(self):
+    def __str__(self):
         return self.day

@@ -11,31 +11,90 @@
     <div class="card-body">
         <i class="bi bi-camera-fill"></i>
         <h3 class="mt-4">내가 선호하는 여행 스타일은?</h3>
-        <p id="select-city" class="mb-4">다중 선택이 가능해요.</p>
+        <p id="select-style" class="mb-4">여행스타일을 선택해주세요.</p>
         
         <!-- 스타일 선택 -->
         <div class="center" style="display: flex; justify-content: center;">
             <div>
                 {% for style in styles|slice:":5" %}
-                    <div id="city-box" style="margin-bottom: 10px; margin-right: 10px;">{{ style.style }}</div>
+                    <button class="style-box">{{ style.style }}</button>
                 {% endfor %}
             </div>
             <div>
                 {% for style in styles|slice:"5:9" %}
-                    <div id="city-box" style="margin-bottom: 10px;">{{ style.style }}</div>
+                    <button class="style-box">{{ style.style }}</button>
                 {% endfor %}
             </div>
-           
         </div>
 
-
+        <!-- 선택된 값 -->
+        <p class="mt-2 mb-4" style="color: #000000; font-weight: bold; text-align: center;">선택</p>
+        <div id="selected-data-container" class="mt-2 mb-4" style="display: flex; flex-direction: column; align-items: center;">
+            <div style="display: flex; justify-content: center;">
+                <div id="city-selected-data" class="selected-data"></div>   
+                <div id="date-selected-data" class="selected-data"></div>  
+                <div id="who-selected-data" class="selected-data"></div>    
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <div id="style-selected-data" class="selected-data"></div>    
+            </div>
+        </div>
+        
 
         <!-- 다음 버튼 -->
         <div class="center mt-3 mb-3">
-            <a href="{% url 'planrecommend:select_plan' %}">
-                <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
-            </a>
+            <button id="next-button" class="btn btn-primary" style="width: 370px; height: 50px;">다음</button>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.style-box');
+        const styleSelectedDataContainer = document.getElementById('style-selected-data');
+        const whoSelectedDataContainer = document.getElementById('who-selected-data');
+        const dateSelectedDataContainer = document.getElementById('date-selected-data');
+        const citySelectedDataContainer = document.getElementById('city-selected-data');
+        const nextButton = document.getElementById('next-button');
+        const who = new URLSearchParams(window.location.search).get('who');
+        const date = new URLSearchParams(window.location.search).get('date');
+        const city = new URLSearchParams(window.location.search).get('city');
+        let selectedStyle = '';
+
+        // 선택된 도시를 city-selected-data에 표시
+        citySelectedDataContainer.innerHTML = `<div class="city-selected-data">${city}</div>`;
+
+        // 선택된 여행시기를 date-selected-data에 표시
+        dateSelectedDataContainer.innerHTML = `<div class="date-selected-data">${date}</div>`;
+
+        // 선택된 동행자를 who-selected-data에 표시
+        whoSelectedDataContainer.innerHTML = `<div class="who-selected-data">${who}</div>`;
+
+        function handleStyleSelection(event) {
+            // 모든 버튼에서 selected 클래스 제거
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            // 클릭된 버튼에 selected 클래스 추가
+            event.currentTarget.classList.add('selected');
+            // 선택된 스타일 저장 및 표시
+            selectedStyle = event.currentTarget.textContent;
+            styleSelectedDataContainer.innerHTML = `<div class="style-selected-data">${selectedStyle}</div>`;
+            
+        }
+
+        function handleNextButtonClick(event) {
+            if (selectedStyle) {
+                // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자, 스타일을 URL 파라미터로 전달
+                window.location.href = `{% url 'planrecommend:select_plan' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(who)}&style=${encodeURIComponent(selectedStyle)}`;
+            } else {
+                // 선택된 스타일이 없을 경우, 알림창 띄우기
+                alert('스타일을 선택해주세요.');
+                // 기본 동작 방지
+                event.preventDefault();
+            }
+        }
+
+        buttons.forEach(button => button.addEventListener('click', handleStyleSelection));
+        nextButton.addEventListener('click', handleNextButtonClick);
+    });
+</script>
 {% endblock %}
