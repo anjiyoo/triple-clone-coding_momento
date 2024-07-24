@@ -215,7 +215,13 @@ def add_memo(request):
 # 여행 계획 조회 함수
 def plan(request):
     new_trip = get_object_or_404(Trip, id=request.GET['trip_id'])
-    plan = list(DayPlan.objects.filter(trip=new_trip.id).annotate(
+    if request.GET['day']:
+        plan = list(DayPlan.objects.filter(trip=new_trip.id , day=request.GET['day']).annotate(
+        title=F('spot__title'),
+        address=F('spot__address')
+    ).values('title', 'address', 'trip', 'spot', 'memo', 'day'))
+    else:
+        plan = list(DayPlan.objects.filter(trip=new_trip.id).annotate(
         title=F('spot__title'),
         address=F('spot__address')
     ).values('title', 'address', 'trip', 'spot', 'memo', 'day'))

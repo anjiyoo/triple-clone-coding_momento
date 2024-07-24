@@ -152,7 +152,7 @@
       <!-- 메인 액션 버튼 -->
       <div class="main-actions">
         <button class="btn btn-primary">+ 일행과 함께 일정짜기</button>
-        <button class="btn btn-primary">% 셀프 패키지</button>
+        <a class="btn btn-primary" href="{% url 'travel_diary:create' new_trip.id %}">여행기 쓰기</a>
       </div>
   
       <!-- 보조 액션 버튼 -->
