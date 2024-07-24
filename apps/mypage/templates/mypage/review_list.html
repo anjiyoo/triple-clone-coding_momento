@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+    <style>
+        .review {
+            border-bottom: 1px solid #eaeaea;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .review-content {
+            max-width: 70%;
+        }
+        .review-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-left: 20px;
+        }
+        .stars {
+            color: gold;
+            margin-bottom: 10px;
+        }
+        .stars span {
+            font-size: 20px;
+        }
+        .review_head_card, .review_main_card {
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            margin-bottom: 5px;
+        }
+        .card-text {
+            margin-bottom: 5px;
+        }
+        .truncate {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .back-button {
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            z-index: 1000;
+            float: left;
+            min-width: 10rem;
+            padding: .5rem 0;
+            margin: .125rem 0 0;
+            font-size: 1rem;
+            color: #000000;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: none;
+            border-radius: .25rem;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            right: 0; /* 드롭다운 메뉴를 오른쪽으로 정렬 */
+            left: auto; /* 기본 왼쪽 정렬을 비활성화 */
+        }
+        .dropdown {
+            position: absolute;
+            right: 0;
+        }
+        .dropdown-toggle {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+        .dropdown-toggle .bi-three-dots {
+            color: #000000;
+        }
+        .dropdown-toggle:focus,
+        .dropdown-toggle:active,
+        .dropdown-toggle:focus:active {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .dropdown-toggle .bi-three-dots {
+            color: #000000;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .back {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .tabs {
+            display: flex;
+            margin-top: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tabs .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .tabs .tab.active {
+            border-bottom: 2px solid #007bff;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <div class="back" onclick="history.back();">&larr;</div>>
+    </div>
+    <div class="tabs">
+        <div class="tab active">리뷰</div>
+    </div>
+    {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{% url 'accommodation:update_review' review.accommodation.id review.id %}">수정하기</a>
+                            <a class="dropdown-item" onclick="deleteReview({{ review.accommodation.id }}, {{ review.id }})">삭제하기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="review-content">
+                    <div class="review_head_card" onclick="goToUrl('{% url 'accommodation:accommodation_detail' review.accommodation.id %}')">
+                        <h5 class="card-title">{{ review.accommodation.name }}</h5>
+                        <p class="card-text">{{ review.accommodation.category }} · {{ review.accommodation.location }}</p>
+                        {% if review.first_image_url %}
+                            <img src="{{ review.first_image_url }}" alt="{{ review.accommodation.name }}" class="review-image">
+                        {% endif %}
+                    </div>
+                    <div class="review_main_card" onclick="goToUrl('{% url 'accommodation:review_detail' review.accommodation.id review.id %}')">
+                        <div class="stars">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <span>★</span>
+                                {% else %}
+                                    <span>☆</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="card-text truncate">{{ review.content|linebreaksbr }}</p>
+                    </div>
+                </div>
+                {% if review.image_url %}
+                <a href="{% url 'accommodation:review_detail' review.accommodation.id review.id %}">
+                    <img class="review-image" src="{{ review.image_url.url }}" alt="Review Image">
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<script>
+    function goToUrl(url) {
+        window.location.href = url;
+    }
+
+    function deleteReview(accommodationPk, reviewPk) {
+        if (confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+            fetch(`/accommodation/detail/${accommodationPk}/review/${reviewPk}/delete/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = `/test_mypage/review_list/`; // 삭제 후 리다이렉트할 URL
+                } else {
+                    return response.text().then(text => {
+                        alert(text);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('리뷰 삭제 중 오류가 발생했습니다.');
+            });
+        }
+    }
+
+    // 드롭다운 버튼 클릭 이벤트 핸들러
+    document.querySelectorAll('.dropdown-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            this.nextElementSibling.classList.toggle('show');
+        });
+    });
+
+    // 문서 클릭 이벤트 핸들러
+    document.addEventListener('click', function(event) {
+        if (!event.target.matches('.dropdown-toggle') && !event.target.closest('.dropdown-menu')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+</script>
+{% endblock %}
