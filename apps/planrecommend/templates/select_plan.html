@@ -84,27 +84,8 @@
 
         function handleNextButtonClick(event) {
             if (selectedPlan) {
-                // 데이터 전달 URL: 선택된 도시, 여행기간, 동행자, 스타일, 여행일정을 URL 파라미터로 전달
-                const dataUrl = `{% url 'planrecommend:recommend' %}?city=${city}&date=${date}&who=${who}&style=${style}&plan=${selectedPlan}`;
-                
-                console.log('dataUrl:', dataUrl);
-
-                // 이동할 페이지 URL
-                const pageUrl = `{% url 'planrecommend:itinerary' %}`;
-
-                // 데이터 전달 후 페이지로 이동
-                fetch(dataUrl)
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.href = pageUrl;
-                        } else {
-                            alert('데이터 전달에 실패했습니다.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('데이터 전달 중 오류가 발생했습니다.');
-                    });
+                // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자, 스타일, 여행일정을 URL 파라미터로 전달
+                window.location.href = `{% url 'planrecommend:preparing' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(who)}&style=${encodeURIComponent(style)}&plan=${encodeURIComponent(selectedPlan)}`;
             } else {
                 // 선택된 여행일정이 없을 경우, 알림창 띄우기
                 alert('여행일정을 선택해주세요.');

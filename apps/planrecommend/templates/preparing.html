@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/preparing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; height: 600px; margin: 0 auto; text-align: center;">
+    <div class="card-body">
+        <!-- 아이콘 전환 -->
+        <div id="icon-container">
+            <i class="bi bi-globe-asia-australia" style="display: none;"></i>
+            <i class="bi bi-calendar2-check-fill" style="display: none;"></i>
+            <i class="bi bi-sunglasses-fill" style="display: none;"></i>
+            <i class="bi bi-emoji-sunglasses-fill" style="display: none;"></i>
+            <i class="bi bi-map-fill" style="display: none;"></i>
+        </div>
+        <h3>
+            여행 스타일에 맞는<br>
+            맞춤 일정을<br>
+            준비중입니다.
+        </h3>
+        <p id="preparing" class="mb-4">잠시만 기다려 주세요.</p>
+        <!-- 로딩 바 -->
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 아이콘 전환 및 로딩 바 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const icons = document.querySelectorAll('#icon-container i');
+        const loadingProgress = document.querySelector('.loading-progress');
+        let currentIconIndex = 0;
+        let progress = 0;
+
+        icons[currentIconIndex].style.display = 'block';
+        loadingProgress.style.width = '0%';
+
+        const intervalId = setInterval(() => {
+            // 아이콘 전환
+            icons[currentIconIndex].style.display = 'none';
+            currentIconIndex = (currentIconIndex + 1) % icons.length;
+            icons[currentIconIndex].style.display = 'block';
+
+            // 로딩 바 전환
+            if (progress < 100) {
+                progress += 20; // 1초에 20%씩 증가
+                loadingProgress.style.width = progress + '%';
+            } else {
+                clearInterval(intervalId); // 100%가 되면 interval을 멈춤
+                window.location.href = '{% url "planrecommend:itinerary" %}'; // 리디렉션할 URL로 변경
+            }
+        }, 1000); // 1초 간격
+    });
+</script>
+{% endblock %}

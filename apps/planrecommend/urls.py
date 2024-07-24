@@ -11,7 +11,7 @@ urlpatterns = [
     path('select_style/', SelectStyleListView.as_view(), name='select_style'),
     path('select_plan/', SelectPlanListView.as_view(), name='select_plan'),
 
-    path('recommend/data/', views.trip_recommend_response, name='recommend'),
+    path('preparing/', PreparingListView.as_view(), name='preparing'),
     path('itinerary/', views.itinerary, name='itinerary'),
     
 ]
