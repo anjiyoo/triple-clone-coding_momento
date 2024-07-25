@@ -38,7 +38,6 @@ urlpatterns = [
     path('customer_service/', include('apps.customer_service.urls')),
     path('test_mypage/', include('apps.mypage.urls')),
     path('accommodation/', include("apps.accommodation.urls")),
-    path('payment/', include("apps.payment.urls")),
 
   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

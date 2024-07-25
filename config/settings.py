@@ -79,8 +79,6 @@ INSTALLED_APPS = [
     'apps.customer_service',
     'apps.accommodation',
     'apps.mypage',
-    'apps.tour',
-    'apps.payment',
 ]
 
 MIDDLEWARE = [
