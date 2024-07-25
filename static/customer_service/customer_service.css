@@ -1,0 +1,137 @@
+/* customer_service/customer_service.css */
+
+.container {
+    margin-top: 40px;
+}
+
+.section-title {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.inquiry-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.inquiry-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-item .inquiry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inquiry-item .title-author {
+    flex-grow: 1;
+}
+
+.inquiry-item .created-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px; /* Add space between author and date */
+}
+
+.inquiry-item a {
+    font-size: 1.2em;
+    color: #333;
+    text-decoration: none;
+}
+
+.disabled-link {
+    color: #ccc;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+.inquiry-item i {
+    margin-left: 5px;
+}
+
+.faq-section {
+    padding: 15px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.faq-header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.faq-header {
+    font-size: 1.5em;
+}
+
+.faq-all-list {
+    margin-left: 20px;
+}
+
+.faq-categories {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+
+.faq-categories div {
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+.faq-item {
+    margin-bottom: 10px;
+}
+
+.my-inquiries, .inquiry-action {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.my-inquiries a, .inquiry-action a {
+    font-size: 1.2em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.tab-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.tab {
+    padding: 10px 20px;
+    border: 1px solid #007BFF;
+    background-color: #f7f7f7;
+    color: #007BFF;
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
+.tab.active {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.faq-content {
+    display: none;
+}
+
+.faq-content.active {
+    display: block;
+}
