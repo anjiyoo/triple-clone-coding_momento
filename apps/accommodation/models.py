@@ -96,6 +96,7 @@ class Reservation(models.Model):
     guests_adult = models.PositiveIntegerField(default=2)  # 성인 인원수 필드
     guests_child = models.PositiveIntegerField(default=0)  # 아동 인원수 필드
     telnum = models.CharField(max_length=15, blank=True, null=True)
+    merchant_uid = models.CharField(max_length=255, unique=True, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.accommodation.name}"

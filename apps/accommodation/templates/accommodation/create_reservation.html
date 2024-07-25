@@ -5,6 +5,10 @@
 {% block title %}Create Reservation{% endblock %}
 
 {% block content %}
+<head>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+
+</head>
 <style>
     .container {
             max-width: 800px; /* 최대 너비 설정 */
@@ -265,12 +269,9 @@
         opacity: 1; /* IE에서의 투명도 문제를 해결하기 위해 */
     }
 
-
-
-
 </style>
 <div class="container mt-4">
-        <h1 style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
+        <h1 id="accommodation-name" style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
         <div style="display: flex; margin-left: 40px; color: gray;">
             <i class="bi bi-geo-alt-fill"></i>
             <p style="margin-left: 10px;">{{ accommodation.city.city_name }}</p>
@@ -443,7 +444,7 @@
         <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
         <div style="display: flex; justify-content: space-between; margin-left: 80px; margin-right: 80px;">
             <span style = "font-size: 20px; font-family:  Arial;">총 결제 금액</span>
-            <span style = "font-size: 30px; font-weight: bold;" >{{ room.price|floatformat:0|intcomma }}원</span>
+            <span style = "font-size: 30px; font-weight: bold;" id="room-price" >{{ room.price|floatformat:0|intcomma }}원</span>
         </div>
     </div>
     <!-- 숨겨진 input 필드 추가 -->
@@ -535,12 +536,28 @@
 
     <div class="button-container">
         <button type="submit" class="custom-button" id="submit-button" disabled>예약하기</button>
+           
     </div>
 
     </form>
 </div>
 <script>
+        document.getElementById('submit-button').addEventListener('click', function(evnet) {
+            event.preventDefault();
+            requestPay();
+        });
+        function getPrice() {
+            const priceElement = document.getElementById('room-price');
+            const priceText = priceElement.textContent;
+            console.log('가격 정보:', priceText);
+            return priceText;
+        }
 
+        // 페이지 로드 시 가격 정보 가져오기
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const price = getPrice();
+            // 가격 정보를 사용하여 필요한 작업 수행
+        });
     function formatDate(input) {
         var date = input.value;
         // 숫자만 입력되었는지 확인하고, 8자리인 경우 처리
@@ -713,5 +730,77 @@
             });
         });
     });
+
+    // CSRF 토큰 가져오기 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // CSRF 토큰 변수 정의
+    const csrftoken = getCookie('csrftoken');
+
+    function getPrice() {
+        const priceElement = document.getElementById('room-price');
+        const priceText = priceElement.textContent;
+        console.log('가격 정보:', priceText);
+        return parseInt(priceText.replace(/[^0-9]/g, ''), 10); // 숫자만 추출하여 정수로 변환
+    }
+    function getAccommodationName() {
+        const nameElement = document.getElementById('accommodation-name');
+        return nameElement.textContent.trim();
+    }
+
+    // 페이지 로드 시 가격 정보 가져오기
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const roomPrice = getPrice(); // 동적으로 가격 설정
+        const accommodationName = getAccommodationName();
+
+        // 아임포트 가맹점 식별코드로 초기화
+        IMP.init('imp57021543'); // 예: 'imp12345678'
+
+        function requestPay() {
+            // 결제 요청
+            IMP.request_pay({
+                pg: 'kakaopay', // PG사
+                pay_method: 'card', // 결제수단
+                merchant_uid: 'merchant_' + new Date().getTime(), // 주문번호
+                name: '주문명: ' + accommodationName + ' 결제',
+                amount: roomPrice, 
+            }, function (rsp) { // callback
+                if (rsp.success) {
+                    // 결제 성공 시 서버로 결제 정보 전송
+                    fetch('/accommodation/reservation/success/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            merchant_uid: rsp.merchant_uid// 결제 정보 전송
+                        })
+                    });
+                } else {
+                    // 결제 실패 시 처리
+                    alert('결제에 실패하였습니다. 다시 시도해주세요.');
+                }
+            });
+        }
+
+        // 결제 버튼 클릭 시 requestPay 함수 호출
+        document.getElementById('submit-button').addEventListener('click', requestPay);
+    });
+
+
 </script>
 {% endblock %}

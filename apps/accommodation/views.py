@@ -129,7 +129,7 @@ def make_reservation(request, accommodation_pk, room_pk):
                 pass
             reservation.save()
 
-            return redirect('accommodation:reservation_success', reservation_id=reservation.id)  # Redirect to a success page
+            return redirect('accommodation:reservation_success_page', reservation_id=reservation.id)  # Redirect to a success page
         else:
              # 폼 유효성 검사 실패 시 오류 메시지 출력
             print("Reservation Form Errors:", reservation_form.errors)
@@ -610,45 +610,71 @@ def search_accommodations(request):
                     'query': query,
                     'viewed_accommodations': viewed_accommodations,})
 
-from datetime import datetime, timedelta
-class CheckAvailabilityAPI(View):
-    def get(self, request):
-        start_date_str = request.GET.get('start_date')
-        end_date_str = request.GET.get('end_date')
-        accommodation_id = request.GET.get('accommodation_id')
-        room_pk = request.GET.get('room_pk')
+# from datetime import datetime, timedelta
+# class CheckAvailabilityAPI(View):
+#     def get(self, request):
+#         start_date_str = request.GET.get('start_date')
+#         end_date_str = request.GET.get('end_date')
+#         accommodation_id = request.GET.get('accommodation_id')
+#         room_pk = request.GET.get('room_pk')
 
-        # 날짜 문자열을 datetime 객체로 변환
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+#         # 날짜 문자열을 datetime 객체로 변환
+#         start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+#         end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
 
-        # 예약 가능 여부 확인
-        available = check_availability(accommodation_id, start_date, end_date, room_pk)
+#         # 예약 가능 여부 확인
+#         available = check_availability(accommodation_id, start_date, end_date, room_pk)
 
-        # JSON 응답 반환
-        data = {'available': available}
-        return JsonResponse(data)
+#         # JSON 응답 반환
+#         data = {'available': available}
+#         return JsonResponse(data)
     
-def check_availability(accommodation_id, start_date, end_date, room_pk):
-    # 예약 가능 여부를 판단할 날짜 범위
-    reservation_start = start_date
-    reservation_end = end_date 
+# def check_availability(accommodation_id, start_date, end_date, room_pk):
+#     # 예약 가능 여부를 판단할 날짜 범위
+#     reservation_start = start_date
+#     reservation_end = end_date 
 
-    # 선택한 객실과 예약된 예약을 확인
-    reserved_room = Reservation.objects.filter(
-        accommodation_id=accommodation_id,
-        room_id=room_pk,
-        check_in__lte=reservation_end,  # 예약 시작일이 예약 종료일보다 작거나 같아야 함
-        check_out__gte=reservation_start  # 예약 종료일이 예약 시작일보다 크거나 같아야 함
-    )
+#     # 선택한 객실과 예약된 예약을 확인
+#     reserved_room = Reservation.objects.filter(
+#         accommodation_id=accommodation_id,
+#         room_id=room_pk,
+#         check_in__lte=reservation_end,  # 예약 시작일이 예약 종료일보다 작거나 같아야 함
+#         check_out__gte=reservation_start  # 예약 종료일이 예약 시작일보다 크거나 같아야 함
+#     )
 
-    if reserved_room.exists():
-        return False  # 예약 불가능: 이미 예약된 객실이 있는 경우
-    else:
-        return True   # 예약 가능: 예약된 객실이 없는 경우
+#     if reserved_room.exists():
+#         return False  # 예약 불가능: 이미 예약된 객실이 있는 경우
+#     else:
+#         return True   # 예약 가능: 예약된 객실이 없는 경우
+
+def get_reservation_id_by_merchant_uid(merchant_uid):
+    # merchant_uid를 사용하여 예약 ID를 반환하는 로직을 구현합니다.
+    reservation = get_object_or_404(Reservation, merchant_uid=merchant_uid)
+    return reservation.id
+    
+def reservation_success(request):
+    if request.method == 'POST':
+        imp_uid = request.POST.get('imp_uid')
+        merchant_uid = request.POST.get('merchant_uid')
+        paid_amount = request.POST.get('paid_amount')
+
+        # 결제 검증 로직 추가 (예: 포트원 서버와 통신하여 결제 검증)
+        payment_verified = True
+
+        # 결제 검증이 성공하면 예약 정보를 업데이트하고 성공 페이지로 리디렉션
+        if payment_verified:
+            reservation_id = get_reservation_id_by_merchant_uid(merchant_uid)  # 예약 ID를 가져오는 로직 추가
+            return JsonResponse({
+                'success': True,
+                'redirect_url': f'/reservation/success/{reservation_id}/'
+            })
+        else:
+            return JsonResponse({'success': False})
+
+    return JsonResponse({'success': False})
     
 
-def reservation_success(request, reservation_id):
+def reservation_success_page(request, reservation_id):
     # 예약 정보를 데이터베이스에서 가져옵니다.
     # 예시로, reservation_id를 사용하여 예약 정보를 조회한다고 가정합니다.
     reservation = get_object_or_404(Reservation, pk=reservation_id)
