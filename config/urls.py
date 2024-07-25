@@ -38,6 +38,9 @@ urlpatterns = [
     path('customer_service/', include('apps.customer_service.urls')),
     path('test_mypage/', include(('apps.mypage.urls', 'mypage'), namespace='mypage')),
     path('accommodation/', include("apps.accommodation.urls")),
+    path('guidepage/', include("apps.guidepage.urls")),
+    
+
 
   
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

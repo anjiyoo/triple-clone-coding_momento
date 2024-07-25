@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slideshow</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'guidepage/css/all_reservation.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="image-container">
+                <img src="{% static 'guidepage/photo/travel_memory.png' %}" alt="Triple Guide">
+                <h2>여행을 기록하면 <br>추억은 더 오래 남으니까</h2>
+                <p>사소한 일들이어도 괜찮아요.<br>여행 중 있었던 행복한 순간들을 기록해두었다가 나중<br>에 꺼내보세요.!<br>그 때의 추억이 새록새록 떠오를 거예요.<br></p>
+            </div>
+        </div>
+        <div class="card-1">
+            <h2>여행코스와 함께<br>기록하는 여행스토리</h2>
+            <p>여행이 끝나면 남는건 기록이죠! 내가 다녀온 여행 코<br>스를 사람들에게 소개해 주세요. 직접 다녀온 생생한<br>후기와 나만의 특별한 팁도 같이 담아서요.</p>
+            <div class="slideshow-container" id="slideshow-1">
+                <div class="slides">
+                    <div class="slide"><img src="{% static 'guidepage/photo/여행기 임시1.png' %}" alt="Slide 1"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/여행기 임시2.png' %}" alt="Slide 2"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/여행기 임시3.png' %}" alt="Slide 3"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/여행기 임시4.png' %}" alt="Slide 4"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/여행기 임시5.png' %}" alt="Slide 5"></div>
+                </div>
+                <a class="prev" onclick="prevSlide('slideshow-1')">&#10094;</a>
+                <a class="next" onclick="nextSlide('slideshow-1')">&#10095;</a>
+            </div>
+        </div>
+        <div class="card-1">
+            <h2>장소마다 남기고<br>싶은 이야기가 있다면?</h2>
+            <p>다녀온 장소에 나만의 리뷰를 남겨보세요. <br>내가 작성한 리뷰가 다음 여행을 준비하는 여행자들에<br>게 큰 도움이 됩니다</p>
+            <div class="slideshow-container" id="slideshow-2">
+                <div class="slides">
+                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 1"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 2"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 3"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 4"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 5"></div>
+                </div>
+                <a class="prev" onclick="prevSlide('slideshow-2')">&#10094;</a>
+                <a class="next" onclick="nextSlide('slideshow-2')">&#10095;</a>
+            </div>
+        </div>
+
+        <div class="card-3">
+            <h2>다른 가이드들이 궁금하다면 ?</h2>
+            <div class="slideshow-container" id="slideshow-4">
+                <div class="slides">
+                    <div class="slide">
+                        <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Slide 1">
+                        <button class="guide-button" onclick="navigateToGuide(1)">일정짜기 가이드 보러가기</button>
+                    </div>
+                    <div class="slide">
+                        <img src="{% static 'guidepage/photo/custom_info.png' %}" alt="Slide 2">
+                        <button class="guide-button" onclick="navigateToGuide(2)">맞춤 정보 가이드 보러가기</button>
+                    </div>
+                    <div class="slide">
+                        <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Slide 3">
+                        <button class="guide-button" onclick="navigateToGuide(3)">예약 가이드 보러가기</button>
+                    </div>
+
+                </div>
+                <a class="prev" onclick="prevSlide('slideshow-4')">&#10094;</a>
+                <a class="next" onclick="nextSlide('slideshow-4')">&#10095;</a>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'guidepage/js/custom_info.js' %}"></script>
+</body>
+</html>
