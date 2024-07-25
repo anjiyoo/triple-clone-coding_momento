@@ -30,13 +30,6 @@ class TripStyle(models.Model):
         return self.style    
 
 
-# 여행일정
-class TripPlan(models.Model):
-    plan = models.CharField(max_length=30)  # 여행일정
-
-    def __str__(self):
-        return self.plan    
-
 
 # 일정추천
 class TripRecommend(models.Model):
@@ -44,7 +37,6 @@ class TripRecommend(models.Model):
     date = models.ForeignKey(TripDate, on_delete=models.CASCADE, null=True)  # 여행기간 외부키 참조
     who = models.ForeignKey(TripWho, on_delete=models.CASCADE, null=True)  # 동행자 외부키 참조
     style = models.ForeignKey(TripStyle, on_delete=models.CASCADE, null=True)  # 스타일 외부키 참조
-    plan = models.ForeignKey(TripPlan, on_delete=models.CASCADE, null=True)  # 여행일정 외부키 참조
     created_at = models.DateTimeField(auto_now_add=True)  # 생성일
 
     def __str__(self):

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/recommend.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 게시글 본문 card 크기 -->
+        <div class="col-md-12">
+            <!-- 질문 예시 -->
+            <div class="mb-4">
+                <div class="btn-group" style="text-align: right;">
+                    <!-- 사용자가 선택한 값 -->
+                    <div id="selectedData" style="margin-bottom: 20px;">
+                        <p>여행도시 <span id="selectedCity">{{ city }}</span></p>
+                        <p>여행기간 <span id="selectedDate">{{ date }}</span></p>
+                        <p>동행자 <span id="selectedWho">{{ who }}</span></p>
+                        <p>여행스타일 <span id="selectedStyle">{{ style }}</span></p>
+                        <p>여행일정 <span id="selectedPlan">{{ plan }}</span></p>
+                    </div>
+                    
+                    <!--  -->
+                    <div class="d-flex justify-content-end mb-4">
+                        <button id="generatePlanButton" type="button" class="btn btn-outline-light btn-custom" style="color: #0BD0AF; border-radius: 10px;">
+                            일정보기
+                        </button>
+                    </div>
+
+                    <div id="planResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- 채팅창 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- 채팅창 배경 -->
+                    <div id="chat-container" class="chat-container" style="border-radius: 10px; height: 400px;">
+                        <!-- 채팅 목록 -->
+                        <div id="chat-message-list" class="chat-message-list" style="border-radius: 10px; background-color: #f4f4f8; height: 380px; overflow-y: auto;">
+                            <!-- 질문 -->
+                            <div id="chat-messages" class="chat-messages" style="border-radius: 10px; height: auto;"></div>
+                            <!-- 응답.. -->
+                            <div id="waiting" class="waiting" style="border-radius: 10px; height: auto;" placeholder="안녕하세요!"></div>
+                        </div>
+                    </div>
+    
+                    <!-- 질문 입력창 -->
+                    <div class="input-group mt-3 mb-3">
+                        <input type="text" id="userInput" class="form-control" style="border-radius: 10px;" placeholder="지역에 대해 궁금한 내용을 입력해주세요">
+                        <div class="input-group-append" style="margin-left: 10px;">
+                            <button id="submitButton" class="submit-button btn-lg">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 작성일 -->
+            <div style="margin-left: auto; text-align: right; flex-shrink: 0;">
+                <small class="text-muted">{{ comment.bae_com_date|date:"Y.m.d" }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- url 파라미터 가져오기-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const city = "{{ city }}";
+        const date = "{{ date }}";
+        const who = "{{ who }}";
+        const style = "{{ style }}";
+        const plan = "{{ plan }}";
+
+        document.getElementById('selectedCity').textContent = city;
+        document.getElementById('selectedDate').textContent = date;
+        document.getElementById('selectedWho').textContent = who;
+        document.getElementById('selectedStyle').textContent = style;
+        document.getElementById('selectedPlan').textContent = plan;
+
+        const generatePlanButton = document.getElementById('generatePlanButton');
+        generatePlanButton.onclick = function() {
+            const question = `${city}에서 ${date} 동안 ${who}와 함께 ${style} 여행을 하고 싶어. ${plan} 일정으로 추천해줘.`;
+            getPlanRecommendation(question);
+        };
+    });
+
+    function getPlanRecommendation(question) {
+        fetch('/api/get_plan_recommendation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ question: question })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('planResult').innerText = data.recommendation;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<!-- 페이지 내용 -->
+<script src="{% static 'chatbot/chatbot_script.js' %}"></script>
+{% endblock %}

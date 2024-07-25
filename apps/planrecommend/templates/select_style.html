@@ -84,7 +84,7 @@
         function handleNextButtonClick(event) {
             if (selectedStyle) {
                 // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자, 스타일을 URL 파라미터로 전달
-                window.location.href = `{% url 'planrecommend:select_plan' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(who)}&style=${encodeURIComponent(selectedStyle)}`;
+                window.location.href = `{% url 'planrecommend:preparing' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(who)}&style=${encodeURIComponent(selectedStyle)}`;
             } else {
                 // 선택된 스타일이 없을 경우, 알림창 띄우기
                 alert('스타일을 선택해주세요.');

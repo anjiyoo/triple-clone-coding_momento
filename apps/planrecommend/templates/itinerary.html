@@ -13,11 +13,51 @@
 {% endblock %}
 
 {% block content %}
-<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
-    <div class="card-body">
-        <i class="bi bi-map-fill"></i>
-        <h3 class="mt-4">{{ city.city }}을 위한 추천 일정</h3>
-        <p id="select-map" class="mb-4">선택해주신 스타일로 일정을 만들어드려요.</p>
-    </div>
-</div>
+    <div id="map"></div>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_api_key }}"></script>
+    <script>
+        // 지도 표시
+        function initMap() {
+            var mapContainer = document.getElementById('map'),
+                mapOption = {
+                    center: new kakao.maps.LatLng(37.5665, 126.978), // 서울의 좌표
+                    level: 8 // 지도의 확대 수준
+                };
+
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+
+            // 관광지 위치 정보 배열
+            var locations = {{ locations|safe }};
+
+            // 마커 추가
+            for (var i = 0; i < locations.length; i++) {
+                var position = new kakao.maps.LatLng(locations[i].lat, locations[i].lng);
+                var marker = new kakao.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: locations[i].name
+                });
+
+                // 마커 클릭 시 인포윈도우 표시
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: '<div style="padding:5px;">' + locations[i].name + '</div>'
+                });
+
+                kakao.maps.event.addListener(marker, 'mouseover', function (marker, infowindow) {
+                    return function () {
+                        infowindow.open(map, marker);
+                    };
+                }(marker, infowindow));
+
+                kakao.maps.event.addListener(marker, 'mouseout', function (infowindow) {
+                    return function () {
+                        infowindow.close();
+                    };
+                }(infowindow));
+            }
+        }
+
+        // 페이지 로드 시 지도 초기화
+        window.onload = initMap;
+    </script>
 {% endblock %}
