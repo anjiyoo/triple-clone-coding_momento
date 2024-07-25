@@ -74,8 +74,8 @@ def itinerary(request):
     return render(request, 'itinerary.html', {'recommendation': trip_recommendation})
 
 ######################################################################
+
 # GPT
-#     
 load_dotenv()  # 환경 변수 파일 로드
 
 OPENAI_API_KEY = os.getenv('OPENAI_KEY')
@@ -101,34 +101,56 @@ print("AI일정추천 DB 성공적으로 실행했습니다")
 #             date INTEGER,
 #             who INTEGER,
 #             style INTEGER,
-#             plan INTEGER,
 #             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 #             FOREIGN KEY (city_name) REFERENCES County(id),
 #             FOREIGN KEY (date) REFERENCES TripDate(id),
 #             FOREIGN KEY (who) REFERENCES TripWho(id),
 #             FOREIGN KEY (style) REFERENCES TripStyle(id),
-#             FOREIGN KEY (plan) REFERENCES TripPlan(id),
 # );
 # ''')
 # print("테이블 TripRecommend 생성 완료")
 
 # # 데이터 삽입 (초기 생성하고 주석처리)
 # trip_recommend_data = [
-#     (1, '가평﹒양평 ', '당일치기.', '혼자', '체험﹒액티비티', '빼곡한일정선호'),
-#     (2, '강릉﹒속초', '1박2일', '친구와', 'SNS핫플레이스', '널널한일정선호'),
-#     (3, '경주', '2박3일', '연인과', '자연과 함께', '빼곡한일정선호'),
-#     (4, '부산', '3박4일', '배우자와', '유명관광지는필수', '널널한일정선호'),
-#     (5, '여수﹒순천', '4박5일', '아이와.', '여유롭게힐링', '빼곡한일정선호'),
-#     (6, '인천', '5박6일', '부모님과', '문화﹒예술﹒역사', '널널한일정선호'),
-#     (7, '전주', '당일치기', '기타', '여행지느낌물씬', '빼곡한일정선호'),
-#     (8, '제주', '1박2일', '혼자', '쇼핑은열정적으로', '널널한일정선호'),
-#     (9, '춘천﹒홍천', '2박3일', '관광보다먹방', '빼곡한일정선호'),
-#     (10, '태안﹒당진﹒서산', '3박4일', '친구와', '체험﹒액티비티', '널널한일정선호'),
-#     (11, '통영﹒거제﹒남해', '4박5일', '연인과 ', 'SNS핫플레이스', '빼곡한일정선호')
+#     (1, '가평﹒양평 ', '당일치기.', '혼자', '자연'),
+#     (2, '가평﹒양평 ', '1박2일.', '친구와', '레포츠'),
+#     (3, '가평﹒양평 ', '2박3일.', '연인과', '음식'),
+
+#     (4, '강릉﹒속초 ', '1박2일.', '혼자', '자연'),
+#     (5, '강릉﹒속초 ', '2박3일.', '친구와', '음식'),
+
+#     (6, '경주', '1박2일', '아이와', '자연'),
+#     (7, '경주', '2박3일', '연인과', '문화'),
+
+#     (8, '부산', '2박3일', '친구과', '자연'),
+#     (9, '부산', '3박4일', '연인과', '문화'),
+#     (10, '부산', '4박5일', '부모님과', '음식'),
+
+#     (11, '여수﹒순천', '2박3일', '연인과.', '자연'),
+#     (12, '여수﹒순천', '3박4일', '부모님과.', '음식'),
+
+#     (13, '인천', '당일치기', '친구과', '문화'),
+#     (14, '인천', '1박2일', '아이와', '음식'),
+
+#     (15, '전주', '1박2일', '아이와', '문화'),
+#     (16, '전주', '2박3일', '부모님과', '음식'),
+
+#     (17, '제주', '2박3일', '친구와', '자연'),
+#     (18, '제주', '3박4일', '연인과', '문화'),
+#     (19, '제주', '4박5일', '부모님과', '쇼핑'),
+
+#     (20, '춘천﹒홍천', '1박2일', '혼자', '자연'),
+#     (21, '춘천﹒홍천', '2박3일', '친구', '레포츠'),
+
+#     (22, '태안﹒당진﹒서산', '1박2일', '연인과', '자연'),
+#     (22, '태안﹒당진﹒서산', '2박3일', '아이와', '문화'),
+
+#     (23, '통영﹒거제﹒남해', '2박3일', '연인과 ', '자연')
+#     (23, '통영﹒거제﹒남해', '3박4일', '부모님과 ', '음식')
 # ]
 
 # cursor.executemany('''
-# INSERT INTO TripRecommend (id, city_name, date, who, style, plan) VALUES (?, ?, ?, ?, ?, ?);
+# INSERT INTO TripRecommend (id, city_name, date, who, style) VALUES (?, ?, ?, ?, ?);
 # ''', trip_recommend_data)
 
 # # 변경사항 저장
@@ -270,14 +292,12 @@ def recommend(request):
     date = request.GET.get('date', '') 
     who = request.GET.get('who', '')   
     style = request.GET.get('style', '') 
-    plan = request.GET.get('plan', '') 
 
     context = {
         'city': city,
         'date': date,
         'who': who,
         'style': style,
-        'plan': plan,
     }
 
     return render(request, 'recommend.html', context)
@@ -350,94 +370,3 @@ def response(request):
         print(f"Error: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-###################################################################### 
-
-# API 호출
-class PreparingListView(View):
-    template_name = 'preparing.html'
-    # AI_API_KEY = os.getenv('API_KEY')  # 관광지 API
-    AI_API_KEY = 'hfoOe068Vlj8Ikt91+xwEM5kDPK3NCkLGH9s6LdQ1yVetzxRw2yAQFyKv1eSy6mGK/EeCBfUDPq7dIEW5r+MxQ=='  # 관광지 API
-    API_URL = 'http://apis.data.go.kr/B551011/KorService1/areaBasedList1'  # 관광지 API URL (지역기반)
-
-    def get_tour_data(self):
-        url = self.API_URL
-
-        # API 요청 url 파라미터
-        base_params = {
-            "serviceKey": self.AI_API_KEY,  # 인증키(필수)
-            "MobileOS": "ETC",  # OS구분(필수)
-            "MobileApp": "AppTest",  # 서비스명(필수)
-            "numOfRows": 10,  # 한페이지결과순
-            "pageNo": 1,  # 페이지번호
-            "_type": "json",  # 응답메세지 형식
-            "arrange": "R",  # 생성일순
-            "contentTypeId": 12,  # 관광타입(관광지)
-            "areaCode": 6 # 지역코드
-        }
-
-        all_data = []
-
-        try:
-            response = requests.get(url, params=base_params)
-            response.raise_for_status()
-            data = response.json()
-            items = data['response']['body']['items']['item']
-            all_data.extend(items)
-        except requests.exceptions.RequestException as e:
-            return {"error": "API에서 데이터를 가져오지 못했습니다.", "details": str(e)}
-        except (ValueError, KeyError) as e:
-            return {"error": "응답 데이터 형식이 잘못되었습니다.", "details": str(e)}
-
-        return all_data
-    
-
-    def save_to_db(self, items, city_name):
-        try:
-            city = County.objects.get(city_name=city_name)
-        except County.DoesNotExist:
-            return {"error": f"{city_name}에 해당하는 County 인스턴스를 찾을 수 없습니다."}
-
-        for item in items:
-            CitySpotRecommend.objects.update_or_create(
-                content_id=item['contentid'],
-                defaults={
-                    'city_name': city,
-                    'title': item['title'],
-                    'address': item.get('addr1', ''),
-                    'img': item.get('firstimage', ''),
-                    'map_x': item['mapx'],
-                    'map_y': item['mapy']
-                }
-            )
-
-
-    def get(self, request, *args, **kwargs):
-        # 클라이언트에서 전달된 URL 파라미터를 가져오기
-        city = request.GET.get('city', '')
-        date = request.GET.get('date', '')
-        who = request.GET.get('who', '')
-        style = request.GET.get('style', '')
-        plan = request.GET.get('plan', '')
-
-        # get_tour_data 함수 실행
-        tour_data = self.get_tour_data()
-
-        if "error" in tour_data:
-            return render(request, 'error.html', {'error': tour_data["error"], 'details': tour_data["details"]})
-
-        # 데이터를 DB에 저장
-        save_result = self.save_to_db(tour_data, city)
-        if save_result and "error" in save_result:
-            return render(request, 'error.html', {'error': save_result["error"]})
-
-        # context에 데이터 추가
-        context = {
-            'city': city,
-            'date': date,
-            'who': who,
-            'style': style,
-            'plan': plan,
-            'tour_data': tour_data
-        }
-
-        return render(request, self.template_name, context)
