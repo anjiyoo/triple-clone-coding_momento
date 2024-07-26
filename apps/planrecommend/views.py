@@ -1,12 +1,14 @@
 from dotenv import load_dotenv
 from openai import OpenAI
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import os, sqlite3, json, requests
 from django.db import connection
 from django.views import View
-from .models import *
+from apps.travel.models import County, CountyImg
+from apps.planrecommend.models import TripDate, TripWho
+
 
 # main(city)
 class SelectCityListView(View):
@@ -46,32 +48,15 @@ class SelectWhoListView(View):
             'whose': TripWho.objects.all() 
         } 
         return render(request, self.template_name, context)
-
-# style
-class SelectStyleListView(View):
-    """여행 스타일을 선택하는 페이지를 렌더링하는 뷰"""
-    template_name = 'select_style.html'
+    
+# preparing
+class PreparingListView(View):
+    """준비중 페이지를 렌더링하는 뷰"""
+    template_name = 'preparing.html'
 
     def get(self, request, *args, **kwargs):
-        context = {
-            'counties': County.objects.all(),
-            'dates': TripDate.objects.all(),
-            'whose': TripWho.objects.all(),
-            'styles': TripStyle.objects.all() 
-        } 
-        return render(request, self.template_name, context)
+        return render(request, self.template_name)
     
-    
-# itinerary
-def itinerary(request):
-    """추천 결과 페이지를 렌더링하는 뷰"""
-    trip_recommendation = request.session.get('trip_recommendation', '추천 결과가 없습니다.')
-    
-    # 데이터가 없을 경우, 400 Bad Request 응답
-    if trip_recommendation == '추천 결과가 없습니다.':
-        return JsonResponse({'error': '추천 결과가 없습니다.'}, status=400)
-    
-    return render(request, 'itinerary.html', {'recommendation': trip_recommendation})
 
 ######################################################################
 
@@ -93,64 +78,76 @@ print("AI일정추천 DB 성공적으로 실행했습니다")
 
 # cursor = conn.cursor()  # 커서 생성
 
+# # 기존 테이블 삭제
+# cursor.execute('DROP TABLE IF EXISTS TripRecommend')
+
 # # 테이블 생성 (초기 생성하고 주석처리)
 # cursor.execute('''
-#         CREATE TABLE IF NOT EXISTS TripRecommend (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             city_name INTEGER,
-#             date INTEGER,
-#             who INTEGER,
-#             style INTEGER,
-#             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-#             FOREIGN KEY (city_name) REFERENCES County(id),
-#             FOREIGN KEY (date) REFERENCES TripDate(id),
-#             FOREIGN KEY (who) REFERENCES TripWho(id),
-#             FOREIGN KEY (style) REFERENCES TripStyle(id),
-# );
+#     CREATE TABLE IF NOT EXISTS TripRecommend (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,
+#         city_name INTEGER,
+#         date TEXT,
+#         who TEXT,
+#         concept_title TEXT,
+#         concept_content TEXT,
+#         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+#         FOREIGN KEY (city_name) REFERENCES County(id),
+#         FOREIGN KEY (date) REFERENCES TripDate(id),
+#         FOREIGN KEY (who) REFERENCES TripWho(id)
+#     );
 # ''')
 # print("테이블 TripRecommend 생성 완료")
 
 # # 데이터 삽입 (초기 생성하고 주석처리)
 # trip_recommend_data = [
-#     (1, '가평﹒양평 ', '당일치기.', '혼자', '자연'),
-#     (2, '가평﹒양평 ', '1박2일.', '친구와', '레포츠'),
-#     (3, '가평﹒양평 ', '2박3일.', '연인과', '음식'),
+#     (1, '가평﹒양평', '당일치기', '혼자', '자연속 힐링 여행', '아름다운 남이섬에서 낭만을 느껴보세요'),
+#     (2, '가평﹒양평', '1박 2일', '친구와', '액티비티 중심 여행', '수상레저와 레일바이크 및 서바이벌 게임을 즐겨보세요'),
+#     (3, '가평﹒양평', '2박 3일', '연인과', '문화와 예술 미식 여행', '프랑스 마을 테마파크인 쁘띠프랑스와 양평 세미원에서 알콩달콩한 데이트 추억을 남겨보세요'),
 
-#     (4, '강릉﹒속초 ', '1박2일.', '혼자', '자연'),
-#     (5, '강릉﹒속초 ', '2박3일.', '친구와', '음식'),
+#     (4, '강릉﹒속초 ', '1박 2일', '친구와', '해변과 자연탐사 여행', '영랑호와 경포해변에서 여유로운 해변산책과 수영을 즐겨보세요.'),
+#     (5, '강릉﹒속초', '2박 3일', '연인과', '힐링과 스파 여행', '강릉의 찜질방에서 휴식 및 스파 체험과 정동진 해변에서 일몰과 로맨틱한 저녁 식사를 추천드려요.'),
+#     (6, '강릉﹒속초', '3박 4일', '아이와', '자연과 동물 체험 여행', '다양한 해양 생물을 볼 수 있는 강릉 아쿠아리움과 속초 테디베어 전시관 탐방을 추천드려요.'),
 
-#     (6, '경주', '1박2일', '아이와', '자연'),
-#     (7, '경주', '2박3일', '연인과', '문화'),
+#     (7, '경주', '1박 2일', '혼자', '역사와 문화 탐방 여행', '경주의 역사와 문화를 느낄 수 있는 경주의 대표적인 사찰인 불국사와 석굴암을 추천드려요.'),
+#     (8, '경주', '2박 3일', '연인과', '예술과 문화체험 여행', '황리단길에서 다양한 갤러리를 탐방하고 개성있는 카페와 상점들을 둘러보며 경주의 문화를 느껴보세요.'),
+#     (9, '경주', '3박 4일', '아이와', '놀이와 체험 중심 여행', '경주 국립박물관과 키즈월드에서 다양한 놀이기구와 체험활동을 즐겨보세요.'),
 
-#     (8, '부산', '2박3일', '친구과', '자연'),
-#     (9, '부산', '3박4일', '연인과', '문화'),
-#     (10, '부산', '4박5일', '부모님과', '음식'),
+#     (10, '부산', '2박 3일', '친구와', '쇼핑과 미식 여행', '부산에는 여러 특색있는 시장이 많아요. 시장에서 다양한 먹거리와 쇼핑을 즐겨보세요.'),
+#     (11, '부산', '3박 4일', '연인과', '아기자기한 문화 여행', '다양한 예술작품과 벽화들을 자랑하는 감천문화마을과 아름다운 풍경을 자랑하는 동백섬, APEC 나루공원의 풍경을 눈에 담아보세요.'),
+#     (12, '부산', '4박 5일', '부모님과', '힐링과 자연 여행', '바다 위의 절경을 자랑하는 해동 용궁사와 바다 위를 걸을 수 있는 오륙도 스카이월드에서 특별한 경험을 남겨보세요.'),
 
-#     (11, '여수﹒순천', '2박3일', '연인과.', '자연'),
-#     (12, '여수﹒순천', '3박4일', '부모님과.', '음식'),
+#     (13, '여수﹒순천', '2박 3일', '친구와', '역사와 문화 여행', '전통 한옥과 한식을 체험할 수 있는 순천 낙안읍성과 여수 항일암을 추천드려요.'),
+#     (14, '여수﹒순천', '3박 4일', '연인과', '미식과 문화 여행', '여수에는 다양한 식물과 멋진 바다경치를 감상할 수 있는 오동도가 있어요 신선한 해산물 요리와 함께 여수 전경을 감상해보세요.'),
+#     (15, '여수﹒순천', '4박 5일', '부모님과', '자연과 힐링 여행', '다양한 테마로 꾸며진 순천만 국가정원과 아름다운 아경을 자랑하는 돌산대교 야경을 보며 힐링 가득한 여행을 추천드려요.'),
 
-#     (13, '인천', '당일치기', '친구과', '문화'),
-#     (14, '인천', '1박2일', '아이와', '음식'),
+#     (16, '인천', '당일치기', '친구와', '문화와 예술 미식 여행', '프랑스 마을 테마파크인 쁘띠프랑스와 양평 세미원에서 알콩달콩한 데이트 추억을 남겨보세요'),
+#     (17, '인천', '1박 2일', '연인과', '문화와 예술 미식 여행', '프랑스 마을 테마파크인 쁘띠프랑스와 양평 세미원에서 알콩달콩한 데이트 추억을 남겨보세요'),
+#     (18, '인천', '2박 3일', '아이와', '테마파크와 탐험 여행', '인천 차이나타운과 인천 대공원에서 다양한 색감과 독특한 문화를 아이와 함께 즐겨보세요.'),
 
-#     (15, '전주', '1박2일', '아이와', '문화'),
-#     (16, '전주', '2박3일', '부모님과', '음식'),
+#     (19, '전주', '1박 2일', '친구와', '미식과 쇼핑 여행', '송도 트리플 스트리트에서 쇼핑과 맛있는 음식을 즐겨보세요.'),
+#     (20, '전주', '2박 3일', '연인과', '여유로운 힐링 여행', '송도 센트럴파크에서 수상택시를 타고 여유로운 힐링을 경험하세요 송도 센트럴 근처 식당에서 식사도 추천드려요.'),
+#     (21, '전주', '3박 4일', '부모님과', '문화와 예술 미식 여행', '프랑스 마을 테마파크인 쁘띠프랑스와 양평 세미원에서 알콩달콩한 데이트 추억을 남겨보세요'),
 
-#     (17, '제주', '2박3일', '친구와', '자연'),
-#     (18, '제주', '3박4일', '연인과', '문화'),
-#     (19, '제주', '4박5일', '부모님과', '쇼핑'),
+#     (22, '제주', '2박 3일', '혼자', '문화와 미식 여행', '제주 돌문화공원과 서귀포 매일올레시장에서는 제주의 독특한 문화를 경험할 수 있어요.'),
+#     (23, '제주', 3박 4일', '친구와', '힐링과 자연 체험 여행', '한라산에서 가벼운 트레킹을 즐겨보세요. 우도에서는 자전거를 이용해 섬을 둘러볼 수 있어요 제주의 아름다운 풍겸을 느껴보세요.'),
+#     (24, '제주', 4박 5일', '연인과', '로맨틱한 해변과 일몰 여행', '협재 해수욕장과 한림공원, 애월 카페거리를 추천드려요. 투명한 바다와 하얀 모래사장에서 로맨틱한 추억을 만들어보세요.'),
 
-#     (20, '춘천﹒홍천', '1박2일', '혼자', '자연'),
-#     (21, '춘천﹒홍천', '2박3일', '친구', '레포츠'),
+#     (25, '춘천﹒홍천 ', '당일치기', '아이와', '물놀이 테마파크 여행', '비발디 파크 오션월드에서 다양한 물놀이 시설과 스파를 즐길 수 있어요 홍천강에서의 카누와 카약 경험도 놓치지 마세요.'),
+#     (26, '춘천﹒홍천 ', '1박 2일', '친구와', '액티비티와 자연 여행', '춘천 의암호 자전거길을 따라 자연 속에서의 여유로운 시간을 보내보세요. 홍천강에서는 카누나 카약을 타며 물놀이를 즐길 수 있어요.'),
+#     (27, '춘천﹒홍천 ', '2박 3일', '연인과', '여유로운 힐링 여행', '소양강댐과 홍천강 수목원에서 아름다운 자연경관을 감상해보세요.'),
 
-#     (22, '태안﹒당진﹒서산', '1박2일', '연인과', '자연'),
-#     (22, '태안﹒당진﹒서산', '2박3일', '아이와', '문화'),
+#     (30, '태안﹒당진﹒서산', '1박 2일', '친구과', '자연 탐험 여행', '몽산포 해수욕장에서 물놀이를 즐기며 일몰에는 바베큐를 즐겨보세요'),
+#     (31, '태안﹒당진﹒서산', '2박 3일', '연인과', '역사와 힐링 여행', '역사적인 장소인 서산 해미읍성과 용현계곡에서 서산 풍경을 느껴보세요.'),
+#     (32, '태안﹒당진﹒서산', '3박 4일', '아이와', '자연과 체험 중심 여행', '태안 안면도의 쥬라기 박물관과 당진 아그로랜드 태신목장에서 아이의 호기심을 자극해보세요.'),
 
-#     (23, '통영﹒거제﹒남해', '2박3일', '연인과 ', '자연')
-#     (23, '통영﹒거제﹒남해', '3박4일', '부모님과 ', '음식')
+#     (33, '통영﹒거제﹒남해', '2박 3일', '연인과', '섬 탐험 여행', '거제의 바람의 언덕에서 멋진 바다 경치를 감상해보세요 외도 보타니아는 섬 하나가 정원으로 꾸며져 있어 여유로운 산책을 즐길 수 있어요.'),
+#     (34, '통영﹒거제﹒남해', '3박 4일', '아이와', '힐링과 자연 체험 여행', '통영 중앙시장에서 다양한 해산물을 구경하고 한려수도 조망 케이블카를 타고 아름다운 풍경을 감상해보세요.'),
+#     (35, '통영﹒거제﹒남해', '4박 5일', '부모님과', '역사와 미식 여행', '남해 보리암에서 아름다운 풍경과 전통 한식을 맛보세요.'),
 # ]
 
 # cursor.executemany('''
-# INSERT INTO TripRecommend (id, city_name, date, who, style) VALUES (?, ?, ?, ?, ?);
+# INSERT INTO TripRecommend (id, city_name, date, who, concept_title, concept_content)
+# VALUES (?, ?, ?, ?, ?, ?);
 # ''', trip_recommend_data)
 
 # # 변경사항 저장
@@ -160,7 +157,6 @@ print("AI일정추천 DB 성공적으로 실행했습니다")
 
 # 데이터베이스 연결 객체를 받아 테이블 이름 목록을 반환
 def get_table_names(conn):
-    """테이블 이름 목록 반환"""
     table_names = []
     tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
     for table in tables.fetchall():
@@ -169,7 +165,6 @@ def get_table_names(conn):
 
 # 데이터베이스 연결 객체와 테이블 이름을 받아 해당 테이블의 컬럼 이름 목록을 반환
 def get_column_names(conn, table_name):
-    """필드 이름 목록 반환"""
     column_names = []
     columns = conn.execute(f"PRAGMA table_info('{table_name}');").fetchall()
     for col in columns:
@@ -205,7 +200,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "ask_database",
-            "description": "이 함수를 사용하여 사용자가 선택한 도시, 날짜, 동행자, 여행스타일, 여행일정타입에 따라 여행일정을 추천하세요. 입력은 완전히 형성된 SQL 쿼리여야 합니다.",
+            "description": "이 함수를 사용하여 사용자가 질문한 동행자, 여행기간, 여행도시의 여행컨셉제목과 여행컨셉내용에 관한 질문에 답하세요. 입력은 완전히 형성된 SQL 쿼리여야 합니다.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -216,12 +211,18 @@ tools = [
                                 SQL은 다음 데이터베이스 스키마를 사용하여 작성되어야 합니다:
                                 {database_schema_string}
                                 쿼리는 JSON이 아닌 일반 텍스트로 반환되어야 합니다.
+                                가평﹒양 평은 하나의 city_name 입니다.
+                                강릉﹒속초 는 하나의 city_name 입니다.
+                                여수﹒순천 은 하나의 city_name 입니다.
+                                춘천﹒홍천 은 하나의 city_name 입니다.
+                                태안﹒당진﹒서산 은 하나의 city_name 입니다.
+                                통영﹒거제﹒남해 는 하나의 city_name 입니다.
 
-                                city_name 조회를 원하는 도시,
-                                date 여행 날짜,
-                                who 여행 동행자,
-                                style 여행 스타일,
-                                plan 여행일정타입,
+                                who 동행자,
+                                city_name 여행도시, 
+                                date 여행기간, 
+                                concept_title 여행컨셉제목, 
+                                concept_content 여행컨셉내용 입니다.
                                 """,
                     }
                 },
@@ -236,11 +237,7 @@ tools = [
 # 데이터베이스에서 정보를 요청하고 결과를 처리하는 기능을 제공
 # DB 조회 함수 정의
 def ask_database(query):
-    """제공된 SQL 쿼리로 SQLite 데이터베이스를 쿼리하는 기능"""
-
-
     conn = sqlite3.connect("triprecommend.db")
-
     try:
         results = str(conn.execute(query).fetchall())
         conn.close()
@@ -250,54 +247,20 @@ def ask_database(query):
 
 # ######################################################################
 
-# # DB 조회결과를 통해 응답 생성
-# tool_calls = response_message.tool_calls  # 모델의 응답에 도구 호출이 포함되어 있는지 확인
-
-# if tool_calls:
-#     # true인 경우 모델은 호출할 도구/함수의 이름과 인수를 반환
-#     tool_call_id = tool_calls[0].id
-#     tool_function_name = tool_calls[0].function.name
-#     tool_query_string = eval(tool_calls[0].function.arguments)['query']
-
-#     # 함수를 호출하고 결과를 검색, 메시지 목록에 결과 추가
-#     if tool_function_name == 'ask_database':
-#         results = ask_database(conn, tool_query_string)
-
-#         messages.append({
-#             "role":"tool",
-#             "tool_call_id":tool_call_id,
-#             "name": tool_function_name,
-#             "content":results
-#         })
-
-#         # 메시지 목록에 함수 응답이 추가된 채팅 완료 API를 호출
-#         model_response_with_function_call = client.chat.completions.create(
-#             model="gpt-4-turbo",
-#             messages=messages,
-#         )  # 함수 응답을 볼 수 있는 모델로부터 새로운 응답을 얻음
-#         print(model_response_with_function_call.choices[0].message.content)
-#     else:
-#         print(f"Error: function {tool_function_name} does not exist")
-# else:
-#     # 모델이 호출할 함수를 식별하지 못했습니다. 결과가 사용자에게 반환될 수 있습니다
-#     print(response_message.content)
-
-
-###################################################################### 
-
 # 사용자가 선택한 값을 URL 파라미터로 받아옴
 def recommend(request):
-    # URL 파라미터에서 값을 가져옴
     city = request.GET.get('city', '')  
     date = request.GET.get('date', '') 
     who = request.GET.get('who', '')   
-    style = request.GET.get('style', '') 
+
+    county = get_object_or_404(County, city_name=city)
+    county_img = CountyImg.objects.filter(city_name=county).first()
 
     context = {
         'city': city,
         'date': date,
         'who': who,
-        'style': style,
+        'county_img': county_img.image.url if county_img else None, 
     }
 
     return render(request, 'recommend.html', context)
@@ -305,63 +268,56 @@ def recommend(request):
 # 질문에 대한 응답 처리
 @csrf_exempt
 def response(request):
-    # POST 요청만 처리
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
     try:
-        data = json.loads(request.body)  # JSON 형식의 클라이언트 요청 가져오기
-        user_query = data.get('user_query')  # 사용자의 질문 추출
+        data = json.loads(request.body)
+        user_query = data.get('user_query')
 
-        # ChatGPT 채팅 실행 
         messages = [
             {
-                "role":"system",
+                "role": "system",
                 "content": "DB에서 조회된 결과만을 이용하여 응답하는 로봇이야"
             },
             {
-                "role":"user",
+                "role": "user",
                 "content": user_query
             }
         ]
 
-        # ChatGPT API 호출
         response = client.chat.completions.create(
             model="gpt-4-turbo",
             messages=messages,
-            tools= tools,
+            tools=tools,
             tool_choice="auto"
         )
 
-        messages.append(response.choices[0].message)  # response 객체에서 choices 리스트의 첫 번째 항목의 message 속성 값을 추가
+        messages.append(response.choices[0].message)
 
-        # DB 조회 결과를 통해 응답 생성
         if response.choices[0].message.tool_calls:
             tool_calls = response.choices[0].message.tool_calls
-            tool_call_id = tool_calls[0].id
-            tool_function_name = tool_calls[0].function.name
-            tool_query_string = eval(tool_calls[0].function.arguments)['query']
+            for tool_call in tool_calls:
+                tool_call_id = tool_call.id
+                tool_function_name = tool_call.function.name
+                tool_query_string = json.loads(tool_call.function.arguments)['query']
 
-            # 함수를 호출하고 결과를 검색, 메시지 목록에 결과 추가
-            if tool_function_name == 'ask_database':
-                results = ask_database(tool_query_string)
+                if tool_function_name == 'ask_database':
+                    results = ask_database(tool_query_string)
 
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call_id,
-                    "name": tool_function_name,
-                    "content": results
-                })
-                
-                # 메시지 목록에 함수 응답이 추가된 채팅 완료 API를 호출
-                model_response_with_function_call = client.chat.completions.create(
-                    model="gpt-4-turbo",
-                    messages=messages,
-                )  # 함수 응답을 볼 수 있는 모델로부터 새로운 응답을 얻음
-                response_message = model_response_with_function_call.choices[0].message.content
-            else:
-                print(f"Error: function {tool_function_name} does not exist")
-                return JsonResponse({'error': f"Unsupported function: {tool_function_name}"}, status=500)
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call_id,
+                        "name": tool_function_name,
+                        "content": results
+                    })
+
+            # 메시지 목록에 함수 응답이 추가된 채팅 완료 API를 호출
+            model_response_with_function_call = client.chat.completions.create(
+                model="gpt-4-turbo",
+                messages=messages
+            )
+            response_message = model_response_with_function_call.choices[0].message.content
         else:
             response_message = response.choices[0].message.content
 

@@ -44,14 +44,23 @@
                 overflow-x: auto;
             }
             .fixed-card {
-        width: 18rem; /* 고정된 너비 */
-        height: 25rem; /* 고정된 높이 */
-        overflow: hidden; /* 내용이 카드 범위를 넘지 않도록 숨김 처리 */
-    }
-    .card-img-top {
-        height: 10rem; /* 이미지 높이 고정 */
-        object-fit: cover; /* 이미지가 카드에 맞게 조절되도록 */
-    }
+                width: 18rem; /* 고정된 너비 */
+                height: 25rem; /* 고정된 높이 */
+                overflow: hidden; /* 내용이 카드 범위를 넘지 않도록 숨김 처리 */
+            }
+            .card-img-top {
+                height: 10rem; /* 이미지 높이 고정 */
+                object-fit: cover; /* 이미지가 카드에 맞게 조절되도록 */
+            }
+            .profile-preview {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                /* 부모 요소의 너비에 따라 가운데 정렬을 위해 추가 */
+                width: 100%;
+            }
+
+           
         </style>
     {% endblock %}
 
@@ -65,7 +74,7 @@
                         <label for="id_profile" style="cursor: pointer;">
                             <img src="{{ user.profile.url }}" alt="{{ user.username }}" class="profile-img mb-2" id="profile-preview">
                         </label>
-                        <input class="file-input visually-hidden" type="file" name="profile" id="id_profile" accept="image/png, image/jpeg, image/gif" onchange="previewFile()">
+                        <!-- <input class="file-input visually-hidden" type="file" name="profile" id="id_profile" accept="image/png, image/jpeg, image/gif" onchange="previewFile()"> -->
                     </div>
                     <div class="col-md-8">
                         <div class="nickname-section">
@@ -230,21 +239,34 @@
     </div>
 </div>
 
-    <!-- 닉네임 변경 모달 -->
+    <!-- 닉네임&& 프로필 사진 변경 모달 -->
     <div class="modal fade" id="nicknameModal" tabindex="-1" aria-labelledby="nicknameModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="nicknameModalLabel">닉네임 변경</h5>
+                    <h5 class="modal-title" id="nicknameModalLabel">프로필 변경</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="nickname-form" method="post" action="{% url 'mypage' %}">
+                    <form id="nickname-form" method="post" action="{% url 'mypage' %}" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <div class="mb-2">
+                            <div class="profile-preview">
+                
+                                <label for="profile" style="cursor: pointer;">
+                                    <img id="profile-preview-img" src="{% if user.profile.url %}{{ user.profile.url }}{% else %}{% static 'profiles/default.png' %}{% endif %}" alt="프로필 사진 미리보기" class="profile-img mb-2">
+                                    <input type="file" name="profile" id="profile" accept="image/png, image/jpeg, image/gif" style="display: none;" onchange="previewFile()">
+                                </label>
+                            </div>
+
+                        </div>
                         <div class="mb-3">
-                            <label for="id_nickname" class="form-label">새 닉네임</label>
+                            <label for="nickname" class="form-label"></label>
                             {{ form.nickname }}
                         </div>
+                        
+                        
+                        
                         <button type="submit" class="btn btn-primary">저장</button>
                     </form>
                 </div>
@@ -253,19 +275,24 @@
     </div>
 
     <script>
-        function previewFile() {
-            const preview = document.getElementById('profile-preview');
-            const file = document.getElementById('id_profile').files[0];
-            const reader = new FileReader();
-            
-            reader.addEventListener("load", function () {
-                preview.src = reader.result;
-            }, false);
 
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
+function previewFile() {
+    const preview = document.getElementById('profile-preview-img'); 
+    const file = document.getElementById('profile').files[0]; 
+    const reader = new FileReader(); 
+
+    reader.addEventListener("load", function () {
+        preview.src = reader.result;
+        preview.style.display = 'block'; 
+    }, false);
+
+    if (file) {
+        reader.readAsDataURL(file); 
+    }
+}
+
+
+
     </script>
 
 {% endblock %}

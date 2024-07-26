@@ -8,20 +8,16 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <!-- 게시글 본문 card 크기 -->
         <div class="col-md-12">
             <!-- 질문 예시 -->
             <div class="mb-4">
                 <div class="btn-group" style="text-align: right;">
-                    <!-- 버튼에 onclick 이벤트 추가 -->
                     <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('제주 날씨에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
                         제주 날씨에 대해 알려줘
                     </button>
-                    
                     <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('여수 지역음식에 대해 알려줘')" style="color: #0BD0AF; margin-right: 10px; border-radius: 10px;">
                         여수 지역음식에 대해 알려줘
                     </button>
-
                     <button type="button" class="btn btn-outline-light btn-custom" onclick="addQuestion('부산 관광지에 대해 알려줘')" style="color: #0BD0AF; border-radius: 10px;">
                         부산 관광지에 대해 알려줘
                     </button>
@@ -38,7 +34,7 @@
                             <!-- 질문 -->
                             <div id="chat-messages" class="chat-messages" style="border-radius: 10px; height: auto;"></div>
                             <!-- 응답.. -->
-                            <div id="waiting" class="waiting" style="border-radius: 10px; height: auto;" placeholder="안녕하세요!"></div>
+                            <div id="waiting" class="waiting" style="border-radius: 10px; height: auto;" placeholder="..."></div>
                         </div>
                     </div>
     
