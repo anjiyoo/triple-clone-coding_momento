@@ -22,14 +22,6 @@ class TripWho(models.Model):
         return self.who
     
 
-# 여행스타일
-class TripStyle(models.Model):
-    style = models.CharField(max_length=30)  # 여행스타일
-
-    def __str__(self):
-        return self.style    
-
-
     
 # 관광지
 class CitySpotRecommend(models.Model):
