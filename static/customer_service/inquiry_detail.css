@@ -1,0 +1,102 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    margin: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.inquiry-detail-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 30px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-header {
+    background-color: #007BFF;
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+    color: #fff;
+    text-align: center;
+}
+
+.inquiry-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.inquiry-body {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.inquiry-image {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.inquiry-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-comments {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 0 0 10px 10px;
+}
+
+.inquiry-comments h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.inquiry-comments .comment {
+    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.inquiry-comments .comment p {
+    margin: 0 0 10px;
+}
+
+.inquiry-comments .comment small {
+    color: #6c757d;
+}
+
+.comment-form {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.comment-form button.btn-submit {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.comment-form button.btn-submit:hover {
+    background-color: #0056b3;
+}

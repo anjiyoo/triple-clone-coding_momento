@@ -1,0 +1,76 @@
+/* customer_service/my_inquiry_list.css */
+
+.container {
+    margin-top: 40px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.inquiry-list {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.inquiry-list-item {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inquiry-title {
+    font-size: 1.2em;
+    margin-right: 20px;
+    color: #333;
+    text-decoration: none;
+    flex: 2;
+}
+
+
+.text-muted {
+    font-size: 0.9em;
+    color: #777;
+    flex: 1;
+    text-align: right;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+    flex: 0.5;
+    text-align: center;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: white;
+    flex: 0.5;
+    text-align: center;
+}
+
+.alert-warning {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.pagination a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #007bff;
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여행 가이드</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'guidepage/guidemain.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="image-container">
+            <img src="{% static 'guidepage/photo/triple_guide.png' %}" alt="Triple Guide">
+            <h2>알고쓰면 더 유용한 <br>모멘토 사용 설명서</h2>
+            <p>여행은 가야하는데 <br>일정짜기도 막막하고,<br> 어디 가야 할지도 고민이라면?<br> 모멘토 하나면 걱정 끝!<br> 이렇게만 사용하면 여행이 쉬워집니다 🌱</p>
+        </div>
+         </div>
+         <!-- 안보여.., -->
+         <!-- <div class="card-1">
+            <h2>#일정짜기 #일자별 추천</h2>
+            <p>나만의 여행일정 짜기</p>
+            <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Travel Plan"><br>
+            <button onclick="navigateToGuide(3)">가이드 보러가기</button>
+        </div> -->
+        <div class="card-1">
+            <h2>#근처_추천장소 #가는길에_들를곳_추천</h2>
+            <p>여행지에서 맞춤 정보받기</p>
+            <img src="{% static 'guidepage/photo/custom_info.png' %}" alt="Custom Info"><br>
+            <button onclick="navigateToGuide(4)">가이드 보러가기</button>
+        </div>
+        <div class="card-1">
+            <h2>#항공 #숙소 #투어·티켓</h2>
+            <p>트리플로 모든 예약을 한 번에</p>
+            <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Shopping Cart"><br>
+            <button onclick="navigateToGuide(1)">가이드 보러가기</button>
+        </div>
+        <div class="card-1">
+            <h2>#여행기 #리뷰</h2>
+            <p>여행 추억 기록하기</p>
+            <img src="{% static 'guidepage/photo/travel_memory.png' %}" alt="Travel Memory"><br>
+            <button onclick="navigateToGuide(2)">가이드 보러가기</button>
+        </div>
+        
+
+    </div>
+    <button class="share-button" onclick="sharePage()">공유하기</button>
+    <script>
+function navigateToGuide(guideNumber) {
+    let url = '';
+    switch (guideNumber) {
+        case 1:
+            url = '/guidepage/guide_reservation';
+            break;
+        case 2:
+            url = '/guidepage/guide_memory';
+            break;
+        case 3:
+            url = '/guidepage/guide_plan';
+            break;
+        case 4:
+            url = '/guidepage/guide_info';
+            break;
+        default:
+            url = '/';
+            break;
+    }
+    window.location.href = url;
+}
+        
+        function sharePage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '여행 가이드',
+                    text: '이 페이지를 확인해 보세요!',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('공유 성공');
+                }).catch((error) => {
+                    console.error('공유 실패:', error);
+                });
+            } else {
+                alert('공유 기능이 지원되지 않는 브라우저입니다.');
+            }
+        }
+    </script>
+</body>
+</html>

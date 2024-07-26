@@ -12,7 +12,7 @@
         margin-bottom: 20px;
         cursor: pointer;
     }
-    .tab {
+    /* .tab {
         padding: 10px 20px;
         border: 1px solid #007BFF;
         background-color: #f7f7f7;
@@ -23,13 +23,26 @@
     .tab.active {
         background-color: #007BFF;
         color: #fff;
-    }
+    } */
     .faq-content {
         display: none;
     }
     .faq-content.active {
         display: block;
     }
+    .tabs {
+            display: flex;
+            margin-top: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tabs .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .tabs .tab.active {
+            border-bottom: 2px solid #007bff;
+            font-weight: bold;
+        }
 </style>
 {% endblock %}
 
@@ -41,7 +54,7 @@
             {{ form.query }}
             <button type="submit" class="btn btn-primary">검색</button>
         </form>
-        <div class="tab-container">
+        <div class="tabs">
             <div class="tab active" id="faq_flightTab" onclick="selectTab('faq_flight')">항공</div>
             <div class="tab" id="faq_accommodationsTab" onclick="selectTab('faq_accommodations')">숙소</div>
             <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">서비스 일반</div>

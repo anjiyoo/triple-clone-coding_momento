@@ -99,7 +99,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="#" class="d-block">
+                <a href=" {% url 'mypage:save_list'%}" class="d-block">
                     <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M79.5 52.5C86.205 45.93 93 38.055 93 27.75C93 21.1859 90.3924 14.8906 85.7509 10.2491C81.1094 5.60758 74.8141 3 68.25 3C60.33 3 54.75 5.25 48 12C41.25 5.25 35.67 3 27.75 3C21.1859 3 14.8906 5.60758 10.2491 10.2491C5.60758 14.8906 3 21.1859 3 27.75C3 38.1 9.75 45.975 16.5 52.5L48 84L79.5 52.5Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -107,7 +107,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-3">
-                <a href="#" class="d-block">
+                <a href="{% url 'mypage:review_list'%}" class="d-block">
                     <svg width="83" height="83" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M40.5 3L52.0875 26.368L78 30.1383L59.25 48.3176L63.675 74L40.5 61.868L17.325 74L21.75 48.3176L3 30.1383L28.9125 26.368L40.5 3Z" stroke="#0BD0AF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>                    
@@ -223,7 +223,7 @@
                 <div class="card-body">
                     <h5 class="card-title">공지 사항</h5>
                     <p class="card-text">공지 사항에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                    <a href="공지 사항 페이지 링크" class="btn btn-primary">자세히 보기</a>
+                    <a href="/customer_service/notice/list" class="btn btn-primary">자세히 보기</a>
                 </div>
             </div>
         </div>
@@ -232,14 +232,27 @@
                 <div class="card-body">
                     <h5 class="card-title">고객 센터</h5>
                     <p class="card-text">고객 센터에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                    <a href="고객 센터 페이지 링크" class="btn btn-primary">자세히 보기</a>
+                    <a href="/customer_service" class="btn btn-primary">자세히 보기</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<<<<<<< HEAD
     <!-- 닉네임&& 프로필 사진 변경 모달 -->
+=======
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <a href="/guidepage">
+                <img src="{% static 'guidepage/photo/MOMENTOguide.png' %}" alt="Clickable Image" class="img-fluid">
+            </a>
+        </div>
+    </div>
+</div>
+    <!-- 닉네임 변경 모달 -->
+>>>>>>> origin/yangchanghun
     <div class="modal fade" id="nicknameModal" tabindex="-1" aria-labelledby="nicknameModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
