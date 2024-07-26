@@ -1,25 +1,23 @@
-# views.py
 from rest_framework import status
 from rest_framework.views import APIView
-# from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Accommodation, Reservation, GuestInfo, TransportationInfo, Room, Review, AccommodationImage,  RoomImage, CancellationPolicy, ReservationHolderInfo,  DOMESTIC_ACCOMMODATION_TYPES, AccommodationLike
+from .models import Accommodation, Reservation, Room, Review, AccommodationImage,  RoomImage, DOMESTIC_ACCOMMODATION_TYPES, AccommodationLike
 from apps.userinfo.models import User
 from apps.travel.models import County, CountyImg
-from .serializers import AccommodationSerializer, ReservationSerializer, ReviewSerializer, UserSerializer, ReservationHolderInfoSerializer
+from .serializers import AccommodationSerializer,ReviewSerializer
 from django.shortcuts import render
-from django.db.models import Avg, Q, F
+from django.db.models import Avg, Q
 from django.conf import settings  
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from rest_framework.permissions import IsAuthenticated
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
 from .forms import ReviewForm, ReservationForm, ReservationHolderInfoForm, GuestInfoForm, TransportationInfoForm
 from django.views.generic import ListView
 from django.http import JsonResponse
+from django.http import HttpResponseBadRequest
+import json
 
 
 
@@ -30,7 +28,6 @@ class ListAccommodations(APIView):
         serializer = AccommodationSerializer(accommodation, many=True)
         return Response(serializer.data)
 
-from datetime import datetime, date 
 
 # 숙소 상세 페이지 조회
 class AccomodationDetailView(APIView):
@@ -91,23 +88,41 @@ def reservation_success(request):
     return render(request, 'accommodation/reservation_success.html')
 
 
+
 @login_required
 def make_reservation(request, accommodation_pk, room_pk):
-
     if request.method == 'POST':
-        reservation_form = ReservationForm(request.POST)
-        holder_form = ReservationHolderInfoForm(request.POST)
-        guest_form = GuestInfoForm(request.POST)
-        transportation_form = TransportationInfoForm(request.POST)
-        reservation_amount = request.POST.get('reservation_amount')
-        total_amount = request.POST.get('total_amount')
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponseBadRequest('잘못된 JSON 형식입니다.')
+
+        imp_uid = data.get('imp_uid')
+        merchant_uid = data.get('merchant_uid')
+        reservation_amount = data.get('amount')
+
+        # 폼 데이터를 추출
+        reservation_data = {
+            'check_in': data.get('check_in'),
+            'check_out': data.get('check_out'),
+            'cancellation_policy_agreed': data.get('cancellation_policy_agreed'),
+            'terms_and_conditions_agreed': data.get('terms_and_conditions_agreed'),
+            'guests_adult': data.get('guests_adult'),
+            'guests_child': data.get('guests_child'),
+            'telnum': data.get('telnum'),
+        }
+
+        reservation_form = ReservationForm(reservation_data)
+        holder_form = ReservationHolderInfoForm(data)
+        guest_form = GuestInfoForm(data)
+        transportation_form = TransportationInfoForm(data)
 
         if (reservation_form.is_valid() and holder_form.is_valid() and
             guest_form.is_valid() and transportation_form.is_valid()):
             
             # Save each form individually
             holder_info = holder_form.save(commit=False)
-            holder_info.user = request.user  # Assuming user is logged in
+            holder_info.user = request.user
             holder_info.save()
 
             guest_info = guest_form.save()
@@ -120,35 +135,32 @@ def make_reservation(request, accommodation_pk, room_pk):
             reservation.transportation_info = transportation_info
             reservation.accommodation_id = accommodation_pk
             reservation.room_id = room_pk
-
-            try:
-                reservation.reservation_amount = float(reservation_amount.replace(',', '')) if reservation_amount else 0.0
-                reservation.total_amount = float(total_amount.replace(',', '')) if total_amount else 0.0
-            except ValueError:
-                # 여기에 오류 처리 로직 추가
-                pass
+            reservation.merchant_uid = merchant_uid
+            reservation.imp_uid = imp_uid
+            reservation.reservation_amount = reservation_amount
+            reservation.total_amount = reservation_amount
             reservation.save()
 
-            return redirect('accommodation:reservation_success', reservation_id=reservation.id)  # Redirect to a success page
+            return JsonResponse({'success': True, 'reservation_id': reservation.id})
         else:
-             # 폼 유효성 검사 실패 시 오류 메시지 출력
-            print("Reservation Form Errors:", reservation_form.errors)
-            print("Holder Form Errors:", holder_form.errors)
-            print("Guest Form Errors:", guest_form.errors)
-            print("Transportation Form Errors:", transportation_form.errors)
-
-
+            return JsonResponse({
+                'success': False,
+                'errors': {
+                    'reservation': reservation_form.errors,
+                    'holder': holder_form.errors,
+                    'guest': guest_form.errors,
+                    'transportation': transportation_form.errors
+                }
+            })
     else:
         reservation_form = ReservationForm()
         holder_form = ReservationHolderInfoForm(user=request.user)
         guest_form = GuestInfoForm()
         transportation_form = TransportationInfoForm()
         
-
     room = get_object_or_404(Room, pk=room_pk)
     accommodation = Accommodation.objects.get(pk=accommodation_pk)
     accommodation_image = AccommodationImage.objects.filter(accommodation=accommodation).first()  # Accommodation에 연결된 모든 이미지 가져오기
-
 
     context = {
         'reservation_form': reservation_form,
@@ -159,10 +171,14 @@ def make_reservation(request, accommodation_pk, room_pk):
         'accommodation': accommodation,
         'accommodation_image': accommodation_image,
         'MEDIA_URL': settings.MEDIA_URL,
-
+        'accommodation_pk': accommodation.pk, 
+        'room_pk': room.pk, 
     }
 
     return render(request, 'accommodation/create_reservation.html', context)
+
+    # return HttpResponseNotAllowed(['POST'])
+
 
 from django.http import HttpResponse,HttpResponseRedirect
 from django.views.decorators.http import require_POST
@@ -437,9 +453,6 @@ def region_select(request):
     # 좋아요 수 계산
     likes_count = sum(accommodation.like.count() for accommodation in accommodations)
     reviews_count = reviews.count()
-    # likes_count = accommodations.like.count()
-
-
 
     # 리뷰의 평균 별점 계산
     if reviews_count > 0:
@@ -610,52 +623,11 @@ def search_accommodations(request):
                     'query': query,
                     'viewed_accommodations': viewed_accommodations,})
 
-from datetime import datetime, timedelta
-class CheckAvailabilityAPI(View):
-    def get(self, request):
-        start_date_str = request.GET.get('start_date')
-        end_date_str = request.GET.get('end_date')
-        accommodation_id = request.GET.get('accommodation_id')
-        room_pk = request.GET.get('room_pk')
-
-        # 날짜 문자열을 datetime 객체로 변환
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-
-        # 예약 가능 여부 확인
-        available = check_availability(accommodation_id, start_date, end_date, room_pk)
-
-        # JSON 응답 반환
-        data = {'available': available}
-        return JsonResponse(data)
-    
-def check_availability(accommodation_id, start_date, end_date, room_pk):
-    # 예약 가능 여부를 판단할 날짜 범위
-    reservation_start = start_date
-    reservation_end = end_date 
-
-    # 선택한 객실과 예약된 예약을 확인
-    reserved_room = Reservation.objects.filter(
-        accommodation_id=accommodation_id,
-        room_id=room_pk,
-        check_in__lte=reservation_end,  # 예약 시작일이 예약 종료일보다 작거나 같아야 함
-        check_out__gte=reservation_start  # 예약 종료일이 예약 시작일보다 크거나 같아야 함
-    )
-
-    if reserved_room.exists():
-        return False  # 예약 불가능: 이미 예약된 객실이 있는 경우
-    else:
-        return True   # 예약 가능: 예약된 객실이 없는 경우
-    
-
 def reservation_success(request, reservation_id):
-    # 예약 정보를 데이터베이스에서 가져옵니다.
-    # 예시로, reservation_id를 사용하여 예약 정보를 조회한다고 가정합니다.
+
     reservation = get_object_or_404(Reservation, pk=reservation_id)
-     # 해당 숙소와 연결된 모든 이미지를 가져옵니다.
     accommodation_images = AccommodationImage.objects.filter(accommodation=reservation.accommodation)
-    
-    # 예약 정보를 템플릿에 전달합니다.
+
     context = {
         'reservation': reservation,
         'accommodation_images': accommodation_images}
