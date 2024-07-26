@@ -16,7 +16,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* p 태그 */
-#select-city {
+#select-who {
     color: rgb(169, 169, 169);
 }
 
@@ -42,13 +42,34 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* 동행자 hover & 선택 */
-.who-box:hover, .date-box.selected {
+.who-box:hover, .who-box.selected {
     background-color: #0BD0AF;
     color: rgb(255, 255, 255);
 }
 
 /* 선택된 값 */
 .city-selected-data, .date-selected-data, .who-selected-data {
+    border-radius: 30px;
+    background-color: #ffffff;
+    width: 180px;
+    height: 60px;
+    padding: 5px;
+    border: 2px solid #0BD0AF;
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-right: 10px;
+
+    font-size: 20px;
+    color: #0BD0AF;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+}
+
+/* 선택된 값 */
+.date-selected-data, .who-selected-data {
     border-radius: 30px;
     background-color: #ffffff;
     width: 120px;
