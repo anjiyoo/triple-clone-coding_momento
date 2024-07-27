@@ -8,5 +8,6 @@ urlpatterns = [
     path('add_plan/',views.add_plan,name='add_plan'),
     path('add_memo',views.add_memo,name='add_memo'),
     path('plan/',views.plan,name='plan'),
-    path('del_plan',views.del_plan,name='del_plan')
+    path('del_plan',views.del_plan,name='del_plan'),
+    path('plan_list',views.PlanList.as_view(),name='plan_list')
 ]

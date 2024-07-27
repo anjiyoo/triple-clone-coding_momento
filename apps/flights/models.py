@@ -1,7 +1,7 @@
 from django.db import models
 from apps.userinfo.models import User
 class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 유저 모델 외부키
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='flight_reservations')  # 유저 모델 외부키
     reservation_date = models.DateTimeField()
     number_of_people = models.IntegerField()
     departure_airport = models.CharField(max_length=50)

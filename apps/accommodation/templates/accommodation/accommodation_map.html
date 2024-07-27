@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Accommodation Map</title>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQtKbm3UoZE_ZPCUzYrphzibFwCYRpoQ4&callback=initMap"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        #info-box {
+            border: 1px solid #ffffff; 
+            background-color: white;
+            border: 1px solid #ccc;
+            padding-left: 35px;
+            padding-right: 35px;
+            padding-top: 10px;
+            margin: 10px;
+            width: 400px;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 30px;
+            left: 50%; /* 가운데 정렬을 위한 왼쪽 위치 */
+            transform: translateX(-50%); /* 가운데 정렬을 위한 transform */
+            z-index: 100; /* 다른 요소 위에 표시하기 위한 z-index 설정 */
+        }
+        #info-box p.inline {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .container {
+            /* display: flex;
+            align-items: center; */
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px;
+        }
+        .like-container {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .like-container .like-count {
+            margin-left: 5px; /* 아이콘과 숫자 사이의 간격 */
+        }
+        .star-rating {
+            display: inline-block;
+            font-size: 0; 
+            margin-left: -5px; 
+            /* margin-top: 10px;
+            margin-bottom: 0px; */
+            margin-bottom: 10px; 
+        }
+        .star-rating .star {
+            font-size: 20px;
+            color: #ddd; /* 기본 별 색상 */
+        }
+        .star-rating .star.filled {
+            color: #f5c518; /* 채워진 별 색상 */
+        }
+        .price {
+            display: block; /* 가격은 다음 줄에 배치 */
+            margin-left: 130px;
+            font-weight: semi-bold;
+            font-size: 20px;
+            margin-top: -10px;
+            /* margin-bottom: 10px; */
+        }
+        p.inline {
+            margin-top: 5px;
+            /* margin-bottom: 10px; */
+            margin-left: 5px;
+        }
+        p.description {
+            margin-right: 20px; 
+            margin-bottom: 10px;
+            /* margin-top: -3px; */
+            
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="info-box" style="overflow: hidden;">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    {% if images %}
+    <img src="{{ MEDIA_URL }}{{ images.0.images }}" 
+         alt="숙소 이미지" 
+         style="float: left; margin-right: 20px; margin-top: 20px; margin-left: 10px; width: 100px; height: auto;">
+    {% endif %}
+        <h2 style="font-size: 18px;">
+            <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                {{ accommodation.name }}
+            </a>
+        </h2>
+        <p class="description">{{ accommodation.description }}</p>
+
+        <div class="star-rating" id="star-rating">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
+        <p class="inline">({{ reviews_count }})</p>
+            
+
+    <!-- </div> -->
+        
+        <p class="price">{{ accommodation.price|floatformat:0  }}원</p>
+
+    </div>
+    <script>
+        function initMap() {
+            // Django 템플릿 변수를 JavaScript 변수로 가져오기
+            var lat = {{ lat }};
+            var lng = {{ lng }};
+            
+            console.log(lat, lng);
+            
+            // 문자열에서 숫자로 변환
+            var latNumber = parseFloat(lat);
+            var lngNumber = parseFloat(lng);
+            
+            var center = {lat: latNumber, lng: lngNumber};
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 17,
+                center: center
+            });
+
+            // 기본 마커
+            var marker = new google.maps.Marker({
+                position: center,
+                map: map
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var averageRating = {{ average_rating }};
+            var stars = document.querySelectorAll('#star-rating .star');
+            for (var i = 0; i < stars.length; i++) {
+                if (i < averageRating) {
+                    stars[i].classList.add('filled');
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+    {% extends 'base.html' %}
+    {% load static %}
+    {% block extra_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'customer_service/inquiry_detial.css' %}">
+    {% endblock %}
+    {% block content %}
+    <div class="inquiry-detail-container">
+        <div class="inquiry-header">
+            <h2 class="inquiry-title">{{ inquiry.inquiry_title }}</h2>
+        </div>
+        <div class="inquiry-body">
+            <p>{{ inquiry.inquiry_body|linebreaksbr }}</p>
+        </div>
+        <div class="inquiry-image">
+            {% if inquiry_image %}
+                <img src="{{ inquiry_image.image.url }}" alt="Inquiry Image">
+            {% else %}
+                <p>이미지 없음</p>
+            {% endif %}
+        </div>
+        <div class="inquiry-comments">
+            <h3>답변 (Comment)</h3>
+            {% for comment in comments %}
+                <div class="comment">
+                    <p>{{ comment.body|linebreaksbr }}</p>
+                    <small>{{ comment.created_at|date:"Y-m-d H:i" }} by 관리자</small>
+                </div>
+            {% empty %}
+                <p>답변이 없습니다.</p>
+            {% endfor %}
+            {% if request.user.is_staff %}
+            <form method="post" class="comment-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn-submit">댓글 작성</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% if request.user.is_staff %}
+    <div>고객 {{inquiry.category.name}} 문의
+         고객 성함   : {{inquiry.created_by.last_name}}{{inquiry.created_by.first_name}}
+         고객 이메일 : {{inquiry.email}}
+         고객 번호   : {{inquiry.phone_number}}
+    </div>
+    {% endif %}
+    {% endblock %}
+    

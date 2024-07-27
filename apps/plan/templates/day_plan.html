@@ -146,7 +146,7 @@
         </form>
         <!-- 여행 날짜 및 유형 표시 -->
         <p class="trip-date">{{new_trip.start_date|date:"Y.m.d"}} ~ {{new_trip.end_date|date:"Y.m.d"}}</p>
-        <p class="trip-type">{{new_trip.who}} | {%for i in style%}{{i}}{%endfor%}</p>
+        <p class="trip-type">{{new_trip.who}} | {%for i in style%} {{i.style}} {%endfor%}</p>
       </div>
   
       <!-- 메인 액션 버튼 -->

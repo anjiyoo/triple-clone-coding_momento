@@ -1,0 +1,26 @@
+{% extends 'mypage.html' %}
+
+
+
+{% block list %}
+{% for i in diary_list%}
+<div class="card mx-2 fixed-card">
+    <a href="{% url 'travel_diary:diary_detail' i.id %}">
+        <img src="{{i.image.url}}" class="card-img-top" alt="여행 일정 이미지">
+    </a>
+    <div class="card-body">
+        <h5 class="card-title">{{i.title}}</h5>
+        <p class="card-text">{{i.content}}</p>
+    </div>
+    <div class="dropdown">
+        <button class="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          ...
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <li><a class="dropdown-item" href="{% url 'travel_diary:update' diary_id=i.id trip_id=i.trip_id %}">수정하기</a></li>
+          <li><a class="dropdown-item" href="#" onclick="">삭제하기</a></li>
+        </ul>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

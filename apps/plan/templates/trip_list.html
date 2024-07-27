@@ -1,0 +1,17 @@
+{% extends 'mypage.html' %}
+
+
+    
+{% block trip_list %}
+{% for i in list %}
+<div class="card mx-2 fixed-card">
+    <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
+        <img src="{{i.city.title_image.url}}" class="card-img-top" alt="여행 일정 이미지">
+    </a>
+    <div class="card-body">
+        <h5 class="card-title">{{i.city}}</h5>
+        <p class="card-text">{{i.start_date|date:'Y.m.d'}} - {{i.end_date|date:'Y.m.d'}}</p>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

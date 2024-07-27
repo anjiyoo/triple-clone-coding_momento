@@ -1,0 +1,130 @@
+
+
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+    }
+    
+    .accommodation-list {
+        margin-left: 20px;
+    }
+    .accommodation-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .accommodation-card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: none;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+    }
+    .accommodation-card:hover {
+        background-color: #f0f0f0; /* 회색 배경색 */
+    }
+    .accommodation-card img {
+        max-width: 100%;
+        border-radius: 5px;
+    }
+    .star-rating {
+        display: inline-block;
+        font-size: 0;
+        margin-left: -10px;
+    }
+    .star-rating .star {
+        font-size: 15px;
+        color: #ddd; 
+    }
+    .star-rating .star.filled {
+        color: #f5c518; 
+    }
+   
+</style>
+<h2 style ="font-weight: bold; margin-left: 150px; margin-bottom: 40px;">{{ filter_name }}에 있는 숙소</h2>
+
+<div class="container">
+
+    <div class="accommodation-list">
+        {% if accommodations %}
+            <ul>
+                {% for accommodation in accommodations %}
+
+                        <a href="{% url 'accommodation:accommodation_detail' accommodation.pk %}" style="text-decoration: none; color: inherit;">
+                        <div class="accommodation-card" data-avg-rating="{{ accommodation.avg_rating }}">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-left: 50px;">
+                                <div style="margin-right: 250px;">
+                                    <h4 style="font-weight: bold;">{{ accommodation.name }}</h4>
+                                    <span style="font-weight: bold; color: #5a5a5a;">{{ accommodation.description }}</span>
+                                    <div style="display: flex; align-items: center; margin-right: 10px; margin-left: 10px;">
+                                        <div class="star-rating" id="star-rating" style="margin-right: 10px;">
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                            <span class="star"><i class="fas fa-star"></i></span>
+                                        </div>
+                                        <p style="margin: 0; color: gray;">({{ accommodation.review_count }})</p>
+                                        <p style="margin: 5px; color: gray;"> · 저장 {{ accommodation.like_count }}</p>
+                                    </div>
+                                    <span style="color: gray; font-size: 15px;">{{ accommodation.city.city_name }} {{ accommodation.city.first_town_name }}</span>
+                                </div>
+                                {% if accommodation.images.all %}
+                                    <img src="{{ accommodation.images.first.images.url }}" alt="{{ accommodation.name }}" style="width: 200px; height: 200px; margin-right:30px;">
+                                {% endif %}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                                <div style="margin-left: 50px;">
+                                    <div style="font-size: 15px; font-weight: bold; color: rgb(94, 189, 131); font-family: 'Roboto', sans-serif;">MOMENTO</div>
+                                    <div style="font-size: 12px; color: gray;">1박, 세금 포함</div>
+                                </div>
+                                <p style="font-weight: bold; font-size: 35px; margin-right: 50px;">{{ accommodation.price|floatformat:0|intcomma }}원</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <hr style="border: 0; border-top: 20px solid #868686d8; margin: 30px 0px; margin-right: 0px;">
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const accommodations = document.querySelectorAll('.accommodation-card');
+
+        accommodations.forEach(accommodation => {
+            let avgRating = parseFloat(accommodation.dataset.avgRating); // 숙소의 평균 평점 가져오기
+            avgRating = Math.floor(avgRating); 
+            const starRating = accommodation.querySelector('.star-rating');
+            const stars = starRating.getElementsByClassName('star');
+
+            for (let i = 0; i < stars.length; i++) {
+                if (i < avgRating) {
+                    stars[i].classList.add('filled'); 
+                } else {
+                    stars[i].classList.remove('filled'); 
+                }
+            }
+        });
+    });
+   
+
+</script>
+{% endblock %}
