@@ -80,7 +80,8 @@ INSTALLED_APPS = [
     'apps.accommodation',
     'apps.mypage',
     'apps.tour',
-    'apps.guidepage'
+    'apps.guidepage',
+    'apps.search'
 ]
 
 MIDDLEWARE = [
