@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/recommend.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="planResult" class="card mt-4 mx-auto text-center" style="width: 50%;" data-who="{{ who }}" data-date="{{ date }}" data-city="{{ city }}">
+                <div class="card-body">
+                    <div class="mt-4 mb-4 d-flex justify-content-center">
+                        {% if county_img %}
+                        <img src="{{ county_img }}" alt="{{ city }} image" class="rounded-circle" style="width: 100px; height: 100px;">
+                        {% else %}
+                        <img src="{% static 'non_city_img.png' %}" alt="Default city image" class="rounded-circle" style="width: 100px; height: 100px;">
+                        {% endif %}
+                    </div>
+                    <p class="font-weight-bold" style="font-weight: bold; font-size: 30px;">
+                        {{ who }} 떠나는 {{ date }}
+                        <br>
+                        <span style="font-size: 30px;">{{ city }}</span>
+                        <span style="color: #088ce4; font-weight: bold; font-size: 30px;">Travel Concept</span>
+                    </p>
+                    <p id="plan" class="mb-2">나만의 여행 컨셉! AI MOMENTO 에게 물어보세요.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4 mt-3 mx-auto text-center shadow-sm" style="width: 50%;">
+                <div class="card-body">
+                    <div id="chat-container" class="chat-container">
+                        <div id="chat-message-list" class="chat-message-list rounded overflow-auto">
+                            <div id="chat-messages" class="chat-messages rounded" style="height: auto;"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group mt-3 mb-3">
+                        <input type="text" id="userInput" class="form-control rounded" placeholder="Travel Concept에 대해 궁금한 내용을 입력해주세요">
+                        <div class="input-group-append">
+                            <button id="submitButton" class="submit-button btn-lg">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'planrecommend/planrecommend_script.js' %}"></script>
+{% endblock %}

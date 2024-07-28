@@ -5,6 +5,10 @@
 {% block title %}Create Reservation{% endblock %}
 
 {% block content %}
+<head>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.1.js"></script>
+
+</head>
 <style>
     .container {
             max-width: 800px; /* 최대 너비 설정 */
@@ -270,7 +274,7 @@
 
 </style>
 <div class="container mt-4">
-        <h1 style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
+        <h1 id="accommodation-name" style="padding: 30px 30px; font-weight: bold;">{{ accommodation.name }}</h1>
         <div style="display: flex; margin-left: 40px; color: gray;">
             <i class="bi bi-geo-alt-fill"></i>
             <p style="margin-left: 10px;">{{ accommodation.city.city_name }}</p>
@@ -322,7 +326,7 @@
     
     </div>
                     
-    <form method="POST">
+    <form id="reservation-form" method="POST" onsubmit="event.preventDefault(); requestPay();">
         {% csrf_token %}
     
           <hr style="border: 0; border-top: 20px solid #9c9c9cd8; margin: 30px 0;">
@@ -443,7 +447,7 @@
         <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 50px;">
         <div style="display: flex; justify-content: space-between; margin-left: 80px; margin-right: 80px;">
             <span style = "font-size: 20px; font-family:  Arial;">총 결제 금액</span>
-            <span style = "font-size: 30px; font-weight: bold;" >{{ room.price|floatformat:0|intcomma }}원</span>
+            <span style = "font-size: 30px; font-weight: bold;" id="room-price" >{{ room.price|floatformat:0|intcomma }}원</span>
         </div>
     </div>
     <!-- 숨겨진 input 필드 추가 -->
@@ -534,12 +538,15 @@
     </div>
 
     <div class="button-container">
-        <button type="submit" class="custom-button" id="submit-button" disabled>예약하기</button>
+        <button type="submit"class="custom-button" id="submit-button" onclick="requestPay()" disabled>예약하기</button>
     </div>
 
     </form>
 </div>
 <script>
+
+
+    
 
     function formatDate(input) {
         var date = input.value;
@@ -713,5 +720,121 @@
             });
         });
     });
+
+    // 가격과 숙소 이름을 동적으로 가져오는 함수들
+        function getPrice() {
+            const priceElement = document.getElementById('room-price');
+            const priceText = priceElement ? priceElement.textContent : '0';
+            return parseInt(priceText.replace(/[^0-9]/g, ''), 10); // 숫자만 추출하여 정수로 변환
+        }
+
+        function getAccommodationName() {
+            const nameElement = document.getElementById('accommodation-name');
+            return nameElement ? nameElement.textContent.trim() : '숙소';
+        }
+
+        function getFormData() {
+            const form = document.getElementById('reservation-form');
+            const formData = new FormData(form);
+            const formObject = {};
+
+            formData.forEach((value, key) => {
+                formObject[key] = value;
+            });
+
+            return formObject;
+        }
+        
+        const accommodation_pk = {{ accommodation_pk }};
+        const room_pk = {{ room_pk }};
+
+        function requestPay() {
+            const IMP = window.IMP;
+            IMP.init('imp57021543'); // 가맹점 식별코드
+
+            const roomPrice = getPrice(); // 동적으로 가격 설정
+            const accommodationName = getAccommodationName();
+            const formData = getFormData(); // 폼 데이터 가져오기
+
+            IMP.request_pay({
+                pg: 'kakaopay',
+                pay_method: 'card',
+                merchant_uid: 'merchant_' + new Date().getTime(),
+                name: accommodationName + ' 결제',
+                amount: roomPrice,
+            }, function (rsp) {
+                if (rsp.success) {
+                    console.log('결제 성공:', rsp);
+                    fetch(`/accommodation/reservation/${accommodation_pk}/room/${room_pk}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
+                        },
+                        body: JSON.stringify({
+                            "imp_uid": rsp.imp_uid,
+                            "merchant_uid": rsp.merchant_uid,
+                            "amount": roomPrice,
+                            ...formData // 폼 데이터 추가
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return response.text(); // JSON이 아닌 경우를 처리하기 위해 텍스트로 변환
+                        }
+                    })
+                    .then(data => {
+                        if (typeof data === 'string') {
+                            // HTML 오류 페이지인 경우
+                            console.error('서버 응답 오류:', data);
+                            alert('서버 응답 오류. 관리자에게 문의하세요.');
+                        } else if (data.success) {
+                            window.location.href = `/accommodation/reservation/success/${data.reservation_id}/`;
+                        } else {
+                            alert('예약 ID를 가져오는 데 실패했습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('예약 ID를 가져오는 중 오류가 발생했습니다.');
+                    });
+                } else {
+                    console.error('결제 실패:', rsp);
+                    alert('결제에 실패하였습니다. 다시 시도해 주세요.');
+                }
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const form = document.querySelector('form');
+            if (form) {
+                form.onsubmit = function (event) {
+                    event.preventDefault(); 
+                    requestPay(); 
+                };
+            }
+        });
+        
+    // CSRF 토큰을 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
 </script>
 {% endblock %}

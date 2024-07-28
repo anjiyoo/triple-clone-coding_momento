@@ -25,3 +25,5 @@ pip install langchain langchain_community psycopg2-binary
 
 pip install django-environ
 pip install django-crispy-forms
+
+pip install django-cors-headers
