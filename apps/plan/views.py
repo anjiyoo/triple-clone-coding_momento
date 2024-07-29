@@ -19,6 +19,10 @@ KAKAO_API_KEY = os.getenv('KAKAO_API_KEY')
 REST_API_KEY = os.getenv('REST_API_KEY')
 # Create your views here.
 
+class PlanList(ListView):
+    model = Trip
+    template_name = 'trip_list.html'
+    ordering = '-pk'
 # @api_view(['GET'])
 # 특정 지역의 관광 데이터를 가져오는 함수
 def get_tour_data(region, cigungu1, cigungu2, cigungu3):
@@ -171,11 +175,35 @@ def day_plan(request, region, cigungu1=0, cigungu2=0, cigungu3=0):
                 trip=new_trip,
                 style=i
             )
+            if tf :
+                style = Trip_style.objects.filter(trip=new_trip)
         
         # 관광 데이터 저장 및 조회
         save_tour_data(region, cigungu1, cigungu2, cigungu3)
         tour_spots = CitySpot.objects.filter(city__area_code=region)
         plan = DayPlan.objects.filter(trip=new_trip.id)
+
+    if request.method == 'GET':
+        new_trip = Trip.objects.get(id=request.GET['trip'])
+        style = Trip_style.objects.filter(trip=request.GET['trip'])
+        tour_spots = CitySpot.objects.filter(city__area_code=request.GET['area_code'])
+        # 날짜 계산
+        day_cnt = (new_trip.end_date - new_trip.start_date).days
+        week = {0:'월', 1:'화', 2:'수', 3:'목', 4:'금', 5:'토', 6:'일'}
+        day = new_trip.start_date.weekday()
+        days = [new_trip.start_date.strftime("%m.%d/"+week[day])]
+        for i in range(1, day_cnt+1):
+            new = new_trip.start_date + timedelta(days=i)
+            new_week = new.weekday()
+            days.append(new.strftime("%m.%d/"+week[new_week]))
+        # origin day
+        origin_day = [new_trip.start_date.strftime("%Y-%m-%d")]
+        for i in range(1, day_cnt+1):
+            new = new_trip.start_date + timedelta(days=i)
+            origin_day.append(new.strftime("%Y-%m-%d"))
+        days = zip(days, origin_day)
+
+        plan = DayPlan.objects.filter(trip=new_trip)
     return render(
         request,
         'day_plan.html',
@@ -215,7 +243,13 @@ def add_memo(request):
 # 여행 계획 조회 함수
 def plan(request):
     new_trip = get_object_or_404(Trip, id=request.GET['trip_id'])
-    plan = list(DayPlan.objects.filter(trip=new_trip.id).annotate(
+    if request.GET['day']:
+        plan = list(DayPlan.objects.filter(trip=new_trip.id , day=request.GET['day']).annotate(
+        title=F('spot__title'),
+        address=F('spot__address')
+    ).values('title', 'address', 'trip', 'spot', 'memo', 'day'))
+    else:
+        plan = list(DayPlan.objects.filter(trip=new_trip.id).annotate(
         title=F('spot__title'),
         address=F('spot__address')
     ).values('title', 'address', 'trip', 'spot', 'memo', 'day'))

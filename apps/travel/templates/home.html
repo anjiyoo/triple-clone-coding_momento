@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}MOMENTO - 국내여행{% endblock %}
+
 {% block content %}
 
 {% load static %}
@@ -8,7 +10,6 @@
 {% endblock %}
 
 <div class="container mt-3">
-    <h3 class="mb-4">국내 여행</h3>
     <!-- 이미지 베너 -->
     <div id="carousel-county" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
@@ -37,9 +38,9 @@
             </a>
         </div>
         <div class="col-md-4 mb-4">
-            <a href="/tour" class="d-block">
-                <i class="bi bi-ticket-perforated" style="color: #0BD0AF; font-size: 4em;"></i>
-                <span class="d-block mt-1"><strong>투어﹒티켓</strong></span>
+            <a href="{% url 'baenangtalk:bae_main' %}" class="d-block">
+                <i class="bi bi-chat-square-dots" style="color: #0BD0AF; font-size: 4em;"></i>
+                <span class="d-block mt-1"><strong>배낭톡</strong></span>
             </a>
         </div>
     </div>
