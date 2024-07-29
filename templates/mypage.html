@@ -155,11 +155,12 @@
 <!-- 여행 일정 -->
 <div class="container mt-3">
     <div class="row">
-        <h2 class="mb-3">최근 여행</h2>
+        
         <div >
             {% block list %}
             <div class="page-wrapper" style="position:relative;">
                 <!--page slider -->
+                <h2>최근 여행</h2>
                 <div class="post-slider">
                   <i class="fas fa-chevron-left prev"></i>  
                   <i class="fas fa-chevron-right next"></i>  
@@ -171,6 +172,7 @@
                         <i class="far fa-user" style="height:10%;">Awa Melvine</i>
                       </div>
                     </div> -->
+                    {% if trip_list %}
                     {% for i in trip_list %}
                     <div class="card mx-2 fixed-card">
                         <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
@@ -191,6 +193,7 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% endif %}
                   </div>
                 </div>
                 <!--post slider-->

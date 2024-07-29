@@ -4,9 +4,10 @@
     
 {% block list %}
 
-
+{% if trips %}
 <div class="page-wrapper" style="position:relative;">
     <!--page slider -->
+    <h2>최근 여행</h2>
     <div class="post-slider">
       <i class="fas fa-chevron-left prev"></i>  
       <i class="fas fa-chevron-right next"></i>  
@@ -43,6 +44,5 @@
     <!--post slider-->
   </div>
 
-
-
+{% endif %}
 {% endblock %}

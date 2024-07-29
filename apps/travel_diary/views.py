@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.views.generic import CreateView ,ListView, DetailView, UpdateView, DeleteView
-from .forms import DiaryForm
+from .forms import DiaryForm,CommentcreateForm
 from apps.plan.models import Trip,DayPlan
 from datetime import datetime, timedelta
-from .models import tag,diary
-from django.shortcuts import redirect
+from .models import tag,diary,DiaryComment
+from django.shortcuts import redirect ,get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
 import os
@@ -59,6 +59,7 @@ class DiaryList(ListView):
     ordering = '-pk'
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user).order_by(self.ordering)
+    
 class DiaryDetail(DetailView):
     model = diary
     template_name = 'diary_detail.html'
@@ -84,14 +85,33 @@ class DiaryDetail(DetailView):
         days = zip(days, origin_day)
         # 일자별 게획
         plan = DayPlan.objects.filter(trip=trip)
+
+        comments = DiaryComment.objects.filter(diary=self.kwargs['pk'])  
+        form = CommentcreateForm()  # 댓글 폼 초기화
+
         context['day_list'] = origin_day
         context['trip_id'] = trip_id
         context['trip'] = trip
         context['days'] = days
         context['plan'] = plan
+        context['form'] = form
+        context['comments'] = comments
         context['KAKAO_API_KEY'] = KAKAO_API_KEY
         context['REST_API_KEY'] = REST_API_KEY
         return context
+    
+    
+    
+    # POST 요청 처리
+    def post(self, request, pk):  
+        form = CommentcreateForm(request.POST)
+        # 입력된 데이터 유효성 검사
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user  # 요청을 보낸 사용자 = 댓글의 작성자
+            comment.diary = diary.objects.get(pk=pk)  
+            comment.save()  # DB 저장
+            return redirect('travel_diary:diary_detail', pk=pk)
 
 class DiaryUpdate(UpdateView):
     model = diary
