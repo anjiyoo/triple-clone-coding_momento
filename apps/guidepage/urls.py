@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+app_name = 'guidepage'
 urlpatterns = [
     path('', views.guidemain, name='index'),
     path('guide_plan', views.guide_plan, name='guide_plan'),

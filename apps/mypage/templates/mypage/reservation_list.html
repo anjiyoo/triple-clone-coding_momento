@@ -3,70 +3,75 @@
 {% block title %}내 예약{% endblock %}
 
 {% block extra_css %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .header .back {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .tabs {
-            display: flex;
-            margin-top: 20px;
-            border-bottom: 2px solid #ccc;
-        }
-        .tabs .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .tabs .tab.active {
-            border-bottom: 2px solid #007bff;
-            font-weight: bold;
-        }
-        .message {
-            text-align: center;
-            margin: 50px 0;
-        }
-        .contact {
-            margin-top: 50px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-top: 1px solid #ccc;
-            text-align: center;
-        }
-        .contact p {
-            margin: 5px 0;
-        }
-        .custom-button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .custom-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        padding: 20px;
+    }
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+    }
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+    .header .back {
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    .tabs {
+        display: flex;
+        margin-top: 20px;
+        border-bottom: 2px solid #ccc;
+    }
+    .tabs .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    .tabs .tab.active {
+        border-bottom: 2px solid #007bff;
+        font-weight: bold;
+    }
+    .faq-content {
+        display: none;
+    }
+    .faq-content.active {
+        display: block;
+    }
+    .message {
+        text-align: center;
+        margin: 50px 0;
+    }
+    .contact {
+        margin-top: 50px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-top: 1px solid #ccc;
+        text-align: center;
+    }
+    .contact p {
+        margin: 5px 0;
+    }
+    .custom-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+    .custom-button:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -77,33 +82,67 @@
             <h1>내 예약</h1>
         </div>
         <div class="tabs">
-            <div class="tab active">항공</div>
+            <div class="tab active" id="faq_flightTab" onclick="selectTab('faq_flight')">항공</div>
+            <div class="tab" id="faq_accommodationsTab" onclick="selectTab('faq_accommodations')">숙소</div>
         </div>
-        <div class="message">
+        <div id="faq_flight" class="faq-content active">
             {% if reservations %}
                 <ul>
                     {% for reservation in reservations %}
+                        {% if reservation.reservation_type == 'flight' %}
                         <li>
-                            <strong>예약날짜:</strong> {{ reservation.reservation_date }}<br>
+                            <strong>예약 날짜:</strong> {{ reservation.reservation_date }}<br>
                             <strong>예약자 성함:</strong> {{ reservation.booker_name }}<br>
-                            <strong>가는편:</strong> {{ reservation.departure_airport }} ->{{ reservation.arrival_airport }} <br>
+                            <strong>가는 편:</strong> {{ reservation.departure_airport }} -> {{ reservation.arrival_airport }}<br>
                             {% if reservation.return_departure_airport %}
-                            <strong>오는편:</strong> {{ reservation.return_departure_airport }} -> {{ reservation.return_arrival_airport }}<br>
+                            <strong>오는 편:</strong> {{ reservation.return_departure_airport }} -> {{ reservation.return_arrival_airport }}<br>
                             {% endif %}
                         </li>
                         <a href="{% url 'flights:reservation_detail' reservation.id %}" class="custom-button">상세보기</a>
-
-                    {% endfor %}    
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             {% else %}
                 <p>예약 내역이 없습니다.</p>
-                <div>
-                    <strong>국내선 결항 대처 방법 안내</strong><br>
-                    예약한 국내선이 결항되었나요?
-                </div>
             {% endif %}
         </div>
-
+        <div id="faq_accommodations" class="faq-content">
+            {% if reservations %}
+                <ul>
+                    {% for reservation in reservations %}
+                        {% if reservation.reservation_type == 'accommodation' %}
+                        <li>
+                            <strong>숙소 이름:</strong> {{ reservation.accommodation_name }}<br>
+                            <strong>객실 이름:</strong> {{ reservation.room_name }}<br>
+                            <strong>체크인 날짜:</strong> {{ reservation.check_in }}<br>
+                            <strong>체크아웃 날짜:</strong> {{ reservation.check_out }}<br>
+                            <strong>투숙자 이름:</strong> {{ reservation.guest_name }}<br>
+                        </li>
+                        <a href="/accommodation/reservation/success/{{ reservation.pk }}" class="custom-button">상세보기</a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>예약 내역이 없습니다.</p>
+            {% endif %}
+        </div>
     </div>
 </body>
+<script>
+    function selectTab(tabId) {
+        // 모든 탭을 비활성화
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        // 클릭한 탭을 활성화
+        document.getElementById(tabId + 'Tab').classList.add('active');
+
+        // 모든 FAQ 내용을 비활성화
+        document.querySelectorAll('.faq-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        // 선택한 FAQ 내용을 활성화
+        document.getElementById(tabId).classList.add('active');
+    }
+</script>
 {% endblock %}

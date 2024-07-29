@@ -79,7 +79,7 @@
             <ul>
                 {% for faq in faq_accommodations %}
                     <li>
-                        <a href="#" class="inquiry-title">{{ faq.faq_title }}</a>
+                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -90,7 +90,7 @@
             <ul>
                 {% for faq in faq_service %}
                     <li>
-                        <a href="#" class="inquiry-title">{{ faq.faq_title }}</a>
+                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
                     </li>
                 {% endfor %}
             </ul>
