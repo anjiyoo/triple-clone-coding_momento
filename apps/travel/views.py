@@ -14,7 +14,15 @@ class HomeListView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['diary']= diary.objects.all()
+        diary_list = diary.objects.all()
+        county_id = self.request.GET.get('county_id')
+        # 필터링 조건 추가
+        if county_id:
+            diary_list = diary_list.filter(trip__city_id=county_id)
+            context['selected_county'] = County.objects.get(pk=county_id)
+            context['county_id'] = int(county_id)
+              
+        context['diary']= diary_list
         return context
 
 # 여행시작 메인페이지 뷰

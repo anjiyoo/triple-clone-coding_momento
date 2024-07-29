@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import CreateView ,ListView, DetailView, UpdateView
+from django.views.generic import CreateView ,ListView, DetailView, UpdateView, DeleteView
 from .forms import DiaryForm
 from apps.plan.models import Trip,DayPlan
 from datetime import datetime, timedelta
@@ -129,3 +129,8 @@ class DiaryUpdate(UpdateView):
     def get_object(self, queryset=None):
         diary_id = self.kwargs.get('diary_id')
         return diary.objects.get(id=diary_id)
+    
+class DiaryDelete(DeleteView):
+    model = diary
+    template_name = 'diary_delete.html'
+    success_url = reverse_lazy('travel_diary:diary_list')

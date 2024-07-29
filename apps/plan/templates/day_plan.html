@@ -152,7 +152,11 @@
       <!-- 메인 액션 버튼 -->
       <div class="main-actions">
         <button class="btn btn-primary">+ 일행과 함께 일정짜기</button>
+        {% if diary %}
+        <a class="btn btn-primary" href="" onclick="error()">여행기 쓰기</a>
+        {% else %}
         <a class="btn btn-primary" href="{% url 'travel_diary:create' new_trip.id %}">여행기 쓰기</a>
+        {% endif %}
       </div>
   
       <!-- 보조 액션 버튼 -->
@@ -420,11 +424,31 @@
   }
 
   // 카카오맵 초기화
-  var container = document.getElementById('map');
-  var options = {
-      center: new kakao.maps.LatLng( 37.715133, 126.734086),
-      level: 13
-  };
+  try{
+    console.log('에러가 나기 직전까지의 코드는 잘 실행됩니다.');
+    const place=document.querySelector('.place').dataset['xy'].split(',')
+    if (!place) {
+        throw new Error('place element not found');
+    }
+    console.log('여기까지')
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng( place[1],place[0]),
+        level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  }catch(err){
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng( 37.715133, 126.734086),
+        level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  }
+
+    
+
+  
 
   var map_xy = new Array();
   var list_name = new Array();
@@ -436,7 +460,6 @@
   })
   console.log(map_xy)
   
-  var map = new kakao.maps.Map(container, options);
   // 지도에 교통정보를 표시
   map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);   
 
@@ -579,5 +602,9 @@
           el.textContent = counter++;
       });
   });
+
+  function error(){
+    alert('이미 작성된 여행기가 있습니다.')
+  }
 </script>
 {% endblock %}
