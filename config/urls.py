@@ -39,8 +39,6 @@ urlpatterns = [
     path('test_mypage/', include(('apps.mypage.urls', 'mypage'), namespace='mypage')),
     path('accommodation/', include("apps.accommodation.urls")),
     path('guidepage/', include("apps.guidepage.urls")),
-    
+    path('search/', include("apps.search.urls")),
 
-
-  
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
