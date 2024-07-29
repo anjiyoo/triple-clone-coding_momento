@@ -184,9 +184,8 @@ class CustomerServiceView(ListView):
         context['faq_best'] = Faq.objects.order_by('id')[:4]
         context['faq_flight'] = Faq.objects.filter(faq_category_id='1').order_by('id')[:4]
         context['faq_accommodations'] = Faq.objects.filter(faq_category_id='2').order_by('id')[:4]
-        context['faq_tourticket'] = Faq.objects.filter(faq_category_id='3').order_by('id')[:4]
-        context['faq_service'] = Faq.objects.filter(faq_category_id='4').order_by('id')[:4]
-        context['faq_common'] = Faq.objects.filter(faq_category_id='5').order_by('id')[:4]
+        context['faq_service'] = Faq.objects.filter(faq_category_id='3').order_by('id')[:4]
+        context['faq_common'] = Faq.objects.filter(faq_category_id='4').order_by('id')[:4]
         return context
 
 # class InquiryListView(ListView):
@@ -238,9 +237,8 @@ class FaqListView(ListView):
         else:
             context['faq_flight'] = Faq.objects.filter(faq_category_id='1')
             context['faq_accommodations'] = Faq.objects.filter(faq_category_id='2')
-            context['faq_tourticket'] = Faq.objects.filter(faq_category_id='3')
-            context['faq_service'] = Faq.objects.filter(faq_category_id='4')
-            context['faq_common'] = Faq.objects.filter(faq_category_id='5')
+            context['faq_service'] = Faq.objects.filter(faq_category_id='3')
+            context['faq_common'] = Faq.objects.filter(faq_category_id='4')
 
         context['form'] = SearchForm()
         return context
