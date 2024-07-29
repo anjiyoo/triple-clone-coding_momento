@@ -1,14 +1,23 @@
 {% extends 'base.html' %}
 
+{% block title %}MOMENTO - 국내여행{% endblock %}
+
 {% block content %}
 
 {% load static %}
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'travel/home.css' %}">
 {% endblock %}
+<style>
+    /* 도시 버튼 커스텀 */
+.btn-custom {
+    color: #fff;
+    background-color: transparent;
+    border-color: #0BD0AF;
+}
 
+</style>
 <div class="container mt-3">
-    <h3 class="mb-4">국내 여행</h3>
     <!-- 이미지 베너 -->
     <div id="carousel-county" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
@@ -37,13 +46,12 @@
             </a>
         </div>
         <div class="col-md-4 mb-4">
-            <a href="/tour" class="d-block">
-                <i class="bi bi-ticket-perforated" style="color: #0BD0AF; font-size: 4em;"></i>
-                <span class="d-block mt-1"><strong>투어﹒티켓</strong></span>
+            <a href="{% url 'baenangtalk:bae_main' %}" class="d-block">
+                <i class="bi bi-chat-square-dots" style="color: #0BD0AF; font-size: 4em;"></i>
+                <span class="d-block mt-1"><strong>배낭톡</strong></span>
             </a>
         </div>
     </div>
-
     <!-- AI일정추천 -->
     <div class="row mt-5 text-center">
         <div>
@@ -52,7 +60,41 @@
             </a>
         </div>
     </div>
-
+    
+    <!-- 여행기 -->
+    <div class="mt-5">
+        <h3 class="mb-4">여행기</h3>
+        <!-- 도시 선택 -->
+        <div class="btn-group mx-3 mb-3" style="display: block; padding: 0;">
+            <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
+                {% if county_id %}
+                    <strong>{{ selected_county.city_name }}</strong>
+                {% else %}
+                    도시 선택
+                {% endif %}
+            </button>
+            <div class="dropdown-menu">
+                {% for county in counties %}
+                    <a class="dropdown-item" href="?county_id={{ county.id }}{% if period_id %}&period_id={{ period_id }}{% endif %}{% if subject_id %}&subject_id={{ subject_id }}{% endif %}">
+                        {{ county.city_name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            {%for i in diary%}
+            <div class="card mx-3 col-md-3" style="max-width: 42rem; padding: 0;">
+                <a href="{% url 'travel_diary:diary_detail' i.id %}">
+                    <img src="{{i.image.url}}" class="card-img-top" alt="여행 일정 이미지" style="width: 100%; height: 220px;">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{i.title}}</h5>
+                    <p class="card-text">{{i.content}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 {% block extra_js %}

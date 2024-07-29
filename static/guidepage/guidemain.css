@@ -17,47 +17,95 @@ body {
     max-width: 1200px;
     margin: 20px 0;
 }
-.card {
+
+/* 메인 카드 */
+.card.main-card {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 5px;
-    padding: 0;  /* Remove padding to make image touch the edges */
+    margin: 20px 0;  /* 위아래 여백 추가 */
+    padding: 20px;   /* 패딩 추가 */
     width: 100%;
-    max-width: 800px;
+    max-width: 600px;
     text-align: center;
-    overflow: hidden; /* Ensure child elements don't overflow */
+    overflow: hidden;
 }
 
-
-.card h2 {
-    font-size: 2em;
-    margin-bottom: 10px;
+.card.main-card h3 {
+    font-size: 30px;
+    margin-bottom: 25px;
+    text-align: left;
 }
 
-.card p {
-    font-size: 1.5em;
+.card.main-card p {
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.5; 
+}
+
+/* 서브 카드 */
+.card-1 {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;  /* 위아래 여백 추가 */
+    padding: 20px;   /* 패딩 추가 */
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+    overflow: hidden;
+}
+
+.card-1 img {
+    width: 100%;
+    height: auto; /* 이미지 비율 유지 */
     margin-bottom: 20px;
 }
-.card img {
-    width: 5px;
-    height: 200px;
-    margin-bottom: 20px;
+
+.card-1 p {
+    text-align: left;
+    color: rgb(18, 113, 255);
+    font-weight: bold;
+}
+
+.card-1 h3 {
+    font-size: 30px;
+    margin-bottom: 25px;
+    text-align: left;
 }
 
 
+/* 이미지 컨테이너 */
+.image-container {
+    width: 100%;
+    height: auto; /* 높이 자동 조절 */
+    margin-bottom: 20px;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto; /* 이미지 비율 유지 */
+    object-fit: cover; /* 이미지가 컨테이너를 채우도록 설정 */
+}
+
+/* 버튼 */
 button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
+    background-color: #ffffff;      /* 배경색 흰색 */
+    border: 1px solid rgb(169, 169, 169); /* 테두리 두께 2px, 색상 검정 */
+    color: rgb(0, 0, 0);            /* 텍스트 색상 검정 */
+    padding: 10px 20px;             /* 상하 10px, 좌우 20px 패딩 */
+    border-radius: 4px;             /* 테두리 둥글기 4px */
+    cursor: pointer;                /* 포인터 커서 */
+    font-size: 1em;                 /* 글자 크기 1em */
+    width: 100%;                   /* 버튼 너비 */
+    text-align: center;             /* 텍스트 가운데 정렬 */
+    display: block;                 /* 버튼을 블록 요소로 설정 */
+    margin: 0 auto;                 /* 버튼을 가로 가운데 정렬 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: rgb(18, 113, 255);
 }
 
 .share-button {
@@ -69,47 +117,37 @@ button:hover {
     cursor: pointer;
     font-size: 1em;
     margin-top: 20px;
+    transition: background-color 0.3s ease;
 }
 
 .share-button:hover {
     background-color: #007B9A;
 }
-.image-container img {
-    width: 100%;
-    height: 20%; /* Make image fill the container */
-    object-fit: cover; /* Ensure the image covers the entire container */
-}
-.image-container {
-    width: 100%;
-    height: 5%; /* Set to half of the card height */
-    overflow: hidden;
-}
 
-.card-1 {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 5px;
-    padding: 0;  /* Remove padding to make image touch the edges */
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-    overflow: hidden; /* Ensure child elements don't overflow */
+/* 메인 화면으로 돌아가기 */
+.close-button {
+    display: inline-block;
+    width: 40px; /* 버튼의 너비 */
+    height: 40px; /* 버튼의 높이 */
+    background-color: rgba(128, 128, 128, 0.3); /* 회색 배경 (투명도 포함) */
+    border-radius: 50%; /* 원형으로 만들기 */
+    color: gray; /* 엑스 표시 색상 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    line-height: 40px; /* 버튼의 높이와 같게 설정하여 수직 가운데 정렬 */
+    font-size: 24px; /* 엑스 표시의 크기 */
+    text-decoration: none; /* 기본 링크 스타일 제거 */
+    position: fixed; /* 화면에 고정 */
+    top: 20px; /* 화면 상단에서의 위치 */
+    right: 20px; /* 화면 오른쪽에서의 위치 */
+    cursor: pointer; /* 클릭 가능한 버튼 모양 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
 }
 
-
-.card-1 h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+.close-button:hover {
+    background-color: rgba(128, 128, 128, 0.5); /* 호버 시 배경색 변경 */
 }
 
-.card-1 p {
-    font-size: 1em;
-    margin-bottom: 20px;
-}
-
-.card-1 img {
-    width: 700px;
-    height: 400px;
-    margin-bottom: 20px;
+.close-icon {
+    display: inline-block;
+    vertical-align: middle; /* 수직 가운데 정렬 */
 }

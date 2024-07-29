@@ -1,40 +1,50 @@
 {% extends 'base.html' %}
 
+{% block title %}MOMENTO - 여행시작{% endblock %}
+
 {% block content %}
 
 {% load static %}
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'travel/home.css' %}">
 {% endblock %}
-<div class="container mt-3">
-    <h3 class="mb-4">여행 시작</h3>
 
-    <div class="row text-center shadow-sm justify-content-center">
-        <div class="col-md-2 mb-3">
+<div class="container mt-3">
+    <!-- 검색창 -->
+    <h1 style="text-align: center;">어디로 가시나요?</h1>
+    <a href="/search" style="display: flex; justify-content: center; align-items: center; margin: 50px;">
+        <input class="form-control mr-sm-2" type="search" placeholder="어디로 떠나시나요?" aria-label="Search" name="q" style="width: 800px; height: 43px; border-color: rgb(16, 179, 144); margin-right: 10px;">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="background-color: rgb(16, 179, 144); color: white; border: none; padding: 10px 20px;">검색</button>
+    </a>
+
+    <!-- 이미지 베너 -->
+    <div id="carousel-county" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            {% for county in counties %}
+            {% for img in county.countyimg_set.all %}
+            <div class="carousel-item {% if forloop.first and forloop.parentloop.first %}active{% endif %}">
+                <img src="{{ img.image.url }}" class="d-block w-100 img-thumbnail" alt="{{ img.city_name.city_name }} 이미지">
+            </div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+     <!-- 아이콘 -->
+     <div class="row mt-5 text-center shadow-sm">
+        <div class="col-md-4 mb-4">
             <a href="{% url 'flights:flight_search' %}" class="d-block">
                 <i class="bi bi-airplane" style="color: #0BD0AF; font-size: 4em;"></i>
                 <span class="d-block mt-1"><strong>항공권</strong></span>
             </a>
         </div>
-        <div class="col-md-2 mb-3">
-            <a href="#" class="d-block">
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'accommodation:accommodation_home' %}" class="d-block">
                 <i class="bi bi-building" style="color: #0BD0AF; font-size: 4em;"></i>
                 <span class="d-block mt-1"><strong>숙소</strong></span>
             </a>
         </div>
-        <div class="col-md-2 mb-3">
-            <a href="#" class="d-block">
-                <i class="bi bi-ticket-perforated" style="color: #0BD0AF; font-size: 4em;"></i>
-                <span class="d-block mt-1"><strong>투어﹒티켓</strong></span>
-            </a>
-        </div>
-        <div class="col-md-2 mb-3">
-            <a href="{% url 'baenangtalk:bae_main' %}" class="d-block">
-                <i class="bi bi-chat-square-dots" style="color: #0BD0AF; font-size: 4em;"></i>
-                <span class="d-block mt-1"><strong>배낭톡</strong></span>
-            </a>
-        </div>
-        <div class="col-md-2 mb-3">
+        <div class="col-md-4 mb-4">
             <a href="{% url 'chatbot:chatbot_main' %}" class="d-block">
                 <i class="bi bi-robot" style="color: #0BD0AF; font-size: 4em;"></i>
                 <span class="d-block mt-1"><strong>챗봇</strong></span>
@@ -42,6 +52,45 @@
         </div>
     </div>
 
+<!-- 사용설명서 이미지 링크-->
+<div class="container mt-3">
+    <div class="image-row">
+        <a href="/guidepage">
+            <img src="{% static '200_guidepage.png' %}" alt="Clickable Image" class="img-fluid custom-image">
+        </a>
+        <a href="/baenangtalk/">
+            <img src="{% static 'beanang.png' %}" alt="Clickable Image" class="img-fluid custom-image">
+        </a>
+        <a href="/planrecommend/">
+            <img src="{% static 'map.png' %}" alt="Clickable Image" class="img-fluid custom-image">
+        </a>
+        <a href="/chatbot/">
+            <img src="{% static 'chatbot.png' %}" alt="Clickable Image" class="img-fluid custom-image">
+        </a>
+    </div>
 </div>
 
+<style>
+    .container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    }
+
+    .image-row {
+        display: flex; /* Flexbox를 사용하여 가로 배치 */
+        justify-content: center; /* 중앙 정렬 */
+        gap: 90px; /* 이미지 사이의 간격 */
+    }
+
+    .custom-image {
+        width: 250px; 
+        height: 250px;
+        border-radius: 8px; /* 이미지 모서리 둥글게 */
+        transition: transform 0.3s ease; /* 이미지 확대 효과 */
+    }
+
+    .custom-image:hover {
+        transform: scale(0.8); /* 호버 시 이미지 확대 효과 */
+    }
+</style>
 {% endblock %}
