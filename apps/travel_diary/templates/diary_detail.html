@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+.container {
+  /* max-width: 36rem; */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
+}
+
+.image {
+  width: 100%;
+  
+  object-fit: cover;
+}
+
+.content {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.description {
+  margin-top: 0.5rem;
+  color: #4b5563;
+}
+.customoverlay {
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+.customoverlay .title {
+    font-size: 14px;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<!-- 카카오 지도 API 스크립트 -->
+<div class="container">
+    <img src="{{diary.image.url}}" alt="" class="image"  height="600">
+    <div class="content">
+        <h2>{{diary.title}}</h2>
+        <p class="description">
+            {{diary.content}}
+        </p>
+    </div>
+    <hr class="my-5" style="border: 5px gray solid;">
+    <div style="display: block; justify-content: center; align-items: center;">
+    {% for i,origin in days %}
+        <h2 style="font-weight: 700; margin-bottom: 20px;">Day {{forloop.counter}} | {{origin}}</h2>
+        <!-- 카카오 지도 표시 영역 -->
+        <div id="map{{forloop.counter}}" style="width:500px;height:400px; margin-left: 380px; margin-bottom: 20px;"></div>
+        {% for p in plan %}
+            {% if p.day|date:'Y-m-d' == origin %}
+                {% if p.spot %}
+                <!-- 관광 장소 항목 -->
+                <div class="d-flex align-items-center" style="margin-left: 380px;">
+                    <div class="spot-counter" style="display: flex; width: 36px; height: 36px; background-color: slateblue; border: 1px; border-radius: 50%; color: white; align-items: center; justify-content: center; margin-right: 30px;">
+                      <span data-date="{{origin}}"></span>
+                    </div>
+                    <div id="{{p.id}}" class="mb-2 place{{origin}}" data-xy="{{p.spot.map_x}},{{p.spot.map_y}},{{p.spot.title}}"  style="width: 460px; height: 80px; display: flex; align-items: center;">
+                      <span data-date="{{origin}}"></span>
+                      <div id="add_spot" class="mt-1">
+                        <div id="{{p.spot.id}}" class="spot_id" style="font-weight: bold; font-size: 20px;">{{p.spot.title}}</div>
+                        <p>관광명소·{{p.spot.address}}</p> 
+                    </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        <hr class="my-5" style="border: 5px gray solid;">
+    {% endfor %}
+    </div>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ KAKAO_API_KEY }}"></script>
+<script>
+  // 마커 이미지 생성 함수
+  function createMarkerImage(number) {
+      var canvas = document.createElement('canvas');
+      var context = canvas.getContext('2d');
+      canvas.width = 36;
+      canvas.height = 36;
+
+      // 원 그리기
+      context.beginPath();
+      context.arc(18, 18, 18, 0, 2 * Math.PI);
+      context.fillStyle = 'slateblue';
+      context.fill();
+
+      // 텍스트 추가
+      context.font = 'bold 14px Arial';
+      context.fillStyle = 'white';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(number, 18, 18);
+
+      return canvas.toDataURL();
+  }
+    
+        days = '{{day_list}}'
+        const daysArray = days.replace(/&#x27;/g, "'").split(' ').join('').replace("['",'').replace("']",'').replace(",'",'').split("'");
+        
+        daysArray.forEach((day,index)=> {
+          console.log(`map${index+1}`)
+          var container = document.getElementById(`map${index+1}`); //지도를 담을 영역의 DOM 레퍼런스
+          var options = { //지도를 생성할 때 필요한 기본 옵션
+          center: new kakao.maps.LatLng( 37.715133, 126.734086), //지도의 중심좌표.
+          level: 12 //지도의 레벨(확대, 축소 정도)
+        };
+
+        var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+        var map_xy = new Array();
+        var list_name = new Array();
+        
+        // 지도에 표시할 장소 데이터 수집
+        document.querySelectorAll(`.place${day}`).forEach(xy => {
+
+            map_xy.push(xy.dataset['xy'].split(','))
+
+            console.log(map_xy,day)
+        
+            var xy = new Array();
+
+            // 마커 생성 및 표시
+            for(var idx=0; idx<map_xy.length; idx++){
+                var x = map_xy[idx][0];
+                var y = map_xy[idx][1];
+                xy.push(new kakao.maps.LatLng(y,x));
+            }
+            console.log(xy)
+            for(var idx=0; idx<xy.length; idx++){
+                var markerImage = new kakao.maps.MarkerImage(
+                    createMarkerImage(idx + 1),
+                    new kakao.maps.Size(36, 36),
+                    {offset: new kakao.maps.Point(18, 18)}
+                );
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: xy[idx],
+                    title: map_xy[idx][2],
+                    image: markerImage,
+                })
+                marker.setMap(map);  
+              }
+              // 카카오 네비게이션 API를 사용한 경로 표시 함수
+              async function getCarDirection() {
+                  const REST_API_KEY = '{{REST_API_KEY}}';
+                  const url = 'https://apis-navi.kakaomobility.com/v1/directions';
+                  for(var idx=0; idx<map_xy.length-1; idx++){
+                      const origin = `${map_xy[idx][0]},${map_xy[idx][1]}`
+                      const destination = `${map_xy[idx+1][0]},${map_xy[idx+1][1]}`
+                      // 요청 헤더 설정
+                      const headers = {
+                          Authorization: `KakaoAK ${REST_API_KEY}`,
+                          'Content-Type': 'application/json'
+                      };
+                      // 요청 파라미터 설정
+                      const queryParams = new URLSearchParams({
+                          origin: origin,
+                          destination: destination
+                      });
+                      const requestUrl = `${url}?${queryParams}`;
+                      console.log(requestUrl)
+                      try {
+                          const response = await fetch(requestUrl, {
+                              method: 'GET',
+                              headers: headers
+                          });
+
+                          if (!response.ok) {
+                              throw new Error(`HTTP error! Status: ${response.status}`);
+                          }
+
+                          const data = await response.json();
+                          console.log(data)
+
+                          // 경로 좌표 추출 및 폴리라인 생성
+                          const linePath = [];
+                          data.routes[0].sections[0].roads.forEach(router => {
+                              router.vertexes.forEach((vertex, index) => {
+                                  if (index % 2 === 0) {
+                                      linePath.push(new kakao.maps.LatLng(router.vertexes[index + 1], router.vertexes[index]));
+                                  }
+                              });
+                          });
+                          var polyline = new kakao.maps.Polyline({
+                              path: linePath,
+                              strokeWeight: 5,
+                              strokeColor: '#000000',
+                              strokeOpacity: 0.7,
+                              strokeStyle: 'solid'
+                          }); 
+                          polyline.setMap(map);
+
+                          // 경로 길이 계산 및 표시
+                          var lengthInMeters = polyline.getLength();
+                          var lengthInKm = (lengthInMeters / 1000).toFixed(2);
+                      
+                          console.log("길이: " + lengthInMeters.toFixed(2) + " 미터");
+                          console.log("길이: " + lengthInKm + " 킬로미터");
+
+                          // 경로의 중간 지점에 거리 정보 표시
+                          var middleIndex = Math.floor(linePath.length / 2);
+                          var middlePosition = linePath[middleIndex];
+
+                          var content = '<div class="customoverlay">' +
+                                      '  <span class="title">' + lengthInKm + ' km</span>' +
+                                      '</div>';
+
+                          var customOverlay = new kakao.maps.CustomOverlay({
+                              map: map,
+                              position: middlePosition,
+                              content: content,
+                              yAnchor: 1 
+                          });
+                      } catch (error) {
+                          console.error('Error:', error);
+                      }
+                  }
+              }
+              
+              getCarDirection();
+            })
+                
+          })
+        
+
+
+    // 페이지 로드 시 여행지 번호 매기기
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    days = '{{day_list}}'
+    
+    const daysArray = days.replace(/&#x27;/g, "'").split(' ').join('').replace("['",'').replace("']",'').replace(",'",'').split("'");
+    console.log(typeof daysArray);
+    console.log(daysArray)
+    daysArray.forEach(day => {
+      let counter = 1;
+      document.querySelectorAll('.spot-counter').forEach(function(el) {
+          if(el.querySelector(`[data-date="${day}"]`)){
+            el.textContent = counter++;
+          }
+      });
+
+
+      
+    });
+  });
+</script>
+{% endblock %}

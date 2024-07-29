@@ -10,16 +10,13 @@
 {% endblock %}
 
 <div class="container mt-3">
-    <h3 class="mb-4">여행 시작</h3>
-    <div class="container mt-3">
-        <a href="/search" style="display: flex; justify-content: center; align-items: center; margin: 20px;">
-            <input class="form-control mr-sm-2" type="search" placeholder="어디로 떠나시나요?" aria-label="Search" name="q" style="width: 800px; height:43px; border-color: rgb(16, 179, 144); margin-right: 10px;">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="background-color: rgb(16, 179, 144); color: white; border: none; padding: 10px 20px;">검색</button>
-        </a>
-    </div>
-    <div class="row text-center shadow-sm justify-content-center">
-        <div class="col-md-2 mb-3">
-            
+    <!-- 검색창 -->
+    <h1 style="text-align: center;">어디로 가시나요?</h1>
+    <a href="/search" style="display: flex; justify-content: center; align-items: center; margin: 50px;">
+        <input class="form-control mr-sm-2" type="search" placeholder="어디로 떠나시나요?" aria-label="Search" name="q" style="width: 800px; height: 43px; border-color: rgb(16, 179, 144); margin-right: 10px;">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="background-color: rgb(16, 179, 144); color: white; border: none; padding: 10px 20px;">검색</button>
+    </a>
+
     <!-- 이미지 베너 -->
     <div id="carousel-county" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
