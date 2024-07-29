@@ -118,7 +118,7 @@
 .spot_btn{
     background-color: gainsboro; 
     border-radius: 20px;
-    font-weight: 900;
+    font-weight: 800;
     height: 40px;
 }
 .customoverlay {
@@ -152,15 +152,17 @@
       <!-- 메인 액션 버튼 -->
       <div class="main-actions">
         <button class="btn btn-primary">+ 일행과 함께 일정짜기</button>
+        {% if diary %}
+        <a class="btn btn-primary" href="" onclick="error()">여행기 쓰기</a>
+        {% else %}
         <a class="btn btn-primary" href="{% url 'travel_diary:create' new_trip.id %}">여행기 쓰기</a>
+        {% endif %}
       </div>
   
       <!-- 보조 액션 버튼 -->
       <div class="secondary-actions">
-        <button class="btn btn-secondary">+ 항공편</button>
-        <button class="btn btn-secondary">+ 숙소</button>
-        <button class="btn btn-secondary">체크리스트</button>
-        <button class="btn btn-secondary">가계부</button>
+        <a href="/flights/" class="btn btn-secondary">+ 항공권 예약하기</a>
+        <a href="/accommodation/" class="btn btn-secondary">+ 숙소 예약하기</a>
       </div>
   
       <!-- 카카오 지도 표시 영역 -->
@@ -202,12 +204,12 @@
               {% if i.spot %}
               <!-- 관광 장소 항목 -->
               <div class="d-flex align-items-center">
-              <div class="spot-counter" style="display: flex; width: 36px; height: 36px; background-color: slateblue; border: 1px; border-radius: 50%; color: white; align-items: center; justify-content: center; margin-right: 30px;">
+              <div class="spot-counter" style="display: flex; width: 36px; height: 36px; background-color: slateblue; border: 1px; border-radius: 50%; color: white; align-items: center; justify-content: center; margin-right: 15px;">
               </div>
               <div id="{{i.id}}" class="mb-2 place" data-xy="{{i.spot.map_x}},{{i.spot.map_y}},{{i.spot.title}}" style="border: 1px #E2E2E2 solid; width: 460px; height: 80px; display: flex; align-items: center;">
                 <div id="add_spot" class="mt-1">
-                    <div id="{{i.spot.id}}" class="spot_id" style="font-weight: bold; font-size: 20px;">{{i.spot.title}}</div>
-                    <p>관광명소·{{i.spot.address}}</p> 
+                    <div id="{{i.spot.id}}" class="spot_id" style="font-weight: bold; font-size: 18px; margin-left: 10px;">{{i.spot.title}}</div>
+                    <p style="margin-left: 10px;">관광명소·{{i.spot.address}}</p> 
                 </div>
                 <button class="del_btn ms-auto" style="border: none; background-color: white;" onclick="del_btn(this)">X</button>
               </div>
@@ -217,12 +219,12 @@
               {% if i.memo %}
               <!-- 메모 항목 -->
               <div class="d-flex align-items-center">
-                <div id="{{i.id}}" class="mb-2" style="border: 1px #E2E2E2 solid; width: 460px; height: 80px; display: flex; align-items: center;">
+                <div id="{{i.id}}" class="mb-2" style="border: 1px #E2E2E2 solid; background-color: rgb(226, 226, 226); width: 460px; height: 50px; display: flex; align-items: center; margin-left: 50px;">
                   <div class="mt-1">
                       <div style="font-weight: bold; font-size: 20px;">{{i.spot.title}}</div>
-                      <p>{{i.memo}}</p> 
+                      <p style="margin-left: 15px;">{{i.memo}}</p> 
                   </div>
-                  <button class="del_btn ms-auto" style="border: none; background-color: white;" onclick="del_btn(this)">X</button>
+                  <button class="del_btn ms-auto" style="border: none; background-color: rgb(226, 226, 226);" onclick="del_btn(this)">X</button>
                 </div>
                 </div>
               {% endif %}
@@ -240,12 +242,12 @@
     </div>
   </div>
 
-<!-- Modal -->
+<!-- 메모 작성 -->
 <div class="modal fade" id="memo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">메모</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form id="memo_form" action="{% url 'plan:add_memo' %}" method="POST">
@@ -258,15 +260,15 @@
           
           </div>
           <input type="hidden" name="trip" value="{{new_trip.id}}">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          <button type="submit" class="btn btn-primary">작성 완료</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Modal -->
+<!-- 장소 추가 -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
@@ -292,8 +294,8 @@
           </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="removeDay()">Close</button>
-          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="addPlan()">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="removeDay()">닫기</button>
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="addPlan()">선택 완료</button>
         </div>
   
     </div>
@@ -420,11 +422,27 @@
   }
 
   // 카카오맵 초기화
-  var container = document.getElementById('map');
-  var options = {
-      center: new kakao.maps.LatLng( 37.715133, 126.734086),
-      level: 13
-  };
+  try{
+    console.log('에러가 나기 직전까지의 코드는 잘 실행됩니다.');
+    const place=document.querySelector('.place').dataset['xy'].split(',')
+    if (!place) {
+        throw new Error('place element not found');
+    }
+    console.log('여기까지')
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng( place[1],place[0]),
+        level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  }catch(err){
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng( 37.715133, 126.734086),
+        level: 10
+    };
+    var map = new kakao.maps.Map(container, options);
+  }
 
   var map_xy = new Array();
   var list_name = new Array();
@@ -579,5 +597,9 @@
           el.textContent = counter++;
       });
   });
+  
+  function error(){
+    alert('이미 작성된 여행기가 있습니다.')
+  }
 </script>
 {% endblock %}

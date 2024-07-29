@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render 
-from django.views.generic import ListView
+from django.views.generic import ListView,UpdateView, DeleteView
+from django.urls import reverse_lazy
 from .models import Trip,Trip_style,CitySpot,DayPlan
 from apps.travel.models import County
+from apps.travel_diary.models import diary
 from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,7 +24,10 @@ REST_API_KEY = os.getenv('REST_API_KEY')
 class PlanList(ListView):
     model = Trip
     template_name = 'trip_list.html'
+    context_object_name = 'trips'
     ordering = '-pk'
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user).order_by(self.ordering)
 # @api_view(['GET'])
 # 특정 지역의 관광 데이터를 가져오는 함수
 def get_tour_data(region, cigungu1, cigungu2, cigungu3):
@@ -204,6 +209,7 @@ def day_plan(request, region, cigungu1=0, cigungu2=0, cigungu3=0):
         days = zip(days, origin_day)
 
         plan = DayPlan.objects.filter(trip=new_trip)
+    get_diary=diary.objects.filter(trip=new_trip)
     return render(
         request,
         'day_plan.html',
@@ -214,7 +220,8 @@ def day_plan(request, region, cigungu1=0, cigungu2=0, cigungu3=0):
             'days': days,
             'plan': plan,
             'KAKAO_API_KEY': KAKAO_API_KEY,
-            'REST_API_KEY': REST_API_KEY
+            'REST_API_KEY': REST_API_KEY,
+            'diary' : get_diary
          }
     )
 
@@ -259,3 +266,8 @@ def plan(request):
 def del_plan(request):
     DayPlan.objects.filter(id=request.GET['dayPlan_id']).delete()
     return JsonResponse({'success': True})
+
+class TripDelete(DeleteView):
+    model=Trip
+    template_name = 'trip_delete.html'
+    success_url = reverse_lazy('plan:plan_list')

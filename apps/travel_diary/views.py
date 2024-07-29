@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views.generic import CreateView ,ListView, DetailView, UpdateView
 from .forms import DiaryForm
@@ -59,6 +60,11 @@ class DiaryList(ListView):
     ordering = '-pk'
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user).order_by(self.ordering)
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        return context
+
 class DiaryDetail(DetailView):
     model = diary
     template_name = 'diary_detail.html'

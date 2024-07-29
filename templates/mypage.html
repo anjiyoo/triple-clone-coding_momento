@@ -121,7 +121,7 @@
             </a>
         </div>
         <div class="col-md-3 mb-5 ">
-            <a href="#" class="d-block">
+            <a href="{% url 'travel_diary:diary_list' %}" class="d-block">
                 <i class="bi bi-journal-minus" style="color: #0BD0AF; font-size: 4em;"></i>
                 <span class="d-block mt-1"><strong>내 여행기</strong></span>
             </a>
@@ -129,12 +129,13 @@
     </div>
 </div>
 
-<!-- 여행 일정 -->
+<!-- 최근 여행 일정 -->
 <div class="container mt-3">
     <div class="row">
         <h2 class="mb-3">최근 여행</h2>
         <div class="d-flex">
             {% block list %}
+            {% if trip_list %}
             {% for i in trip_list %}
             <div class="card mx-2 fixed-card">
                 <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
@@ -146,52 +147,8 @@
                 </div>
             </div>
             {% endfor %}
+            {% endif %}
             {% endblock %}
-        </div>
-    </div>
-</div>
-
-<!-- 내 예약 -->
-<div class="container mt-3">
-    <div class="row">
-        <h2 class="mb-3">최근 예약</h2>
-        <div class="d-flex">
-            <div class="card mx-2 fixed-card">
-                <a href="개별 예약 페이지 링크">
-                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">예약 장소명</h5>
-                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                </div>
-            </div>
-            <div class="card mx-2 fixed-card">
-                <a href="개별 예약 페이지 링크">
-                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">예약 장소명</h5>
-                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                </div>
-            </div>
-            <div class="card mx-2 fixed-card">
-                <a href="개별 예약 페이지 링크">
-                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">예약 장소명</h5>
-                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                </div>
-            </div>
-            <div class="card mx-2 fixed-card">
-                <a href="개별 예약 페이지 링크">
-                    <img src="대표이미지 주소" class="card-img-top" alt="개별 예약 대표 이미지">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">예약 장소명</h5>
-                    <p class="card-text">예약에 대한 간단한 설명이 들어갈 수 있습니다.</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
