@@ -1,0 +1,198 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px 0;
+}
+
+.card, .card-1, .card-2, .card-3 {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;  /* 위아래 여백 추가 */
+    padding: 20px;   /* 패딩 추가 */
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.card h2, .card-1 h2, .card-2 h2, .card-3 h2 {
+    font-size: 30px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.card p, .card-1 p, .card-2 p, .card-3 p {
+    margin-bottom: 20px;
+    text-align: left;
+    line-height: 1.5; 
+}
+
+
+.card img, .card-2 img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.image-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.slideshow-container {
+    width: 100%;
+    position: relative;
+    margin: auto;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+}
+
+.slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.6s ease;
+    user-select: none;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+.prev {
+    left: 0;
+    border-radius: 0 3px 3px 0;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0,0,0,0.8);
+}
+
+.disabled {
+    display: none;
+}
+
+.guide-button {
+    position: absolute;
+    background-color: #ffffff;      /* 배경색 흰색 */
+    bottom: 20px;
+    border: 1px solid rgb(169, 169, 169); /* 테두리 두께 2px, 색상 검정 */
+    color: rgb(0, 0, 0);            /* 텍스트 색상 검정 */
+    padding: 10px 20px;             /* 상하 10px, 좌우 20px 패딩 */
+    border-radius: 4px;             /* 테두리 둥글기 4px */
+    cursor: pointer;                /* 포인터 커서 */
+    font-size: 1em;                 /* 글자 크기 1em */
+    width: 100%;                   /* 버튼 너비 */
+    text-align: center;             /* 텍스트 가운데 정렬 */
+    display: block;                 /* 버튼을 블록 요소로 설정 */
+    margin: 0 auto;                 /* 버튼을 가로 가운데 정렬 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+}
+
+.guide-button:hover {
+    background-color: rgb(18, 113, 255);
+}
+
+.card-3 img {
+    width: 100%;
+    height: 100%;
+    margin-bottom: 100px;
+}
+
+.btn-link {
+    background-color: #ffffff;      /* 배경색 흰색 */
+    border: 1px solid rgb(169, 169, 169); /* 테두리 두께 2px, 색상 검정 */
+    color: rgb(0, 0, 0);            /* 텍스트 색상 검정 */
+    padding: 10px 20px;             /* 상하 10px, 좌우 20px 패딩 */
+    border-radius: 4px;             /* 테두리 둥글기 4px */
+    cursor: pointer;                /* 포인터 커서 */
+    font-size: 1em;                 /* 글자 크기 1em */
+    width: 100%;                   /* 버튼 너비 */
+    text-align: center;             /* 텍스트 가운데 정렬 */
+    display: block;                 /* 버튼을 블록 요소로 설정 */
+    margin: 0 auto;                 /* 버튼을 가로 가운데 정렬 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+}
+.btn-link:hover {
+    background-color: rgb(18, 113, 255);
+}
+
+/* 메인 화면으로 돌아가기 */
+.close-button {
+    display: inline-block;
+    width: 40px; /* 버튼의 너비 */
+    height: 40px; /* 버튼의 높이 */
+    background-color: rgba(128, 128, 128, 0.3); /* 회색 배경 (투명도 포함) */
+    border-radius: 50%; /* 원형으로 만들기 */
+    color: gray; /* 엑스 표시 색상 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    line-height: 40px; /* 버튼의 높이와 같게 설정하여 수직 가운데 정렬 */
+    font-size: 24px; /* 엑스 표시의 크기 */
+    text-decoration: none; /* 기본 링크 스타일 제거 */
+    position: fixed; /* 화면에 고정 */
+    top: 20px; /* 화면 상단에서의 위치 */
+    right: 20px; /* 화면 오른쪽에서의 위치 */
+    cursor: pointer; /* 클릭 가능한 버튼 모양 */
+    transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+}
+
+.close-button:hover {
+    background-color: rgba(128, 128, 128, 0.5); /* 호버 시 배경색 변경 */
+}
+
+.close-icon {
+    display: inline-block;
+    vertical-align: middle; /* 수직 가운데 정렬 */
+}

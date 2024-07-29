@@ -78,9 +78,12 @@ INSTALLED_APPS = [
     'apps.planrecommend',
     'apps.customer_service',
     'apps.travel_diary',
+    'corsheaders',
     'apps.accommodation',
     'apps.mypage',
     'apps.tour',
+    'apps.guidepage',
+    'apps.search',
 ]
 
 MIDDLEWARE = [
@@ -92,7 +95,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True  # 또는 특정 도메인만 허용하고 싶다면 리스트로 지정
 
 ROOT_URLCONF = 'config.urls'
 
@@ -118,7 +124,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# # DB postgresql 설정
+# DB postgresql 설정
 # DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.postgresql',

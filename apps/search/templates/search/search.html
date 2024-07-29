@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'customer_service/my_inquiry_list.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .tab-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+        cursor: pointer;
+    }
+    .tab {
+        padding: 10px 20px;
+        border: 1px solid #007BFF;
+        background-color: #f7f7f7;
+        color: #007BFF;
+        border-radius: 4px;
+        margin: 0 5px;
+    }
+    .tab.active {
+        background-color: #007BFF;
+        color: #fff;
+    }
+    .faq-content {
+        display: none;
+    }
+    .faq-content.active {
+        display: block;
+    }
+    .tabs {
+        display: flex;
+        margin-top: 20px;
+        border-bottom: 2px solid #ccc;
+    }
+    .tabs .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    .tabs .tab.active {
+        border-bottom: 2px solid #007bff;
+        font-weight: bold;
+    }
+    .result-list {
+        list-style: none;
+        padding: 0;
+    }
+    .result-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+    }
+    .result-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-right: 20px;
+        border-radius: 8px;
+    }
+    .result-item-details {
+        flex: 1;
+    }
+    .result-item-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #007BFF;
+    }
+    .result-item-meta {
+        font-size: 14px;
+        color: #777;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-6">
+    <div class="faq-section">
+        <div class="faq-header">어디로 떠나시나요?</div>
+        <form method="get">
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">검색</button>
+        </form>
+        {% if query %}
+        <div class="tabs">
+            <div class="tab active" id="faq_commonTab" onclick="selectTab('faq_common')">추천</div>
+            <div class="tab" id="faq_flightTab" onclick="selectTab('faq_flight')">배낭톡</div>
+            <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">숙소</div>
+        </div>
+
+        <div id="faq_common" class="faq-content active">
+            <ul class="result-list">
+                <p>배낭톡</p>
+                {% for baenangtalk in best_bae %}
+                <li class="result-item">
+                    {% if baenangtalk.bae_img %}
+                    <img src="{{ baenangtalk.bae_img.url }}" alt="Baenangtalk Image">
+                    {% endif %}
+                    <div class="result-item-details">
+                        <div class="result-item-title">
+                            <a href="{% url 'baenangtalk:bae_detail' baenangtalk.id %}">{{ baenangtalk.bae_title }}</a>
+                        </div>
+                        <div class="result-item-meta">{{ baenangtalk.county.city_name }} - {{ baenangtalk.subject.bae_sub_name }}</div>
+                    </div>
+                </li>
+                {% empty %}
+                <li>No baenangtalks found.</li>
+                {% endfor %}
+                {% if best_bae %}
+                <div class="tab" id="faq_flightTab" onclick="selectTab('faq_flight')">배낭톡 검색결과 더보기</div>
+                {% endif %}
+            </ul>
+            <ul class="result-list">
+                <p>숙소</p>
+                {% for accommodation in best_accommodation %}
+                <li class="result-item">
+                    {% if accommodation.images.first %}
+                    <img src="{{ accommodation.images.first.images.url }}" alt="Accommodation Image">
+                    {% endif %}
+                    <div class="result-item-details">
+                        <div class="result-item-title">
+                            <a href="{% url 'accommodation:accommodation_detail' accommodation.id %}">{{ accommodation.name }}</a>
+                        </div>
+                        <div class="result-item-meta">{{ accommodation.city.city_name }} - {{ accommodation.location }}</div>
+                    </div>
+                </li>
+                {% empty %}
+                <li>No accommodations found.</li>
+                {% endfor %}
+                {% if best_accommodation %}
+                <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">숙소 검색결과 더보기</div>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div id="faq_flight" class="faq-content">
+            <ul class="result-list">
+                {% for baenangtalk in results2 %}
+                <li class="result-item">
+                    {% if baenangtalk.bae_img %}
+                    <img src="{{ baenangtalk.bae_img.url }}" alt="Baenangtalk Image">
+                    {% endif %}
+                    <div class="result-item-details">
+                        <div class="result-item-title">
+                            <a href="{% url 'baenangtalk:bae_detail' baenangtalk.id %}">{{ baenangtalk.bae_title }}</a>
+                        </div>
+                        <div class="result-item-meta">{{ baenangtalk.county.city_name }} - {{ baenangtalk.subject.bae_sub_name }}</div>
+                    </div>
+                </li>
+                {% empty %}
+                <li>No baenangtalks found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="faq_service" class="faq-content">
+            <ul class="result-list">
+                {% for accommodation in results1 %}
+                <li class="result-item">
+                    {% if accommodation.images.first %}
+                    <img src="{{ accommodation.images.first.images.url }}" alt="Accommodation Image">
+                    {% endif %}
+                    <div class="result-item-details">
+                        <div class="result-item-title">
+                            <a href="{% url 'accommodation:accommodation_detail' accommodation.id %}">{{ accommodation.name }}</a>
+                        </div>
+                        <div class="result-item-meta">{{ accommodation.city.city_name }} - {{ accommodation.location }}</div>
+                    </div>
+                </li>
+                {% empty %}
+                <li>No accommodations found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+    function selectTab(tabId) {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId + 'Tab').classList.add('active');
+
+        document.querySelectorAll('.faq-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+    }
+</script>
+{% endblock %}

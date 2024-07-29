@@ -16,10 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 서버 응답을 기다리는 동안의 메시지
         var waitingDiv = document.getElementById('waiting');
-        var questionDiv = document.createElement('div');
-        waitingDiv.textContent = "...";
+        if (!waitingDiv) {
+            waitingDiv = document.createElement('div');
+            waitingDiv.id = 'waiting';
+            chatMessages.appendChild(waitingDiv);
+        }
         waitingDiv.className = 'waiting';  // 대기 메시지에 'waiting' 클래스 추가
-        chatMessages.appendChild(waitingDiv);
+        waitingDiv.textContent = '...';  // 대기 메시지 텍스트 추가
 
         // 서버에 /chatbot/response/ 엔드포인트로 POST 요청 보냄 (JSON 형식 데이터 포함)
         fetch('/chatbot/response/', {
@@ -62,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('userInput').value = '';
     });
 });
-
 
 // 챗봇 메인 화면 검색예시 버튼
 function addQuestion(question) {

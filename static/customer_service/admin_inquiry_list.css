@@ -1,0 +1,97 @@
+.container {
+    margin-top: 40px;
+}
+
+.section-title {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    text-align: center;
+}
+
+.inquiry-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.inquiry-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f7f7f7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.inquiry-item a {
+    font-size: 1.2em;
+    color: #333;
+    text-decoration: none;
+}
+
+.disabled-link {
+    color: #ccc;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+.inquiry-item i {
+    margin-left: 5px;
+}
+
+.faq-section {
+    padding: 15px;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.faq-header {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.faq-categories {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+
+.faq-categories div {
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+.faq-item {
+    margin-bottom: 10px;
+}
+
+.my-inquiries, .inquiry-action {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.my-inquiries a, .inquiry-action a {
+    font-size: 1.2em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.pagination a, .pagination strong {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.pagination strong {
+    font-weight: bold;
+    color: #333;
+}

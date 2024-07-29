@@ -20,6 +20,7 @@ class Reservation(models.Model):
     return_airline_code = models.CharField(max_length=10, blank=True, null=True)
     return_flight_name = models.CharField(max_length=50, blank=True, null=True)
     return_free_baggage_allowance = models.IntegerField(blank=True, null=True)
+    merchant_uid = models.CharField(max_length=255, unique=True, null=True, blank=True)  # 결제를 위한 필드 추가
     
 
 class BookerInfo(models.Model):
@@ -38,3 +39,4 @@ class PassengerInfo(models.Model):
     return_price = models.IntegerField()   # 올때가격
     age_category = models.CharField(max_length=20)  # 어른, 소아, 유아
     birth_date = models.CharField(max_length=8)
+    

@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% block title %}MYPAGE{% endblock %}
+
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -69,7 +72,7 @@
                     </div>
                     <div class="col-md-8">
                         <div class="nickname-section">
-                            <h2 class="mb-3">현재 닉네임</h2>
+                            <h2 class="mb-3">닉네임</h2>
                             <p id="current-nickname" class="mb-2">{{ user.nickname }}</p>
                             <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nicknameModal" style="background-color: #0BD0AF; border-color: #0BD0AF;">프로필 변경</button>
                         </div>

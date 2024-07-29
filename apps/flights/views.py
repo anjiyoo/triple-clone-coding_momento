@@ -14,6 +14,8 @@ from .models import Reservation,BookerInfo,PassengerInfo
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # load_dotenv(os.path.join(BASE_DIR, '.env'))
@@ -322,7 +324,7 @@ def flight_booking_view(request):
                         )
                         passenger_info.save()
 
-                return redirect('/')
+                return redirect('flights:reservation_detail', pk=reservation.pk)
             else:
                 return HttpResponse('예약을 생성하는 중 오류가 발생했습니다.', status=400)
 
@@ -332,3 +334,44 @@ def flight_booking_view(request):
         except Exception as e:
             print(f'예약 처리 중 오류가 발생했습니다: {e}')
             return HttpResponse(f'예약 처리 중 오류가 발생했습니다: {e}', status=500)
+
+class ReservationDetailView(DetailView):
+    model = Reservation
+    template_name = 'flights/reservation_detail.html'
+    context_object_name = 'reservation'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        reservation = self.get_object()
+        context['booker_info'] = get_object_or_404(BookerInfo, reservation=reservation)
+        context['passenger_infos'] = PassengerInfo.objects.filter(reservation=reservation)
+
+        # 총 결제 금액 계산
+        total_price = sum(p.one_way_price + p.return_price for p in context['passenger_infos'])
+        context['total_price'] = total_price
+
+        return context
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Reservation
+
+@csrf_exempt
+def payment_callback(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        merchant_uid = data.get('merchant_uid')
+        reservation_id = data.get('reservation_id')
+
+        try:
+            reservation = get_object_or_404(Reservation, id=reservation_id)
+            reservation.merchant_uid = merchant_uid
+            reservation.save()
+
+            return JsonResponse({'success': True})
+        except Reservation.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Reservation not found'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})

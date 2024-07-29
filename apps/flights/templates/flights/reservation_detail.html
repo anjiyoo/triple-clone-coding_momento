@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.1.js"></script>
+</head>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>항공권 예약 디테일</h2>
+            <div class="reservation-details">
+                <!-- 예약 정보 -->
+                <h3>예약 정보</h3>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>예약 날짜</th>
+                            <td>{{ reservation.reservation_date }}</td>
+                        </tr>
+                        <tr>
+                            <th>예약자 성함</th>
+                            <td>{{ booker_info.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>전화번호</th>
+                            <td>{{ booker_info.phone_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>이메일</th>
+                            <td>{{ booker_info.email }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 가는편 정보 -->
+                <h3>가는편 정보</h3>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>출발 공항</th>
+                            <td>{{ reservation.departure_airport }}</td>
+                        </tr>
+                        <tr>
+                            <th>도착 공항</th>
+                            <td>{{ reservation.arrival_airport }}</td>
+                        </tr>
+                        <tr>
+                            <th>출발 시간</th>
+                            <td>{{ reservation.departure_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>도착 시간</th>
+                            <td>{{ reservation.arrival_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공편 번호</th>
+                            <td>{{ reservation.flight_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공사 코드</th>
+                            <td>{{ reservation.airline_code }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공편 이름</th>
+                            <td>{{ reservation.flight_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>무료 수하물 허용량</th>
+                            <td>{{ reservation.free_baggage_allowance }}kg</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 오는편 정보 -->
+                {% if reservation.return_departure_airport %}
+                <h3>오는편 정보</h3>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>출발 공항</th>
+                            <td>{{ reservation.return_departure_airport }}</td>
+                        </tr>
+                        <tr>
+                            <th>도착 공항</th>
+                            <td>{{ reservation.return_arrival_airport }}</td>
+                        </tr>
+                        <tr>
+                            <th>출발 시간</th>
+                            <td>{{ reservation.return_depature_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>도착 시간</th>
+                            <td>{{ reservation.return_arrival_time }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공편 번호</th>
+                            <td>{{ reservation.return_flight_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공사 코드</th>
+                            <td>{{ reservation.return_airline_code }}</td>
+                        </tr>
+                        <tr>
+                            <th>항공편 이름</th>
+                            <td>{{ reservation.return_flight_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>무료 수하물 허용량</th>
+                            <td>{{ reservation.return_free_baggage_allowance }}kg</td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% endif %}
+                <!-- 탑승객 정보 -->
+                <h3>탑승객 정보</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>성</th>
+                            <th>이름</th>
+                            <th>성별</th>
+                            <th>국적</th>
+                            <th>갈때 가격</th>
+                            <th>올때 가격</th>
+                            <th>연령 구분</th>
+                            <th>생년월일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for passenger in passenger_infos %}
+                        <tr>
+                            <td>{{ passenger.last_name }}</td>
+                            <td>{{ passenger.first_name }}</td>
+                            <td>{{ passenger.gender }}</td>
+                            <td>{{ passenger.nationality }}</td>
+                            <td>{{ passenger.one_way_price }}</td>
+                            <td>{{ passenger.return_price }}</td>
+                            <td>{{ passenger.age_category }}</td>
+                            <td>{{ passenger.birth_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="payment-section">
+                {% if reservation.merchant_uid %}
+                <h3>결제 완료</h3>
+                {% else %}
+                <h3>결제하기</h3>
+                <button type="submit" class="btn btn-primary btn-block" id="payment-button" onclick="requestPay()">결제하기</button>
+                {% endif %}
+                <p>총 금액: ₩{{ total_price }}</p>
+                <p id="payment-status" style="display:none;">결제가 완료되었습니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getPrice() {
+        const priceElement = document.querySelector('.payment-section p');
+        const priceText = priceElement ? priceElement.textContent : '0';
+        return parseInt(priceText.replace(/[^0-9]/g, ''), 10); // 숫자만 추출하여 정수로 변환
+    }
+
+    function getFormData() {
+        return {
+            booker_name: "{{ booker_info.name }}",
+            booker_phone: "{{ booker_info.phone_number }}",
+            booker_email: "{{ booker_info.email }}",
+            reservation_id: "{{ reservation.id }}",
+            // 다른 필요한 데이터들 추가
+        };
+    }
+
+    function requestPay() {
+        const IMP = window.IMP;
+        IMP.init('imp57021543'); // 가맹점 식별코드 확인
+
+        const totalPrice = getPrice();
+        const formData = getFormData(); // 폼 데이터 가져오기
+        const merchantUid = 'merchant_' + new Date().getTime(); // 고유한 merchant_uid 생성
+
+        console.log('Total Price:', totalPrice);
+        console.log('Form Data:', formData);
+        console.log('Merchant UID:', merchantUid);
+
+        IMP.request_pay({
+            pg: 'kakaopay',
+            pay_method: 'card',
+            merchant_uid: merchantUid,
+            name: '항공권 결제',
+            amount: totalPrice,
+        }, function (rsp) {
+            console.log('Payment Response:', rsp);
+
+            if (rsp.success) {
+                console.log('결제 성공:', rsp);
+                fetch(`/flights/payment/callback/`, { // 결제 콜백 URL
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
+                    },
+                    body: JSON.stringify({
+                        "imp_uid": rsp.imp_uid,
+                        "merchant_uid": merchantUid,
+                        "amount": totalPrice,
+                        ...formData // 폼 데이터 추가
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Callback Response:', data);
+                    if (data.success) {
+                        document.getElementById('payment-status').style.display = 'block'; // 결제 완료 메시지 표시
+                        document.getElementById('payment-button').innerText = '결제 완료'; // 버튼 텍스트 변경
+                        document.getElementById('payment-button').disabled = true; // 버튼 비활성화
+                        alert('결제가 완료 되었습니다!');
+                    } else {
+                        alert('예약 ID를 가져오는 데 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('예약 ID를 가져오는 중 오류가 발생했습니다.');
+                });
+            } else {
+                console.error('결제 실패:', rsp);
+                alert('결제에 실패하였습니다. 오류 메시지: ' + rsp.error_msg);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const form = document.querySelector('form');
+        if (form) {
+            form.onsubmit = function (event) {
+                event.preventDefault(); 
+                requestPay(); 
+            };
+        }
+    });
+
+    function getCookie(name) {
+        let cookieValue = null; 
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

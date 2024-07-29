@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}AI여행컨셉추천 준비중{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/preparing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center; height: 400px; display: flex; justify-content: center; align-items: center;">
+    <div class="card-body">
+        <!-- 아이콘 전환 -->
+        <div id="icon-container" style="margin-top: 50px;">
+            <i class="bi bi-globe-asia-australia" style="display: none;"></i>
+            <i class="bi bi-calendar2-check-fill" style="display: none;"></i>
+            <i class="bi bi-emoji-sunglasses-fill" style="display: none;"></i>
+            <i class="bi bi-map-fill" style="display: none;"></i>
+        </div>
+        <p class="font-weight-bold" style="margin-top: 50px; font-weight: bold; font-size: 30px;">
+            선택한 데이터를 기반으로
+            <br>
+            <span style="color: #088ce4; font-weight: bold; font-size: 30px;">Travel Concept</span>를 준비중입니다.
+        </p>
+        <p id="preparing" class="mb-2">나만의 여행 컨셉! AI MOMENTO 에게 물어보세요.</p>
+        <!-- 로딩 바 추가 -->
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 아이콘 전환 및 로딩바 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const icons = document.querySelectorAll('#icon-container i');
+        const loadingProgress = document.querySelector('.loading-progress');
+        let currentIconIndex = 0;
+        let progress = 0;
+
+        icons[currentIconIndex].style.display = 'block';
+        loadingProgress.style.width = '0%';
+
+        const intervalId = setInterval(() => {
+            // 아이콘 전환
+            icons[currentIconIndex].style.display = 'none';
+            currentIconIndex = (currentIconIndex + 1) % icons.length;
+            icons[currentIconIndex].style.display = 'block';
+
+            // 로딩 바
+            if (progress < 100) {
+                progress += 33.3; // 1초에 33.3%씩 증가
+                loadingProgress.style.width = progress + '%';
+            } else {
+                clearInterval(intervalId); // 100%가 되면 interval을 멈춤
+                redirectToNextPage(); // 로딩이 끝나면 리디렉션
+            }
+        }, 1000); // 1초 간격
+    });
+
+    // URL 파라미터 전달
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        const city = params.get('city');
+        const date = params.get('date');
+        const who = params.get('who');
+
+        return { city, date, who };
+    }
+
+    function redirectToNextPage() {
+        const params = getQueryParams();
+        const url = `{% url 'planrecommend:recommend' %}?city=${encodeURIComponent(params.city)}&date=${encodeURIComponent(params.date)}&who=${encodeURIComponent(params.who)}`;
+        window.location.href = url;
+    }
+</script>
+{% endblock %}

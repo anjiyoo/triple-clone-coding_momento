@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
+{% block title %}AI여행컨셉추천 동행자선택{% endblock %}
+
 {% load static %}
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'planrecommend/who.css' %}">
 {% endblock %}
 
 {% block content %}
-<p id="select-page" class="mb-4" style="color: #1F66F0; font-weight: bold; text-align: center;">3/5</p>
+<p id="select-page" class="mb-4" style="color: #1F66F0; font-weight: bold; text-align: center;">3/3</p>
 <div class="card mb-4 mt-3 center shadow-sm" style="width: 30%; margin: 0 auto; text-align: center;">
     <div class="card-body">
         <i class="bi bi-emoji-sunglasses-fill"></i>
         <h3 class="mt-4">누구와 떠나나요?</h3>
-        <p id="select-city" class="mb-4">동행자를 선택해주세요.</p>
+        <p id="select-who" class="mb-4">동행자를 선택해주세요.</p>
         
         <!-- 동행자 선택 -->
         <div class="center" style="display: flex; justify-content: center;">
             <div>
-                {% for who in whose|slice:":4" %}
+                {% for who in whose|slice:":3" %}
                     <button class="who-box">{{ who.who }}</button>
                 {% endfor %}
             </div>
             <div>
-                {% for who in whose|slice:"4:7" %}
+                {% for who in whose|slice:"3:" %}
                     <button class="who-box">{{ who.who }}</button>
                 {% endfor %}
             </div>
@@ -29,11 +31,15 @@
 
         <!-- 선택된 값 -->
         <p class="mt-2 mb-4" style="color: #000000; font-weight: bold; text-align: center;">선택</p>
-        <div id="selected-data-container" class="mt-2 mb-4" style="display: flex; justify-content: center;">
-            <div id="city-selected-data" class="selected-data"></div>   
-            <div id="date-selected-data" class="selected-data"></div>  
-            <div id="who-selected-data" class="selected-data"></div>    
-        </div>  
+        <div id="selected-data-container" class="mt-2 mb-4" style="display: flex; flex-direction: column; align-items: center;">
+            <div style="display: flex; justify-content: center;">
+                <div id="city-selected-data" class="selected-data"></div>   
+                <div id="date-selected-data" class="selected-data"></div>    
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <div id="who-selected-data" class="selected-data"></div>     
+            </div>
+        </div>
 
         <!-- 다음 버튼 -->
         <div class="center mt-3 mb-3">
@@ -71,9 +77,9 @@
         }
 
         function handleNextButtonClick(event) {
-            if (selectedDate) {
+            if (selectedWho) {
                 // 다음 페이지로 이동하면서 선택된 도시, 여행기간, 동행자를 URL 파라미터로 전달
-                window.location.href = `{% url 'planrecommend:select_style' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(selectedDate)}&who=${encodeURIComponent(selectedWho)}`;
+                window.location.href = `{% url 'planrecommend:preparing' %}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(date)}&who=${encodeURIComponent(selectedWho)}`;
             } else {
                 // 선택된 동행자가 없을 경우, 알림창 띄우기
                 alert('동행자를 선택해주세요.');
