@@ -5,10 +5,11 @@
     
 {% block list %}
 
-{% if trips %}
+
 <div class="page-wrapper" style="position:relative;">
     <!--page slider -->
     <h2>최근 여행</h2>
+    {% if trips %}
     <div class="post-slider">
       <i class="fas fa-chevron-left prev"></i>  
       <i class="fas fa-chevron-right next"></i>  
@@ -43,7 +44,12 @@
       </div>
     </div>
     <!--post slider-->
+    {% else %}
+    <div  class="d-flex justify-content-center">
+      <p style="font-size: 50px; color: lightgray;">작성된 여행기가 없습니다.</p>
+    </div>
+    {% endif %}
   </div>
 
-{% endif %}
+
 {% endblock %}
