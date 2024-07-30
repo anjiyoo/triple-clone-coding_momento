@@ -197,13 +197,6 @@ db_password = os.getenv('DB_PASSWORD')
 db_host = os.getenv('DB_HOST')
 db_port = os.getenv('DB_PORT')
 
-# 디버깅을 위해 환경 변수를 출력
-print(f"DB_NAME: {db_name}")
-print(f"DB_USER: {db_user}")
-print(f"DB_PASSWORD: {db_password}")
-print(f"DB_HOST: {db_host}")
-print(f"DB_PORT: {db_port}")
-
 # 포트 값을 정수로 변환 
 db_port = int(db_port)
 
@@ -394,12 +387,11 @@ conn.commit()
 # 데이터베이스 연결 객체를 받아 테이블 이름 목록을 반환
 def get_table_names(conn):
     with conn.cursor() as cursor:
-        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('triprecommend');")
         tables = cursor.fetchall()
-        if tables:
-            return [table[0] for table in tables]
-        else:
-            return []
+        table_names = [table[0] for table in tables]
+        print(table_names)
+        return table_names
 
 # # 데이터베이스 연결 객체와 테이블 이름을 받아 해당 테이블의 컬럼 이름 목록을 반환
 def get_column_names(conn, table_name):
@@ -414,14 +406,21 @@ def get_column_names(conn, table_name):
 # 데이터베이스 연결 객체와 테이블 이름을 받아 해당 테이블의 컬럼 이름 목록을 반환
 def get_database_info(conn):
     table_names = get_table_names(conn)
+    table_dicts = []
     if table_names:  # table_names가 None이 아닌지 확인
         for table_name in table_names:
-            # 원하는 작업 수행
-            print(f"Table: {table_name}")
+            columns = get_column_names(conn, table_name)
+            table_info = {
+                'table_name': table_name,
+                'columns': columns
+            }
+            table_dicts.append(table_info)
+            print(f"Table: {table_name}, Columns: {columns}")
     else:
         print("No tables found in the database.")
-
-get_database_info(conn)
+    print("table_dicts")
+    print(table_dicts)
+    return table_dicts
 
 # ######################################################################
 
@@ -432,10 +431,11 @@ conn.close()
 if database_info is not None:
     database_schema_string = "\n".join(
         [
-            f"Table: {table['table_name']}\nColumns: {', '.join(table['column_names'])}"
+            f"Table: {table['table_name']}\nColumns: {', '.join(table['columns'])}"
             for table in database_info
         ]
     )
+    print("database_schema_string")
     print(database_schema_string)
 else:
     database_schema_string = "No database info found."
@@ -449,30 +449,27 @@ tools = [
         "type": "function",
         "function": {
             "name": "ask_database",
-            "description": "이 함수를 사용하여 사용자가 질문한 동행자, 여행기간, 여행도시의 여행컨셉제목과 여행컨셉내용에 관한 질문에 답하세요. 입력은 완전히 형성된 SQL 쿼리여야 합니다.",
+            "description": f"""
+                이 함수를 사용하여 사용자가 질문한 동행자, 여행기간, 여행도시의 여행컨셉제목과 내용에 답하세요.
+                입력은 완전히 형성된 SQL 쿼리여야 합니다.
+
+                city_name는 다음과 같이 매핑됩니다:
+                가평﹒양평=1, 강릉﹒속초=2, 경주=3, 부산=4, 여수=5, 인천=6, 전주=7, 제주=8, 춘천﹒홍천=9, 태안﹒당진﹒서산=10, 통영﹒거제﹒남해=11, 포함﹒안동=12
+
+                SQL 쿼리는 다음 스키마를 사용합니다:
+                {database_schema_string}
+
+                예시 쿼리:
+                SELECT city_name, date, who, concept_title, concept_content
+                FROM TripRecommend 
+                WHERE city_name = 4;
+                """,
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": f"""
-                                사용자의 질문에 답하기 위해 정보를 추출하는 SQL 쿼리입니다.
-                                SQL은 다음 데이터베이스 스키마를 사용하여 작성되어야 합니다:
-                                {database_schema_string}
-                                쿼리는 JSON이 아닌 일반 텍스트로 반환되어야 합니다.
-                                가평﹒양 평은 하나의 city_name 입니다.
-                                강릉﹒속초 는 하나의 city_name 입니다.
-                                여수﹒순천 은 하나의 city_name 입니다.
-                                춘천﹒홍천 은 하나의 city_name 입니다.
-                                태안﹒당진﹒서산 은 하나의 city_name 입니다.
-                                통영﹒거제﹒남해 는 하나의 city_name 입니다.
-
-                                who 동행자,
-                                city_name 여행도시, 
-                                date 여행기간, 
-                                concept_title 여행컨셉제목, 
-                                concept_content 여행컨셉내용 입니다.
-                                """,
+                        "description": "사용자의 질문에 답하기 위해 정보를 추출하는 SQL 쿼리입니다."
                     }
                 },
                 "required": ["query"],
@@ -480,6 +477,7 @@ tools = [
         }
     }
 ]
+
 
 # ######################################################################
 

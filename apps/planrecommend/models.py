@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from apps.travel.models import County
 from apps.userinfo.models import User
 

@@ -111,13 +111,6 @@ db_password = os.getenv('DB_PASSWORD')
 db_host = os.getenv('DB_HOST')
 db_port = os.getenv('DB_PORT')
 
-# 디버깅을 위해 환경 변수를 출력
-print(f"DB_NAME: {db_name}")
-print(f"DB_USER: {db_user}")
-print(f"DB_PASSWORD: {db_password}")
-print(f"DB_HOST: {db_host}")
-print(f"DB_PORT: {db_port}")
-
 # 포트 값을 정수로 변환 
 db_port = int(db_port)
 
@@ -130,7 +123,7 @@ conn = psycopg2.connect(
         port=db_port
 )
 print("Chatbot DB 성공적으로 실행했습니다")
-
+print(conn)
 cursor = conn.cursor()  # 커서 생성
 
 ######################################################################
@@ -175,7 +168,7 @@ print("테이블 ChatbotTravelInfo 생성 완료")
 
 ######################################################################
 
-# 기존 테이블 데이터 삭제
+# # 기존 테이블 데이터 삭제
 cursor.execute("DELETE FROM ChatbotTravelInfo")
 conn.commit()
 
@@ -192,7 +185,8 @@ travel_data = [
     (8, 8, '제주는 한반도의 남쪽 끝에 위치한 대한민국 최대 섬 입니다.', '제주는 아열대 기후의 영향을 받아 사계절이 뚜렷한 편이며 섬 지형으로 인해 바람이 강한 편입니다.', '한라산, 성산일출봉, 김녕해변, 제주 올레길, 우도', '제주는 화산섬의 자연환경이 반영된 독특한 방언, 신화, 돌문화, 민속예술, 음식문화 등 다양한 전통문화를 가지고 있는 섬입니다.', '고기국수, 흑돼지, 해산물, 물회, 감귤, 오메기떡, 해장국', '항공, 선박'),
     (9, 9, '춘천은 강원도 중부, 홍천은 강원도 영서 지역에 위치한 도시 입니다.', '춘천&홍천 날씨는 대륙성 기후의 영향을 받아 여름은 덥고 습하며 겨울은 춥고 눈이 많이 내립니다.', '소양강댐, 소양강 스카이워크, 닭갈비 골목, 홍천 자연휴양림, 평화의 댐', '홍천은 강원도 대표 농촌지역이며, 춘천은 강원도 중심지로 자연과 문화가 조화를 이루는 도시입니다.', '닭갈비, 토종 닭백숙, 막국수, 토마토, 산채비빔밥', '경춘선 기차, 버스'),
     (10, 10, '태안과 당진, 서산은 충청남도 서해안 중부 지역에 위치한 도시입니다.', '태안&당진&서산은 해양성 기후의 영향을 받아 연간 강수량이 많은 편이며 여름에는 고온 다습한 편이고 겨울철에는 기온이 낮고 눈이 많이 옵니다.', '안면도 국립공언, 신두리 해안사구, 당진 해미읍성, 당진 삽교호, 고대산 국립공원, 서산 갯벌, 부수산, 석림사', '태안&당진&서산은 자연경관, 역사문화유산, 향토 음식 등 다양한 문화적 자원을 보유하고 있습니다.', '해장국, 활어회, 장어구이, 보리밥, 해물탕, 생선구이', '버스, 자가용'),
-    (11, 11, '통영과 거제, 남해는 경상남도 남부의 해안 지역에 위치한 도시입니다.', '통영&거제&남해는 온화한 해양성 기후를 보이며, 봄과 가을에는 맑고 선선한 날씨이며 여름에는 습하고 겨울에는 온화한 날씨입니다. ', '통영 해상케이블카, 통영 동피랑마을, 거제 해금강, 거제 자연휴양림, 거제 외도, 남해 독일마을, 남해 금산, 남해 미조항', '통영&거제&남해는 섬과 바다가 어우러진 아름다운 자연경관과 다양한 체험 활동을 할 수 있는 지역입니다.', '멸치회, 오징어회, 굴 구이, 해물파전, 꽃게탕, 멍게회, 장어구이, 멍게비빔밥', '버스, 선박')
+    (11, 11, '통영과 거제, 남해는 경상남도 남부의 해안 지역에 위치한 도시입니다.', '통영&거제&남해는 온화한 해양성 기후를 보이며, 봄과 가을에는 맑고 선선한 날씨이며 여름에는 습하고 겨울에는 온화한 날씨입니다.', '통영 해상케이블카, 통영 동피랑마을, 거제 해금강, 거제 자연휴양림, 거제 외도, 남해 독일마을, 남해 금산, 남해 미조항', '통영&거제&남해는 섬과 바다가 어우러진 아름다운 자연경관과 다양한 체험 활동을 할 수 있는 지역입니다.', '멸치회, 오징어회, 굴 구이, 해물파전, 꽃게탕, 멍게회, 장어구이, 멍게비빔밥', '버스, 선박'),
+    # (12, 12, '포항과 안동, 포항는 경상남도 남부의 해안 지역에 위치한 도시입니다.', '포항&안동은 온화한 해양성 기후를 보이며, 봄과 가을에는 맑고 선선한 날씨이며 여름에는 습하고 겨울에는 온화한 날씨입니다.', '포항 호미곶, 안동 하회마을', '포항&안동은 바다가 아름다운 자연경관과 다양한 먹거리를 즐길 수 있는 지역입니다.', '고래고기, 상어고기, 안동소주, 한정식', '버스, 기차')
 ]
 
 # ChatbotTravelInfo 테이블에 데이터 삽입
@@ -208,12 +202,12 @@ conn.commit()
 # 데이터베이스 연결 객체를 받아 테이블 이름 목록을 반환
 def get_table_names(conn):
     with conn.cursor() as cursor:
-        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('chatbottravelinfo');")
         tables = cursor.fetchall()
-        if tables:
-            return [table[0] for table in tables]
-        else:
-            return []
+        table_names = [table[0] for table in tables]
+        print(table_names)
+        return table_names
+
 
 # # 데이터베이스 연결 객체와 테이블 이름을 받아 해당 테이블의 컬럼 이름 목록을 반환
 def get_column_names(conn, table_name):
@@ -228,14 +222,21 @@ def get_column_names(conn, table_name):
 # 데이터베이스 연결 객체와 테이블 이름을 받아 해당 테이블의 컬럼 이름 목록을 반환
 def get_database_info(conn):
     table_names = get_table_names(conn)
+    table_dicts = []
     if table_names:  # table_names가 None이 아닌지 확인
         for table_name in table_names:
-            # 원하는 작업 수행
-            print(f"Table: {table_name}")
+            columns = get_column_names(conn, table_name)
+            table_info = {
+                'table_name': table_name,
+                'columns': columns
+            }
+            table_dicts.append(table_info)
+            print(f"Table: {table_name}, Columns: {columns}")
     else:
         print("No tables found in the database.")
-
-get_database_info(conn)
+    print("table_dicts")
+    print(table_dicts)
+    return table_dicts
 
 # ######################################################################
 
@@ -246,10 +247,11 @@ conn.close()
 if database_info is not None:
     database_schema_string = "\n".join(
         [
-            f"Table: {table['table_name']}\nColumns: {', '.join(table['column_names'])}"
+            f"Table: {table['table_name']}\nColumns: {', '.join(table['columns'])}"
             for table in database_info
         ]
     )
+    print("database_schema_string")
     print(database_schema_string)
 else:
     database_schema_string = "No database info found."
@@ -263,26 +265,28 @@ tools = [
         "type": "function",
         "function": {
             "name": "ask_database",
-            "description": "이 함수를 사용하여 사용자가 질문한 지역의 지역위치, 지역날씨, 지역관광지, 지역문화, 지역음식, 지역교통에 관한 질문에 답하세요. 입력은 완전히 형성된 SQL 쿼리여야 합니다.",
+            "description": f"""
+                이 함수를 사용하여 사용자가 특정 지역에 대한 정보를 질문할 때 답변하세요. 
+                SQL 쿼리를 사용하여 DB에서 위치, 날씨, 관광지, 문화, 음식, 교통 정보를 추출합니다.
+                도시 이름은 고유한 county_id로 매핑됩니다.
+
+                county_id 는 
+                가평﹒양평=1, 강릉﹒속초=2, 경주=3, 부산=4, 여수=5, 인천=6, 전주=7, 제주=8, 춘천﹒홍천=9, 태안﹒당진﹒서산=10, 통영﹒거제﹒남해=11, 포함﹒안동=12
+
+                SQL 쿼리는 다음 스키마를 사용합니다:
+                {database_schema_string}
+
+                예시 쿼리:
+                SELECT info_location, info_weather, info_tourist, info_cultural, info_food, info_traffic 
+                FROM ChatbotTravelInfo 
+                WHERE county_id = 4;
+                """,
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": f"""
-                                사용자의 질문에 답하기 위해 정보를 추출하는 SQL 쿼리입니다.
-                                SQL은 다음 데이터베이스 스키마를 사용하여 작성되어야 합니다:
-                                {database_schema_string}
-                                쿼리는 JSON이 아닌 일반 텍스트로 반환되어야 합니다.
-
-                                county_id 조회를 원하는 도시,
-                                info_location 도시 위치,
-                                info_weather 도시 날씨,
-                                info_tourist 도시 관광지,
-                                info_cultural 도시 지역문화,
-                                info_food 도시 음식,
-                                info_traffic 도시 교통 입니다.
-                                """,
+                        "description": "사용자의 질문에 답하기 위해 정보를 추출하는 SQL 쿼리입니다."
                     }
                 },
                 "required": ["query"],
@@ -290,6 +294,8 @@ tools = [
         }
     }
 ]
+
+
 
 # ######################################################################
 
