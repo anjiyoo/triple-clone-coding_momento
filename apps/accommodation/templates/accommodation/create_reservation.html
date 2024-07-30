@@ -215,18 +215,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        content: '\2714';
-        color: #ccc;
+        content: '';
     }
     
     .custom-checkbox:checked + .custom-label {
-        /* background-color: #4CAF50;  */
         color: black; 
         border-radius: 4px; 
     }
 
     .custom-checkbox:checked + .custom-label::before {
-        background-color: rgb(145, 145, 145);
+        /* background-color: rgb(145, 145, 145); */
         border-color: rgb(61, 132, 199);
         color: white;
     }
@@ -234,10 +232,11 @@
         content: '\2713';
         position: absolute;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translate(-215%, -50%);
         font-size: 16px;
-        color: white;
+        color: rgb(61, 132, 199); /* 파란색 체크 표시 */
     }
+
     #submit-button {
         background-color: #cccccc; /* 비활성화 상태의 배경색 */
         color: #ffffff; /* 글꼴 색상 */
