@@ -110,6 +110,58 @@
         border: 1px solid #ccc;
         border-radius: 4px;
     }
+    /* 로딩 표시 스타일 */
+    .loading {
+        display: none;
+        text-align: center;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+    
+    .lds-hourglass-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .lds-hourglass,
+    .lds-hourglass:after {
+        box-sizing: border-box;
+    }
+    .lds-hourglass {
+        display: none;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        font-size: 18px;
+    }
+    .lds-hourglass:after {
+        content: " ";
+        display: block;
+        border-radius: 50%;
+        width: 0;
+        height: 0;
+        margin: 8px;
+        box-sizing: border-box;
+        border: 32px solid currentColor;
+        border-color: currentColor transparent currentColor transparent;
+        animation: lds-hourglass 1.2s infinite;
+    }
+    @keyframes lds-hourglass {
+        0% {
+            transform: rotate(0);
+            animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        }
+        50% {
+            transform: rotate(900deg);
+            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+        100% {
+            transform: rotate(1800deg);
+        }
+    }
+
+
 </style>
 {% endblock %}
 
@@ -120,15 +172,47 @@
         <div class="tab" id="roundTripTab" onclick="selectTab('roundTrip')">왕복</div>
     </div>
     <!-- 검색form -->
-    <form id="flightSearchForm">
+    <form id="flightSearchForm">    
         {% csrf_token %}
         <div class="form-group">
             <label for="origin">출발지</label>
-            <input type="text" id="origin" name="origin" required>
+            <select id="origin" name="origin" required>
+                <option value="GMP">김포 (GMP)</option>
+                <option value="ICN">인천 (ICN)</option>
+                <option value="CJJ">청주 (CJJ)</option>
+                <option value="CJU">제주 (CJU)</option>
+                <option value="PUS">김해 (PUS)</option>
+                <option value="TAE">대구 (TAE)</option>
+                <option value="KWJ">광주 (KWJ)</option>
+                <option value="HIN">사천 (HIN)</option>
+                <option value="RSU">여수 (RSU)</option>
+                <option value="KUV">군산 (KUV)</option>
+                <option value="MWX">무안 (MWX)</option>
+                <option value="USN">울산 (USN)</option>
+                <option value="WJU">원주 (WJU)</option>
+                <option value="YNY">양양 (YNY)</option>
+                <option value="KPO">포항 (KPO)</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="destination">도착지</label>
-            <input type="text" id="destination" name="destination" required>
+            <select id="destination" name="destination" required>
+                <option value="GMP">김포 (GMP)</option>
+                <option value="ICN">인천 (ICN)</option>
+                <option value="CJJ">청주 (CJJ)</option>
+                <option value="CJU">제주 (CJU)</option>
+                <option value="PUS">김해 (PUS)</option>
+                <option value="TAE">대구 (TAE)</option>
+                <option value="KWJ">광주 (KWJ)</option>
+                <option value="HIN">사천 (HIN)</option>
+                <option value="RSU">여수 (RSU)</option>
+                <option value="KUV">군산 (KUV)</option>
+                <option value="MWX">무안 (MWX)</option>
+                <option value="USN">울산 (USN)</option>
+                <option value="WJU">원주 (WJU)</option>
+                <option value="YNY">양양 (YNY)</option>
+                <option value="KPO">포항 (KPO)</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="departure_date">출발 날짜</label>
@@ -153,6 +237,8 @@
         <input type="hidden" id="oneWay" name="oneWay" value="true">
         <button type="submit">항공권 검색</button>
     </form>
+    <div class="lds-hourglass" id="lds-hourglass">검색 중...</div>
+    
 </div>
 <div class="results" id="resultsContainer"></div>
 <div class="selected-flight" id="selectedFlightContainer" style="display: none;"></div>
@@ -198,6 +284,7 @@
     // 검색입력 보내기
     document.getElementById('flightSearchForm').addEventListener('submit', function(event) {
         event.preventDefault();
+        document.getElementById('lds-hourglass').style.display = 'block'; // 로딩 표시 보이기
         const origin = document.getElementById('origin').value;
         const destination = document.getElementById('destination').value;
         const departure_date = document.getElementById('departure_date').value;
@@ -235,6 +322,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            document.getElementById('lds-hourglass').style.display = 'none'; // 로딩 표시 숨기기
             console.log("Response Data:", data); // 서버 응답 확인
             if (oneWay) {
                 displayResults(data, 'outbound');
@@ -243,6 +331,7 @@
             }
         })
         .catch(error => {
+            document.getElementById('lds-hourglass').style.display = 'none'; // 로딩 표시 숨기기
             console.error('Error:', error);
         });
     });
@@ -251,7 +340,7 @@
         const resultsContainer = document.getElementById('resultsContainer');
         resultsContainer.innerHTML = '';
 
-        if (Array.isArray(data.data)) {
+        if (Array.isArray(data.data) && data.data.length > 0) {
             data.data.forEach(flight => {
                 const flightItem = document.createElement('div');
                 flightItem.className = 'flight-item';
@@ -276,7 +365,7 @@
                 resultsContainer.appendChild(flightItem);
             });
         } else {
-            resultsContainer.innerHTML = '<p>No flights found.</p>';
+            resultsContainer.innerHTML = '<p>검색된 항공권이 없습니다</p>';
         }
     }
 
@@ -298,6 +387,7 @@
             flight.travelerPricings.forEach((traveler, index) => {
                 travelerDetails += `<p class="traveler-details">Traveler ${index + 1} (${traveler.travelerType}): ${traveler.price.total} ${flight.price.currency}</p>`;
             });
+
             flightItem.innerHTML = `
                 <div class="details">
                     <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
@@ -321,7 +411,7 @@
             let travelerDetails = '';
             flight.travelerPricings.forEach((traveler, index) => {
                 travelerDetails += `<p class="traveler-details">Traveler ${index + 1} (${traveler.travelerType}): ${traveler.price.total} ${flight.price.currency}</p>`;
-            });
+            })
             flightItem.innerHTML = `
                 <div class="details">
                     <p>${firstSegment.departure.iataCode} (${firstSegment.departure.at}) - ${lastSegment.arrival.iataCode} (${lastSegment.arrival.at})</p>
@@ -344,6 +434,7 @@
             if (document.getElementById('oneWay').value === 'false') {
                 // Fetch return flights based on selected outbound flight
                 fetchReturnFlights();
+                document.getElementById('lds-hourglass').style.display = 'block'; // 로딩 표시 보이기
             } else {
                 displaySelectedFlight();
             }
@@ -381,6 +472,7 @@
         })
         .then(response => response.json())
         .then(data => {
+            document.getElementById('lds-hourglass').style.display = 'none'; // 로딩 표시 숨기기
             console.log("Return Flight Data:", data); // 서버 응답 확인
             displayResults(data, 'return');
         })
