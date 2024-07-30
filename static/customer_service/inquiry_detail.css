@@ -1,102 +1,44 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-    margin: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-.inquiry-detail-container {
-    width: 100%;
+.card {
+    margin: 20px auto;
     max-width: 800px;
-    margin: 30px;
     padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.inquiry-header {
-    background-color: #007BFF;
-    padding: 15px;
-    border-radius: 10px 10px 0 0;
-    color: #fff;
-    text-align: center;
+.card-header {
+    margin-bottom: 15px;
 }
 
-.inquiry-title {
-    margin: 0;
+.card-title {
     font-size: 24px;
     font-weight: bold;
+    color: #333;
 }
 
-.inquiry-body {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 20px;
+.card-body {
+    line-height: 1.6;
+    color: #555;
 }
 
-.inquiry-image {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.inquiry-image img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.inquiry-comments {
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 0 0 10px 10px;
-}
-
-.inquiry-comments h3 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.inquiry-comments .comment {
-    padding: 15px;
-    background-color: #ffffff;
-    border: 1px solid #e9ecef;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.inquiry-comments .comment p {
-    margin: 0 0 10px;
-}
-
-.inquiry-comments .comment small {
-    color: #6c757d;
-}
-
-.comment-form {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.comment-form button.btn-submit {
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+.btn-back {
+    padding: 10px 15px;
+    background-color: #fff; /* 하얀색 배경 */
+    color: #000; /* 검정색 글자 */
+    border: 1px solid #ddd; /* 검정색 테두리 */
+    border-radius: 8px;
     font-size: 16px;
 }
 
-.comment-form button.btn-submit:hover {
-    background-color: #0056b3;
+.btn-back:hover {
+    background-color: #f0f0f0; /* 호버 시 배경 색상 변화 */
+    color: #333; /* 호버 시 글자 색상 변화 */
+    border-color: #333; /* 호버 시 테두리 색상 변화 */
+}
+
+.btn-back-container {
+    text-align: center;
+    margin: 20px auto;
 }

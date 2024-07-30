@@ -11,7 +11,7 @@
     <div class="container">
         <div class="card">
             <div class="image-container">
-                <a href="{% url 'index' %}" class="close-button">
+                <a href="{% url 'guidepage:index' %}" class="close-button">
                     <span class="close-icon">&times;</span>
                 </a>
                 <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Triple Guide">
@@ -77,11 +77,11 @@
                     </div>
                     <div class="slide">
                         <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Slide 2">
-                        <button class="guide-button" onclick="navigateToGuide(2)">일정짜기 보러가기</button>
+                        <button class="guide-button" onclick="navigateToGuide(3)">여행일정 가이드 보러가기</button>
                     </div>
                     <div class="slide">
                         <img src="{% static 'guidepage/photo/custom_info.png' %}" alt="Slide 3">
-                        <button class="guide-button" onclick="navigateToGuide(3)">맞춤 정보 가이드 보러가기</button>
+                        <button class="guide-button" onclick="navigateToGuide(3)">여행지 정보 가이드 보러가기</button>
                     </div>
 
                 </div>

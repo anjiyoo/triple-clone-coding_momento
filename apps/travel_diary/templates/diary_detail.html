@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block extra_css %}
-<style>
+<link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/post/detail.css' %}">
+<style>    
 .container {
   /* max-width: 36rem; */
   margin-left: auto;
@@ -122,14 +123,14 @@
                             {% if request.user %}
                                 {% if request.user in comment.diary_com_like_by.all %}   
                                     <!-- 로그인 한 회원이며, 댓글을 이미 좋아요한 경우 -->
-                                    <form action="" method="post" style="display: inline;">
+                                    <form action="{% url 'travel_diary:com_unlike' comment.id%}" method="post" style="display: inline;">
                                         {% csrf_token %}
                                         <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart-fill" style="color: red;"></i></button>
                                         <span>{{ comment.diary_com_like }}</span>
                                     </form>
                                 {% else %}
                                     <!-- 로그인 한 회원이며, 댓글을 아직 좋아요하지 않은 경우 -->
-                                    <form action="" method="post" style="display: inline;">
+                                    <form action="{% url 'travel_diary:com_like' comment.id%}" method="post" style="display: inline;">
                                         {% csrf_token %}
                                         <button type="submit" style="border: none; background-color: transparent;"><i class="bi bi-heart" style="color: red;"></i></button>
                                         <span>{{ comment.diary_com_like }}</span>
@@ -148,8 +149,8 @@
                 <!-- 댓글 수정 및 삭제 링크 -->
                 {% if diary.user == request.user %}
                 <div style="margin-left: 10px;">
-                    <a href="" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline; margin-right: 10px;">수정</a>
-                    <a href="" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline;">삭제</a>
+                    <a href="{% url 'travel_diary:com_edit' comment.id %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline; margin-right: 10px;">수정</a>
+                    <a href="{% url 'travel_diary:com_delete' comment.id %}" style="color: rgb(165, 165, 165); font-size: 15px; text-decoration: underline;">삭제</a>
                 </div>
                 {% endif %}
             </li>
@@ -192,13 +193,22 @@
         daysArray.forEach((day,index)=> {
           console.log(`map${index+1}`)
           var container = document.getElementById(`map${index+1}`); //지도를 담을 영역의 DOM 레퍼런스
-          var options = { //지도를 생성할 때 필요한 기본 옵션
-          center: new kakao.maps.LatLng( 37.715133, 126.734086), //지도의 중심좌표.
-          level: 12 //지도의 레벨(확대, 축소 정도)
-        };
-
-        var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-
+          try{
+            const place=document.querySelector('.mb-2').dataset['xy'].split(',')
+            console.log('여기까지')
+            var options = { //지도를 생성할 때 필요한 기본 옵션
+            center: new kakao.maps.LatLng( place[1], place[0]), //지도의 중심좌표.
+            level: 13 //지도의 레벨(확대, 축소 정도)
+            };
+            var map = new kakao.maps.Map(container, options);
+            }catch(err){
+            var options = {
+                center: new kakao.maps.LatLng( 37.715133, 126.734086),
+                level: 13
+            };
+            var map = new kakao.maps.Map(container, options);
+        }
+       
         var map_xy = new Array();
         var list_name = new Array();
         
@@ -331,9 +341,6 @@
             el.textContent = counter++;
           }
       });
-
-
-      
     });
   });
 </script>

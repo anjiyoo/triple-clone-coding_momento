@@ -148,64 +148,9 @@
             {% if accommodations %}
                 <ul>
                     {% for accommodation in accommodations %}
-                    <h4 style="font-weight: bold;"> 날짜, 인원수 선택</h4>
-                    <div style="text-align: center;">
-                        <input type="text" 
-                               name="datefilter" 
-                               class="daterange" 
-                               style="margin-left: 50px; height: 38px; text-align: center; font-size: 16px;"  
-                               placeholder="날짜 선택"/>
-                               
-        
-                         <input type="text" 
-                               name="guestcount" 
-                               class="guestcount" 
-                               style="margin-left: 10px; height: 38px; text-align: center; font-size: 16px; width: 200px;"  
-                               placeholder="성인 2" onclick="openGuestModal()"/>           
-                </div>
 
-                 <!-- 모달 창 -->
-        <div style="text-align: center;">
-            <div id="guestModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeGuestModal()">&times;</span>
-                    <h2 style = "margin-left: 30px">인원 선택</h2>
 
-            <!-- 구분선 -->
-            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
-                <div class="horizontal-input-group">
-                        <label for="adultCount" style="font-size: 18px; font-weight: bold;">성인</label>
-                        <div class="counter">
-                 
-                                <button class="icon-button" onclick="decreaseCount('adultCount')"><i class="bi bi-dash"></i></button>
-                                <input type="number" id="adultCount" min="1" value="2" readonly>
-                                <button class="icon-button" onclick="increaseCount('adultCount')"><i class="bi bi-plus"></i></button>
-                        </div>
-                    </div>
-                <br>
 
-                <div class="horizontal-input-group">
-                    <label for="childCount" style="font-size: 18px; font-weight: bold;">아동</label>
-                         <div class="counter">
-                            <button class="icon-button" onclick="decreaseCount('childCount')"><i class="bi bi-dash"></i></button>
-                            <input type="number" id="childCount" min="0" value="0" readonly>
-                            <button class="icon-button" onclick="increaseCount('childCount')"><i class="bi bi-plus"></i></button>
-                        </div>
-                </div>
-                <br>
-            
-
-            <!-- 구분선 -->
-            <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 30px;">
-
-            <div class="center-button">
-                <button onclick="applyGuestCount()">선택 완료</button>
-            </div>
-        </div>  
-        </div>
-    </div>
-
-                <hr style="border: 0; border-top: 20px solid #868686d8; margin: 30px 0;">
 
                    
                           

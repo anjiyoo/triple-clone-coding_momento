@@ -50,6 +50,7 @@
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'account_logout' %}" id="logout-button">LOGOUT</a></li>
                     <li><a href="{% url 'mypage' %}" id="mypage-button">마이페이지</a></li>
+                    <li><a href="{% url 'plan:city' %}" id="mypage-button">일정만들기</a></li>
                     <li><a href="{% url 'mypage:my_reservations' %}" id="mypage-button">예약내역</a></li>
                     {% else %}
                     <li><a href="#" onclick="gotoLogin()" id="login-button">LOGIN</a></li>

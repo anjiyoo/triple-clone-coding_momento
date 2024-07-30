@@ -19,6 +19,8 @@ class diary(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(tag,blank=True)
+    diary_like = models.IntegerField('좋아요', default=0)  # 배낭톡 좋아요
+    diary_like_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='diary_liked_posts')  # 좋아요 누른 회원
 
 # 여행기 댓글
 class DiaryComment(models.Model):

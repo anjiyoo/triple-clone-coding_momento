@@ -6,20 +6,45 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from apps.accommodation.models import Reservation as AccommodationReservation,GuestInfo
+from apps.flights.models import Reservation as FlightReservation ,BookerInfo
+from django.views.generic import ListView
+from apps.accommodation.models import Reservation as AccommodationReservation, GuestInfo
+from apps.flights.models import Reservation as FlightReservation, BookerInfo
+
+from django.views.generic import ListView
+from apps.accommodation.models import Reservation as AccommodationReservation, GuestInfo
+from apps.flights.models import Reservation as FlightReservation, BookerInfo
 
 class ReservationListView(ListView):
     template_name = 'mypage/reservation_list.html'
     context_object_name = 'reservations'
 
     def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user)
+        flight_reservations = FlightReservation.objects.filter(user=self.request.user)
+        accommodation_reservations = AccommodationReservation.objects.filter(user=self.request.user)
+
+        for reservation in flight_reservations:
+            reservation.reservation_type = 'flight'
+        
+        for reservation in accommodation_reservations:
+            reservation.reservation_type = 'accommodation'
+
+        return list(flight_reservations) + list(accommodation_reservations)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         reservations = context['reservations']
         for reservation in reservations:
-            booker_info = BookerInfo.objects.filter(reservation=reservation).first()
-            reservation.booker_name = booker_info.name
+            if reservation.reservation_type == 'flight':
+                booker_info = BookerInfo.objects.filter(reservation=reservation).first()
+                reservation.booker_name = booker_info.name if booker_info else ''
+            elif reservation.reservation_type == 'accommodation':
+                guest_info = GuestInfo.objects.filter(id=reservation.guest_info_id).first()
+                reservation.guest_name = guest_info.name if guest_info else ''
+                reservation.accommodation_name = reservation.accommodation.name
+                reservation.room_name = reservation.room.name
+        context['reservations'] = reservations
         return context
 
 class SaveListView(ListView):
