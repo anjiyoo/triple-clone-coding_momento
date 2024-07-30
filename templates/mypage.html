@@ -5,75 +5,94 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'mypage/mypage.css' %}">
-{% endblock %}
-
-{% block extra-style %}
-<style>
-    .profile-img {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        /* 이미지를 컨테이너에 맞게 조정 */
-        border-radius: 50%;
-    }
-
-    .profile-section {
-        display: flex;
-        align-items: center;
-        padding: 20px;
-        border: 1px solid hsla(0, 0%, 100%, .3);
-        gap: 20px;
-        /* 프로필 사진과 나머지 요소들 사이의 간격을 설정 */
-    }
-
-    .icon-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-
-    .btn-container {
-        margin-top: 20px;
-        /* 버튼과 프로필 사이의 간격 조정 */
-    }
-
-    .d-flex {
-        display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-    }
-
-    .fixed-card {
-        width: 18rem;
-        /* 고정된 너비 */
-        height: 25rem;
-        /* 고정된 높이 */
-        overflow: hidden;
-        /* 내용이 카드 범위를 넘지 않도록 숨김 처리 */
-    }
-
-    .card-img-top {
-        height: 10rem;
-        /* 이미지 높이 고정 */
-        object-fit: cover;
-        /* 이미지가 카드에 맞게 조절되도록 */
-    }
-
-    .profile-preview {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        /* 부모 요소의 너비에 따라 가운데 정렬을 위해 추가 */
-        width: 100%;
-    }
-</style>
-{% endblock %}
+    {% load static %}
+    {% block extra_css %}
+        <!-- jQuery 스크립트 추가 -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Slick 플러그인 스크립트 추가 -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="{% static 'mypage/mypage.css' %}">
+    {% endblock %}
+    
+    {% block extra-style %}
+        <style>
+            .profile-img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover; /* 이미지를 컨테이너에 맞게 조정 */
+                border-radius: 50%;
+            }
+            .profile-section {
+                display: flex;
+                align-items: center;
+                padding: 20px;
+                border: 1px solid hsla(0, 0%, 100%, .3);
+                gap: 20px; /* 프로필 사진과 나머지 요소들 사이의 간격을 설정 */
+            }
+            .icon-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .icon-container svg,
+            .icon-container i {
+                width: 60px; /* 아이콘 크기 조정 */
+                height: 60px; /* 아이콘 크기 조정 */
+                margin-bottom: 10px; /* 아이콘과 설명 사이의 공백을 설정합니다 */
+            }
+            .btn-container {
+                margin-top: 20px; /* 버튼과 프로필 사이의 간격 조정 */
+            }
+            .d-flex {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            .fixed-card {
+                width: 18rem; /* 고정된 너비 */
+                height: 25rem; /* 고정된 높이 */
+                overflow: hidden; /* 내용이 카드 범위를 넘지 않도록 숨김 처리 */
+            }
+            .card-img-top {
+                height: 10rem; /* 이미지 높이 고정 */
+                object-fit: cover; /* 이미지가 카드에 맞게 조절되도록 */
+            }
+            .profile-preview {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                /* 부모 요소의 너비에 따라 가운데 정렬을 위해 추가 */
+                width: 100%;
+            }
+                /*post slider*/
+            .post-slider .next{
+            position:absolute;
+            top:40%;
+            right:0px;
+            font-size:2em;
+            color:gray;
+            cursor: pointer;
+            }
+            .post-slider .prev{
+            position:absolute;
+            top:40%;
+            left:0px;
+            font-size:2em;
+            color:gray;
+                cursor: pointer;
+            }
+            .post-slider .post-wrapper{
+            width:95%;
+            height:350px;
+            margin:0px auto;
+            overflow: hidden;
+            }
+                    
+        </style>
+    {% endblock %}
 
 <div class="container mt-3">
     <div class="row">
@@ -132,22 +151,49 @@
 <!-- 최근 여행 일정 -->
 <div class="container mt-3">
     <div class="row">
-        <h2 class="mb-3">최근 여행</h2>
-        <div class="d-flex">
+        
+        <div >
             {% block list %}
-            {% if trip_list %}
-            {% for i in trip_list %}
-            <div class="card mx-2 fixed-card">
-                <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
-                    <img src="{{i.city.title_image.url}}" class="card-img-top" alt="여행 일정 이미지">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">{{i.city}}</h5>
-                    <p class="card-text">{{i.start_date|date:'Y.m.d'}} - {{i.end_date|date:'Y.m.d'}}</p>
+            <div class="page-wrapper" style="position:relative;">
+                <!--page slider -->
+                <h2>최근 여행</h2>
+                <div class="post-slider">
+                  <i class="fas fa-chevron-left prev"></i>  
+                  <i class="fas fa-chevron-right next"></i>  
+                  <div class="post-wrapper">
+                    <!-- <div class="post">
+                      <img src="img/paris.jpg" class="slider-image">
+                      <div class="post-info">
+                        <h4><a href="#" class="post-subject">Lorem ipsu eiusmod tempor incididunt ut </a></h4>
+                        <i class="far fa-user" style="height:10%;">Awa Melvine</i>
+                      </div>
+                    </div> -->
+                    {% if trip_list %}
+                    {% for i in trip_list %}
+                    <div class="card mx-2 fixed-card">
+                        <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
+                            <img src="{{i.city.title_image.url}}" class="card-img-top" alt="여행 일정 이미지">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">{{i.city}}</h5>
+                            <p class="card-text">{{i.start_date|date:'Y.m.d'}} - {{i.end_date|date:'Y.m.d'}}</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            ...
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <!-- <li><a class="dropdown-item" href="">수정하기</a></li> -->
+                            <li><a class="dropdown-item" href="{% url 'plan:trip_delete' pk=i.id %}" onclick="">삭제하기</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                  </div>
                 </div>
-            </div>
-            {% endfor %}
-            {% endif %}
+                <!--post slider-->
+              </div>
             {% endblock %}
         </div>
     </div>
@@ -224,6 +270,17 @@
             reader.readAsDataURL(file);
         }
     }
+</script>
+
+<script>
+    $('.post-wrapper').slick({
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      autoplaySpeed: 2000,
+      infinite: false,  
+      nextArrow:$('.next'),
+      prevArrow:$('.prev'),
+    });
 </script>
 
 {% endblock %}

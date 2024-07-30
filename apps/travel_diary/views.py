@@ -1,14 +1,15 @@
 from typing import Any
 from django.shortcuts import render
-from django.views.generic import CreateView ,ListView, DetailView, UpdateView
-from .forms import DiaryForm
+from django.views.generic import CreateView ,ListView, DetailView, UpdateView, DeleteView
+from .forms import DiaryForm,CommentcreateForm, CommentEditForm
 from apps.plan.models import Trip,DayPlan
 from datetime import datetime, timedelta
-from .models import tag,diary
-from django.shortcuts import redirect
+from .models import tag,diary,DiaryComment
+from django.shortcuts import redirect ,get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
 import os
+from django.contrib.auth.decorators import login_required
 KAKAO_API_KEY = os.getenv('KAKAO_API_KEY')
 REST_API_KEY = os.getenv('REST_API_KEY')
 class DiaryCreateView(CreateView):
@@ -61,10 +62,6 @@ class DiaryList(ListView):
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user).order_by(self.ordering)
     
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        return context
-
 class DiaryDetail(DetailView):
     model = diary
     template_name = 'diary_detail.html'
@@ -90,14 +87,33 @@ class DiaryDetail(DetailView):
         days = zip(days, origin_day)
         # 일자별 게획
         plan = DayPlan.objects.filter(trip=trip)
+
+        comments = DiaryComment.objects.filter(diary=self.kwargs['pk'])  
+        form = CommentcreateForm()  # 댓글 폼 초기화
+
         context['day_list'] = origin_day
         context['trip_id'] = trip_id
         context['trip'] = trip
         context['days'] = days
         context['plan'] = plan
+        context['form'] = form
+        context['comments'] = comments
         context['KAKAO_API_KEY'] = KAKAO_API_KEY
         context['REST_API_KEY'] = REST_API_KEY
         return context
+    
+    
+    
+    # POST 요청 처리
+    def post(self, request, pk):  
+        form = CommentcreateForm(request.POST)
+        # 입력된 데이터 유효성 검사
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user  # 요청을 보낸 사용자 = 댓글의 작성자
+            comment.diary = diary.objects.get(pk=pk)  
+            comment.save()  # DB 저장
+            return redirect('travel_diary:diary_detail', pk=pk)
 
 class DiaryUpdate(UpdateView):
     model = diary
@@ -135,3 +151,64 @@ class DiaryUpdate(UpdateView):
     def get_object(self, queryset=None):
         diary_id = self.kwargs.get('diary_id')
         return diary.objects.get(id=diary_id)
+    
+class DiaryDelete(DeleteView):
+    model = diary
+    template_name = 'diary_delete.html'
+    success_url = reverse_lazy('travel_diary:diary_list')
+
+# 댓글 좋아요
+@login_required
+def com_like(request, comment_id):
+    if request.method == 'POST':
+        comment = get_object_or_404(DiaryComment, id=comment_id)
+        user = request.user  # 현재 로그인된 사용자
+
+
+        if user not in comment.diary_com_like_by.all():
+            comment.diary_com_like_by.add(user)
+            comment.diary_com_like += 1
+            comment.save()
+        return redirect('travel_diary:diary_detail', pk=comment.diary.pk)
+
+    return redirect('travel_diary:diary_detail', pk=comment.diary.pk)
+
+
+
+# 댓글 좋아요 취소
+@login_required
+def com_unlike(request, comment_id):
+    if request.method == 'POST':
+        comment = get_object_or_404(DiaryComment, id=comment_id)
+        user = request.user  # 현재 로그인된 사용자
+
+        if user in comment.diary_com_like_by.all():
+            comment.diary_com_like_by.remove(user)
+            comment.diary_com_like -= 1
+            comment.save()
+        return redirect('travel_diary:diary_detail', pk=comment.diary.pk)
+
+    return redirect('travel_diary:diary_detail', pk=comment.diary.pk)
+
+# 댓글 수정
+def com_edit(request, comment_id):
+    comment = get_object_or_404(DiaryComment, id=comment_id)
+    
+    if request.method == 'POST':
+        form = CommentEditForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('travel_diary:diary_detail', pk=comment.diary.pk) # 댓글이 수정된 후 게시글 상세페이지로 이동
+    else:
+        form = CommentEditForm(instance=comment)
+    
+    return render(request, 'diary_comment_edit.html', {'form': form})
+
+# 댓글 삭제
+@login_required
+def com_delete(request, comment_id):
+    comment = get_object_or_404(DiaryComment, id=comment_id)
+    if request.method == 'GET':
+        if comment.diary:  # comment.bae가 존재하는지 확인
+            comment.delete()
+            return redirect('travel_diary:diary_detail', pk=comment.diary.pk)

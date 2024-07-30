@@ -42,7 +42,7 @@ def profile(request):
             messages.error(request, '프로필 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.')
     else:
         form = UserEditForm(instance=request.user)
-    trip_list = Trip.objects.all()
+    trip_list = Trip.objects.filter(user=request.user).order_by('-pk')
     context = {
         'form': form,
         'user': request.user,
