@@ -167,11 +167,11 @@
                 <img src="{{ MEDIA_URL }}{{ images.0.images }}" class="profile-image" alt="Accommodation Image" style="margin-right: 10px;">
             {% endif %}
             <div>
-                <h5 style="font-weight: bold; margin-bottom: 0;">
+                <h6 style="font-weight: bold; margin-bottom: 0;">
                     <a href="{% url 'accommodation:accommodation_detail' accommodation.pk %}" style="text-decoration: none; color: inherit;">
                         {{ review.accommodation.name }}
                     </a>
-                </h5>
+                </h6>
                 <span style="font-weight: bold; font-size: 14px;">{{ review.accommodation.city.city_name }}</span>
             </div>
             <div class="ml-auto" style="margin-left: 450px;">
