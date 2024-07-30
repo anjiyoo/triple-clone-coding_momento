@@ -6,42 +6,43 @@
 <link rel="stylesheet" type="text/css" href="{% static 'customer_service/my_inquiry_list.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-    .tab-container {
-        display: flex;
-        justify-content: space-around;
+    .faq-section {
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .faq-header {
+        font-size: 36px;
+        font-weight: bold;
+        margin-top: 20px;
         margin-bottom: 20px;
-        cursor: pointer;
+        text-align: center;
+    }
+    .tabs {
+        margin-top: 20px;
+        border-bottom: 2px solid #ddd;
     }
     .tab {
         padding: 10px 20px;
-        border: 1px solid #007BFF;
-        background-color: #f7f7f7;
+        cursor: pointer;
         color: #007BFF;
-        border-radius: 4px;
-        margin: 0 5px;
+        border-bottom: 2px solid transparent;
+        transition: border-color 0.3s, color 0.3s;
     }
     .tab.active {
-        background-color: #007BFF;
-        color: #fff;
+        border-bottom: 2px solid #007BFF;
+        font-weight: bold;
+        color: #0056b3;
     }
     .faq-content {
         display: none;
+        margin-top: 20px;
     }
     .faq-content.active {
         display: block;
-    }
-    .tabs {
-        display: flex;
-        margin-top: 20px;
-        border-bottom: 2px solid #ccc;
-    }
-    .tabs .tab {
-        padding: 10px 20px;
-        cursor: pointer;
-    }
-    .tabs .tab.active {
-        border-bottom: 2px solid #007bff;
-        font-weight: bold;
     }
     .result-list {
         list-style: none;
@@ -51,8 +52,8 @@
         display: flex;
         align-items: center;
         margin-bottom: 20px;
-        border-bottom: 1px solid #ddd;
         padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
     }
     .result-item img {
         width: 100px;
@@ -73,16 +74,52 @@
         font-size: 14px;
         color: #777;
     }
+
+
+    .btn-primary {
+        background-color: #007BFF;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-left: 10px; /* 버튼과 입력 필드 사이의 여백 */
+        margin-bottom: 17px;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* 가로 중앙 정렬 */
+    }
+    .search-form input[type="text"] {
+        flex: 1;
+        margin-right: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 600px; /* 입력 필드 너비 */
+    }
+    /* 레이블 숨기기 */
+    .search-form label {
+            display: none;
+        }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="col-md-6">
+<div class="container">
     <div class="faq-section">
         <div class="faq-header">어디로 떠나시나요?</div>
-        <form method="get">
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">검색</button>
+        <form method="get" class="search-form">
+            {{ form.as_p|safe }}
+            <button type="submit" class="btn-primary">검색</button>
         </form>
         {% if query %}
         <div class="tabs">
@@ -93,7 +130,7 @@
 
         <div id="faq_common" class="faq-content active">
             <ul class="result-list">
-                <p>배낭톡</p>
+                <li><strong>배낭톡</strong></li>
                 {% for baenangtalk in best_bae %}
                 <li class="result-item">
                     {% if baenangtalk.bae_img %}
@@ -110,11 +147,11 @@
                 <li>No baenangtalks found.</li>
                 {% endfor %}
                 {% if best_bae %}
-                <div class="tab" id="faq_flightTab" onclick="selectTab('faq_flight')">배낭톡 검색결과 더보기</div>
+                <div class="tab mt-2" id="faq_flightTab" onclick="selectTab('faq_flight')">배낭톡 검색결과 더보기</div>
                 {% endif %}
             </ul>
             <ul class="result-list">
-                <p>숙소</p>
+                <li><strong>숙소</strong></li>
                 {% for accommodation in best_accommodation %}
                 <li class="result-item">
                     {% if accommodation.images.first %}
@@ -131,7 +168,7 @@
                 <li>No accommodations found.</li>
                 {% endfor %}
                 {% if best_accommodation %}
-                <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">숙소 검색결과 더보기</div>
+                <div class="tab mt-2" id="faq_serviceTab" onclick="selectTab('faq_service')">숙소 검색결과 더보기</div>
                 {% endif %}
             </ul>
         </div>

@@ -1,0 +1,52 @@
+{% extends 'mypage.html' %}
+
+
+
+{% block list %}
+
+<div class="page-wrapper" style="position:relative;">
+  <!--page slider -->
+  <h2>내 여행기</h2>
+  {% if diary_list %}
+  <div class="post-slider">
+    <i class="fas fa-chevron-left prev"></i>  
+    <i class="fas fa-chevron-right next"></i>  
+    <div class="post-wrapper">
+      <!-- <div class="post">
+        <img src="img/paris.jpg" class="slider-image">
+        <div class="post-info">
+          <h4><a href="#" class="post-subject">Lorem ipsu eiusmod tempor incididunt ut </a></h4>
+          <i class="far fa-user" style="height:10%;">Awa Melvine</i>
+        </div>
+      </div> -->
+      {% for i in diary_list%}
+<div class="card mx-2 fixed-card">
+    <a href="{% url 'travel_diary:diary_detail' i.id %}">
+        <img src="{{i.image.url}}" class="card-img-top" alt="여행 일정 이미지">
+    </a>
+    <div class="card-body">
+        <h5 class="card-title">{{i.title}}</h5>
+        <p class="card-text">{{i.content}}</p>
+    </div>
+    <div class="dropdown">
+        <button class="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          ...
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <li><a class="dropdown-item" href="{% url 'travel_diary:update' diary_id=i.id trip_id=i.trip_id %}">수정하기</a></li>
+          <li><a class="dropdown-item" href="{% url 'travel_diary:delete' pk=i.id %}" onclick="">삭제하기</a></li>
+        </ul>
+    </div>
+</div>
+{% endfor %}
+    </div>
+  </div>
+  <!--post slider-->
+  {% else %}
+  <div  class="d-flex justify-content-center">
+    <p style="font-size: 50px; color: lightgray;">작성된 여행기가 없습니다.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

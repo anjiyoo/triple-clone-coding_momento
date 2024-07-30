@@ -1,0 +1,54 @@
+{% extends "mypage.html" %}
+
+
+    
+{% block list %}
+
+
+<div class="page-wrapper" style="position:relative;">
+    <!--page slider -->
+    <h2>최근 여행</h2>
+    {% if trips %}
+    <div class="post-slider">
+      <i class="fas fa-chevron-left prev"></i>  
+      <i class="fas fa-chevron-right next"></i>  
+      <div class="post-wrapper">
+        <!-- <div class="post">
+          <img src="img/paris.jpg" class="slider-image">
+          <div class="post-info">
+            <h4><a href="#" class="post-subject">Lorem ipsu eiusmod tempor incididunt ut </a></h4>
+            <i class="far fa-user" style="height:10%;">Awa Melvine</i>
+          </div>
+        </div> -->
+        {% for i in trips %}
+        <div class="card mx-2 fixed-card">
+            <a href="{% url 'plan:day_plan' i.city.area_code i.city.cigungu1|default:0 i.city.cigungu2|default:0 i.city.cigungu3|default:0 %}?trip={{i.id}}&area_code={{i.city.area_code}}">
+                <img src="{{i.city.title_image.url}}" class="card-img-top" alt="여행 일정 이미지">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">{{i.city}}</h5>
+                <p class="card-text">{{i.start_date|date:'Y.m.d'}} - {{i.end_date|date:'Y.m.d'}}</p>
+            </div>
+            <div class="dropdown">
+                <button class="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                ...
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <!-- <li><a class="dropdown-item" href="">수정하기</a></li> -->
+                <li><a class="dropdown-item" href="{% url 'plan:trip_delete' pk=i.id %}" onclick="">삭제하기</a></li>
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!--post slider-->
+    {% else %}
+    <div  class="d-flex justify-content-center">
+      <p style="font-size: 50px; color: lightgray;">작성된 여행기가 없습니다.</p>
+    </div>
+    {% endif %}
+  </div>
+
+
+{% endblock %}

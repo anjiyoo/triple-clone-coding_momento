@@ -1,19 +1,19 @@
-/* customer_service/my_inquiry_list.css */
-
 .container {
     margin-top: 40px;
 }
 
 h2 {
     margin-bottom: 20px;
-    font-size: 1.8em;
+    font-size: 2em;
     text-align: center;
+    font-weight: bold;
 }
 
 .inquiry-list {
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 10px;
+    font-size: 15px;
 }
 
 .inquiry-list-item {

@@ -1,17 +1,24 @@
 {% extends 'base.html' %}
+
+{% block title %}고객센터 상세{% endblock %}
+
 {% load static %}
+
 {% block extra_css %}
-    <link rel="stylesheet" type="text/css" href="{% static 'customer_service/inquiry_detial.css' %}">
-    
+    <link rel="stylesheet" type="text/css" href="{% static 'customer_service/inquiry_detail.css' %}">
 {% endblock %}
+
 {% block content %}
-<div class="inquiry-detail-container">
-    <div class="inquiry-header">
-        <h2 class="inquiry-title">공지사항{{ notice.notice_title }}</h2>
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ notice.notice_title }}</h2>
     </div>
-    <div class="inquiry-body">
+    <div class="card-body">
         <p>{{ notice.notice|linebreaksbr }}</p>
     </div>
+</div>
 
+<div class="btn-back-container">
+    <a href="{% url 'customer_service:notice_list' %}" class="btn btn-back">목록으로 돌아가기</a>
 </div>
 {% endblock %}

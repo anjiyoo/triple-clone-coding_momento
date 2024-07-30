@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}내 저장{% endblock %}
+
 {% block extra_css %}
 <style>
     .tab-container {
@@ -8,90 +10,105 @@
         margin-bottom: 20px;
         cursor: pointer;
     }
+
     .faq-content {
         display: none;
     }
+
     .faq-content.active {
         display: block;
     }
+
     .header {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .header .back {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .container {
-            padding: 20px;
-        }
-        .tabs {
-            display: flex;
-            margin-top: 20px;
-            border-bottom: 2px solid #ccc;
-        }
-        .tabs .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .tabs .tab.active {
-            border-bottom: 2px solid #007bff;
-            font-weight: bold;
-        }
-        .heart-fill {
-            color: red; /* 좋아요 상태일 때 하트 색 */
- 
-        }
-        .review_head_card {
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .header .back {
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .tabs {
+        display: flex;
+        margin-top: 20px;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .tabs .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    .tabs .tab.active {
+        border-bottom: 2px solid #007bff;
+        font-weight: bold;
+    }
+
+    .heart-fill {
+        color: red;
+        /* 좋아요 상태일 때 하트 색 */
+
+    }
+
+    .review_head_card {
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-        <div class="header">
-            <div class="back" onclick="history.back();">&larr;</div>
-            <h1>내 저장</h1>
-        </div>
-        <div class="tabs">
-            <div class="tab active">숙소</div>
-        </div>
-        <div id="faq_flight" class="faq-content active">
-            <ul>
-                {% for like in likes %}
-                <div class="review_head_card" onclick="goToUrl('{% url 'accommodation:accommodation_detail' like.accommodation.id %}')">                
-                    <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
-                        <div style="display: flex; align-items: center;">
-                            <div style="flex: 1;">
-                                <a href="{% url 'accommodation:accommodation_detail' like.accommodation.id %}" class="inquiry-title">{{ like.accommodation.name }}</a>
-                                <p>{{ like.accommodation.description }}</p>
-                                <p>
-                                    <span style="color: #FFD700;">★</span>  ({{like.reviews_count}}) · 저장 {{ like.likes_count }}
-                                </p>
-                                <p>{{ like.accommodation.accommodation_type }} · {{ like.accommodation.location }}</p>
-                            </div>
-                            <div style="position: relative;">
-                                {% if like.first_image_url %}
-                                    <img src="{{ like.first_image_url }}" alt="{{ like.accommodation.name }}" style="width: 100px; height: 100px; object-fit: cover;">
-                                {% endif %}
-                                <i class="bi bi-heart heart-fill" 
-                                   data-id="{{ like.accommodation.id }}" 
-                                   style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;"
-                                   onclick="toggleLike(this)"></i>
-                            </div>
+    <div class="header">
+        <div class="back" onclick="history.back();">&larr;</div>
+        <h1>내 저장</h1>
+    </div>
+    <div class="tabs">
+        <div class="tab active">숙소</div>
+    </div>
+    <div id="faq_flight" class="faq-content active">
+        <ul>
+            {% for like in likes %}
+            <div class="review_head_card"
+                onclick="goToUrl('{% url 'accommodation:accommodation_detail' like.accommodation.id %}')">
+                <li style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                    <div style="display: flex; align-items: center;">
+                        <div style="flex: 1;">
+                            <a href="{% url 'accommodation:accommodation_detail' like.accommodation.id %}"
+                                class="inquiry-title">{{ like.accommodation.name }}</a>
+                            <p>{{ like.accommodation.description }}</p>
+                            <p>
+                                <span style="color: #FFD700;">★</span> ({{like.reviews_count}}) · 저장 {{ like.likes_count
+                                }}
+                            </p>
+                            <p>{{ like.accommodation.accommodation_type }} · {{ like.accommodation.location }}</p>
                         </div>
-                    </li>
+                        <div style="position: relative;">
+                            {% if like.first_image_url %}
+                            <img src="{{ like.first_image_url }}" alt="{{ like.accommodation.name }}"
+                                style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                            <i class="bi bi-heart heart-fill" data-id="{{ like.accommodation.id }}"
+                                style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer;"
+                                onclick="toggleLike(this)"></i>
+                        </div>
+                    </div>
+                </li>
                 {% endfor %}
-            </ul>
-            </div>
-        </div>
+        </ul>
+    </div>
+</div>
 </div>
 <script>
     function selectTab(tabId) {
@@ -119,15 +136,15 @@
             },
             body: JSON.stringify({ 'accommodationId': accommodationId })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ok') {
-                window.location.reload();
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    window.location.reload();
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
     function goToUrl(url) {
         window.location.href = url;

@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% block title %}고객센터{% endblock %}
+
 {% load static %}
 
 {% block extra_css %}
@@ -15,50 +18,50 @@
         <div class="col-md-6">
             <div class="inquiry-list">
                 <div class="faq-section">
-                <div class="faq-header">모든 사용자들의 문의내역</div>
-                {% if request.user.is_staff %}
-                <div id="faq_all_list" class="faq-all-list">
-                <a href="{% url 'customer_service:admin_inquiry_list' %}" class="faq_list">전체보기 ></a>
-                </div>
-                {% endif %}
-                {% for post in inquirys %}
-                <div class="inquiry-item">
-                    <div class="inquiry-header">
-                        <div class="title-author">
-                            {% if post.inquiries_id in user_inquiries or is_admin %}
-                                <a href="{% url 'customer_service:post_detail' post.inquiries_id %}">{{ post.inquiry_title }}</a>
+                    <div class="faq-header">모든 사용자들의 문의내역</div>
+                    {% if request.user.is_staff %}
+                    <div id="faq_all_list" class="faq-all-list">
+                        <a href="{% url 'customer_service:admin_inquiry_list' %}" class="faq_list">전체보기 ></a>
+                    </div>
+                    {% endif %}
+                    {% for post in inquirys %}
+                    <div class="inquiry-item">
+                        <div class="inquiry-header">
+                            <div class="title-author">
+                                {% if post.inquiries_id in user_inquiries or is_admin %}
+                                    <a href="{% url 'customer_service:post_detail' post.inquiries_id %}">{{ post.inquiry_title }}</a>
+                                {% else %}
+                                    <a href="#" class="disabled-link">{{ post.inquiry_title }} <i class="fas fa-lock"></i></a>
+                                {% endif %}
+                            </div>
+                            <div class="created-info">
+                                <span class="inquiry-author">{{  post.created_by_masked }}</span>
+                                <span class="inquiry-date">{{ post.created_at|date:"Y/m/d" }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            {% if post.answer_status %}
+                                <span class="badge badge-success">답변 완료</span>
                             {% else %}
-                                <a href="#" class="disabled-link">{{ post.inquiry_title }} <i class="fas fa-lock"></i></a>
+                                <span class="badge badge-warning">답변 대기중</span>
                             {% endif %}
                         </div>
-                        <div class="created-info">
-                            <span class="inquiry-author">{{  post.created_by_masked }}</span>
-                            <span class="inquiry-date">{{ post.created_at }}</span>
-                        </div>
                     </div>
-                    <div>
-                        {% if post.answer_status %}
-                            <span class="badge badge-success">답변 완료</span>
-                        {% else %}
-                            <span class="badge badge-warning">답변 대기중</span>
-                        {% endif %}
+                    {% empty %}
+                    <div class="alert alert-warning" role="alert">
+                        작성된 문의가 없습니다.
                     </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="alert alert-warning" role="alert">
-                    작성된 문의가 없습니다.
-                </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
 
         <div class="col-md-6">
             <div class="faq-section">
                 <div class="faq-header-container">
                     <div class="faq-header">자주 묻는 질문</div>
                     <div id="faq_all_list" class="faq-all-list">
-                        <a href="{% url 'customer_service:faq_list' %}" class="faq_list">전체보기 ></a>
+                        <a href="{% url 'customer_service:faq_list' %}" class="faq_list">전체보기</a>
                     </div>
                 </div>
                 <div class="tab-container">
@@ -70,7 +73,7 @@
                 </div>
 
                 <div id="faq_best" class="faq-content active">
-                    <h1>BEST FAQ</h1>
+                    <h5>BEST FAQ</h5>
                     <ul>
                         {% for faq in faq_best %}
                             <li>
@@ -81,7 +84,7 @@
                 </div>
 
                 <div id="faq_flight" class="faq-content">
-                    <h1>FAQ - 항공</h1>
+                    <h5>FAQ - 항공</h5>
                     <ul>
                         {% for faq in faq_flight %}
                             <li>
@@ -92,7 +95,7 @@
                 </div>
 
                 <div id="faq_accommodations" class="faq-content">
-                    <h1>FAQ - 숙소</h1>
+                    <h5>FAQ - 숙소</h5>
                     <ul>
                         {% for faq in faq_accommodations %}
                             <li>
@@ -103,7 +106,7 @@
                 </div>
 
                 <div id="faq_service" class="faq-content">
-                    <h1>FAQ - 서비스 일반</h1>
+                    <h5>FAQ - 서비스 일반</h5>
                     <ul>
                         {% for faq in faq_service %}
                             <li>
@@ -114,7 +117,7 @@
                 </div>
 
                 <div id="faq_common" class="faq-content">
-                    <h1>FAQ - 공통</h1>
+                    <h5>FAQ - 공통</h5>
                     <ul>
                         {% for faq in faq_common %}
                             <li>
@@ -128,11 +131,15 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 my-inquiries">
-            <a href="{% url 'customer_service:my_inquiry_list' %}">내 문의내역</a>
+        <div class="col-md-6">
+            <div class="card btn-card">
+                <a href="{% url 'customer_service:my_inquiry_list' %}" class="btn btn-link">내 문의내역</a>
+            </div>
         </div>
-        <div class="col-md-6 inquiry-action">
-            <a href="{% url 'customer_service:inquiry_create' %}">문의하기</a>
+        <div class="col-md-6">
+            <div class="card btn-card">
+                <a href="{% url 'customer_service:inquiry_create' %}" class="btn btn-link">문의하기</a>
+            </div>
         </div>
     </div>
 </div>

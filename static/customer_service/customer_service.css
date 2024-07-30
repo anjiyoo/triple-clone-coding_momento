@@ -1,13 +1,12 @@
-/* customer_service/customer_service.css */
-
 .container {
     margin-top: 40px;
 }
 
 .section-title {
     margin-bottom: 20px;
-    font-size: 1.8em;
+    font-size: 2em;
     text-align: center;
+    font-weight: bold;
 }
 
 .inquiry-list {
@@ -74,7 +73,8 @@
 }
 
 .faq-header {
-    font-size: 1.5em;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .faq-all-list {
@@ -134,4 +134,15 @@
 
 .faq-content.active {
     display: block;
+}
+
+
+
+.card.btn-card {
+    margin-top: 25px;
+}
+
+.btn-link {
+    font-size: 15px;
+    color: #000; /* 검정색 글자 */
 }

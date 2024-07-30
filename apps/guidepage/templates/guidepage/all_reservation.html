@@ -11,19 +11,28 @@
     <div class="container">
         <div class="card">
             <div class="image-container">
+                <a href="{% url 'guidepage:index' %}" class="close-button">
+                    <span class="close-icon">&times;</span>
+                </a>
                 <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Triple Guide">
-                <h2>모멘토에서 한 번에 <br>예약하면 편하니까</h2>
-                <p>항공권부터 숙소, 투어티켓까지 최저가로 한번에 <br>예약하고 편리하게 관리하세요.<br> 모멘토 여행자에게만 드리는 할인 혜택들도 많이 준비<br>되어 있어요.<br></p>
+                <h2>모멘토에서 한번에 예약하면 편하니까</h2>
+                <p>항공권부터 숙소까지 최저가로 한번에 예약하고 편리하게 관리하세요.<br> 
+                    모멘토 여행자에게만 드리는 할인 혜택들도 많이 준비되어 있어요.
+                </p>
             </div>
         </div>
         <div class="card-1">
             <h2>똑똑한 항공권 검색과 빠른발권</h2>
-            <p>출발 시간, 항공사 등 원하는 조건의 항공권만 쏙쏙 <br> 골라볼 수 있습니다.<br> 모멘토의 항공이 특별한 이유는 초스피드 에약이<br> 가능하다는 점! 에약과 발권이 동시에 진행돼 1분이면 예<br>약이 가능해요.</p>
+            <p>출발 시간, 항공사 등 원하는 조건의 항공권만 쏙쏙 골라볼 수 있습니다.<br>
+                모멘토의 항공이 특별한 이유는 초스피드 에약이 가능하다는 점!<br>
+                에약과 발권이 동시에 진행돼 1분이면 예약이 가능해요.
+            </p>
             <div class="slideshow-container" id="slideshow-1">
                 <div class="slides">
-                    <div class="slide"><img src="{% static 'guidepage/photo/항공권1.png' %}" alt="Slide 1"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/항공권2.png' %}" alt="Slide 2"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/항공권3.png' %}" alt="Slide 3"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/flights.png' %}" alt="Slide 1"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/flights1.png' %}" alt="Slide 2"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/flights2.png' %}" alt="Slide 3"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/flights3.png' %}" alt="Slide 4"></div>
                 </div>
                 <a class="prev" onclick="prevSlide('slideshow-1')">&#10094;</a>
                 <a class="next" onclick="nextSlide('slideshow-1')">&#10095;</a>
@@ -31,21 +40,20 @@
             <div class="col-md-4 mb-4">
                 <br>
                 <br>
-                <a href="{% url 'flights:flight_search' %}" class="d-block">
-                    <span class="d-block mt-1"><strong>항공권 예약하러 가기</strong></span>
+                <a href="{% url 'flights:flight_search' %}" class="btn-link">
+                    <span><strong>항공권 예약하러 가기</strong></span>
                 </a>
             </div>
         </div>
         <div class="card-1">
             <h2>최적의 호텔을 최저가에 예약</h2>
-            <p>숙소를 고를 때 위치는 어디가 좋을지, 어디서 예약하<br>면 가장 저렴할지... 생각해야 할 부분이 참 많죠?<br> 모멘토가 제종하는 여행 스타일별 숙소 지역 추천을<br>참고해 최적의 숙소를 최저가로 예약하세요</p>
+            <p>숙소를 고를 때 어디서 예약하면 가장 저렴할지<br> 
+                위치는 어디가 좋을지, 생각해야 할 부분이 참 많죠?<br>
+                모멘토가 제공하는 여행 스타일별 숙소 지역 추천을 참고하면<br>
+                최적의 숙소를 최저가로 예약할 수 있어요</p>
             <div class="slideshow-container" id="slideshow-2">
                 <div class="slides">
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 1"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 2"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 3"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 4"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 5"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/accommodation.png' %}" alt="Slide 1"></div>
                 </div>
                 <a class="prev" onclick="prevSlide('slideshow-2')">&#10094;</a>
                 <a class="next" onclick="nextSlide('slideshow-2')">&#10095;</a>
@@ -53,32 +61,10 @@
             <div class="col-md-4 mb-4">
                 <br>
                 <br>
-                <a href="{% url 'accommodation:accommodation_home' %}" class="d-block">
-                    <span class="d-block mt-1"><strong>숙소 예약하러 가기</strong></span>
+                <a href="{% url 'accommodation:accommodation_home' %}" class="btn-link">
+                    <span><strong>숙소 예약하러 가기</strong></span>
                 </a>
             </div>
-        </div>
-        <div class="card-1">
-            <h2>여행 경험을 더 풍부하게! 투어티켓</h2>
-            <p>투어티켓으로 특별한 추억을 만들어보세요. 교통패<br>스,입장권,투어 프로그램 등 다양한 상품들이 준비되<br>어 있습니다.<br>모멘토에서 미리 예매하면 현지에서 구입하는 것보다<br>훨씬 저렴하니,여행 전에 꼭 준비하세요</p>
-            <div class="slideshow-container" id="slideshow-3">
-                <div class="slides">
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 1"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 2"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 3"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 4"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 5"></div>
-                </div>
-                <a class="prev" onclick="prevSlide('slideshow-3')">&#10094;</a>
-                <a class="next" onclick="nextSlide('slideshow-3')">&#10095;</a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <br>
-                <br>
-                <a href="#" class="d-block">
-                    <span class="d-block mt-1"><strong>투어티켓 예약하러 가기</strong></span>
-                </a>
-            </div>  
         </div>
 
         <div class="card-3">
@@ -91,11 +77,11 @@
                     </div>
                     <div class="slide">
                         <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Slide 2">
-                        <button class="guide-button" onclick="navigateToGuide(2)">일정짜기 보러가기</button>
+                        <button class="guide-button" onclick="navigateToGuide(3)">여행일정 가이드 보러가기</button>
                     </div>
                     <div class="slide">
                         <img src="{% static 'guidepage/photo/custom_info.png' %}" alt="Slide 3">
-                        <button class="guide-button" onclick="navigateToGuide(3)">맞춤 정보 가이드 보러가기</button>
+                        <button class="guide-button" onclick="navigateToGuide(3)">여행지 정보 가이드 보러가기</button>
                     </div>
 
                 </div>

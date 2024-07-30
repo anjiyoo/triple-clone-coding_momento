@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+
+{% block title %}자주 묻는 질문{% endblock %}
+
 {% load static %}
 
 {% block extra_css %}
@@ -6,110 +9,143 @@
 <link rel="stylesheet" type="text/css" href="{% static 'customer_service/my_inquiry_list.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-    .tab-container {
+    .faq-section {
+        margin: 20px auto;
+        max-width: 800px;
+    }
+    .faq-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .form-inline {
+        margin-bottom: 20px;
+        text-align: right; /* 버튼을 우측 정렬 */
+    }
+    .tabs {
         display: flex;
         justify-content: space-around;
         margin-bottom: 20px;
+        border-bottom: 2px solid #ccc;
         cursor: pointer;
     }
-    /* .tab {
+    .tab {
         padding: 10px 20px;
-        border: 1px solid #007BFF;
-        background-color: #f7f7f7;
-        color: #007BFF;
-        border-radius: 4px;
-        margin: 0 5px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #007bff;
     }
     .tab.active {
-        background-color: #007BFF;
-        color: #fff;
-    } */
+        border-bottom: 2px solid #007bff;
+        color: #007bff;
+    }
     .faq-content {
         display: none;
     }
     .faq-content.active {
         display: block;
     }
-    .tabs {
-            display: flex;
-            margin-top: 20px;
-            border-bottom: 2px solid #ccc;
-        }
-        .tabs .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .tabs .tab.active {
-            border-bottom: 2px solid #007bff;
-            font-weight: bold;
-        }
+    .inquiry-list {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+    .inquiry-list-item {
+        padding: 10px 20px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f7f7f7;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .inquiry-title {
+        font-size: 1.2em;
+        color: #333;
+        text-decoration: none;
+        flex: 2;
+    }
+    .inquiry-title:hover {
+        text-decoration: underline;
+    }
+    .btn-custom {
+        background-color: #ffffff; /* 배경색 흰색 */
+        color: #333333; /* 텍스트 색상 검정색 */
+        border: 1px solid #ddd; /* 테두리 색상 */
+        border-radius: 5px; /* 테두리 반경 */
+        padding: 10px 20px; /* 패딩 */
+    }
+    .btn-custom:hover {
+        background-color: #f8f9fa; /* 호버 시 배경색 */
+        color: #000000; /* 호버 시 텍스트 색상 */
+        border-color: #ccc; /* 호버 시 테두리 색상 */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="col-md-6">
-    <div class="faq-section">
-        <div class="faq-header">자주 묻는 질문</div>
-        <form method="GET" action="{% url 'customer_service:faq_list' %}" class="form-inline mb-4">
-            {{ form.query }}
-            <button type="submit" class="btn btn-primary">검색</button>
-        </form>
-        <div class="tabs">
-            <div class="tab active" id="faq_flightTab" onclick="selectTab('faq_flight')">항공</div>
-            <div class="tab" id="faq_accommodationsTab" onclick="selectTab('faq_accommodations')">숙소</div>
-            <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">서비스 일반</div>
-            <div class="tab" id="faq_commonTab" onclick="selectTab('faq_common')">공통</div>
-        </div>
+<div class="faq-section">
+    <div class="faq-header">자주 묻는 질문</div>
+    <form method="GET" action="{% url 'customer_service:faq_list' %}" class="form-inline mb-4">
+        {{ form.query }}
+        <button type="submit" class="btn btn-custom ml-2">검색</button>
+    </form>
+    <div class="tabs">
+        <div class="tab active" id="faq_flightTab" onclick="selectTab('faq_flight')">항공</div>
+        <div class="tab" id="faq_accommodationsTab" onclick="selectTab('faq_accommodations')">숙소</div>
+        <div class="tab" id="faq_serviceTab" onclick="selectTab('faq_service')">서비스 일반</div>
+        <div class="tab" id="faq_commonTab" onclick="selectTab('faq_common')">공통</div>
+    </div>
 
+    <div id="faq_flight" class="faq-content active">
+        <h5>FAQ - 항공</h5>
+        <ul class="inquiry-list">
+            {% for faq in faq_flight %}
+                <li class="inquiry-list-item">
+                    <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 
+    <div id="faq_accommodations" class="faq-content">
+        <h5>FAQ - 숙소</h5>
+        <ul class="inquiry-list">
+            {% for faq in faq_accommodations %}
+                <li class="inquiry-list-item">
+                    <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-        <div id="faq_flight" class="faq-content active">
-            <h1>FAQ - 항공</h1>
-            <ul>
-                {% for faq in faq_flight %}
-                    <li>
-                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div id="faq_service" class="faq-content">
+        <h5>FAQ - 서비스 일반</h5>
+        <ul class="inquiry-list">
+            {% for faq in faq_service %}
+                <li class="inquiry-list-item">
+                    <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-        <div id="faq_accommodations" class="faq-content">
-            <h1>FAQ - 숙소</h1>
-            <ul>
-                {% for faq in faq_accommodations %}
-                    <li>
-                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div id="faq_service" class="faq-content">
-            <h1>FAQ - 서비스 일반</h1>
-            <ul>
-                {% for faq in faq_service %}
-                    <li>
-                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div id="faq_common" class="faq-content">
-            <h1>FAQ - 공통</h1>
-            <ul>
-                {% for faq in faq_common %}
-                    <li>
-                        <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}
-                            <div style="display: none;">{{ faq.faq_answer }}</div>
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div id="faq_common" class="faq-content">
+        <h5>FAQ - 공통</h5>
+        <ul class="inquiry-list">
+            {% for faq in faq_common %}
+                <li class="inquiry-list-item">
+                    <a href="{% url 'customer_service:faq_detail' faq.id %}" class="inquiry-title">{{ faq.faq_title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
+
 <script>
     function selectTab(tabId) {
         // 모든 탭을 비활성화

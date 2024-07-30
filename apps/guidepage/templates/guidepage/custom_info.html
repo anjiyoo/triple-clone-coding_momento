@@ -11,21 +11,30 @@
     <div class="container">
         <div class="card">
             <div class="image-container">
+                <a href="{% url 'guidepage:index' %}" class="close-button">
+                    <span class="close-icon">&times;</span>
+                </a>
                 <img src="{% static 'guidepage/photo/custom_info.png' %}" alt="Triple Guide">
-                <h2>여행지에서 받는 <br>맞춤 서비스</h2>
-                <p>여행지에서도 모멘토를 꼭 써야 하는 이유!<br>현재 내가 있는 위치와 여행 일정에 맞춰 필요한 정보<br>들을 받을 수 있어요.<br>입국한 순간부터 출국할 때까지 당신의 여행을 밀착<br>케어 해드릴게요.<br></p>
+                <h2>여행지에서 받는 맞춤 서비스</h2>
+                <p>여행지에서도 모멘토를 꼭 써야 하는 이유!<br>
+                    현재 내가 있는 위치와 여행 일정에 맞춰 필요한 정보들을 받을 수 있어요.<br>
+                    입국한 순간부터 출국할 때까지 당신의 여행을 밀착 케어 해드릴게요.<br>
+                </p>
             </div>
         </div>
         <div class="card-1">
-            <h2>현지 실시간 정보 궁금하다면<br><br>지금 현지에 있는 여행자들과 정보를 나눠보세요.</h2>
-            <p>여행을 하다 보면 여행지에 대한 이런저런 이야기를<br>나누고 싶을 때가 있죠. 위치 기반 이야기 서비스 '배낭<br> 톡'에서 같은 도시에 있는 여행자들과 자유롭게 이야<br>기 나눠보세요.</p>
+            <h2>여행지의 정보가 궁금하다면<br>
+                배낭톡을 통해 정보를 나눠보세요.
+            </h2>
+            <p>여행을 하다 보면 여행지에 대한 이런저런 이야기를 나누고 싶을 때가 있죠.<br>
+                '배낭톡'에서 여행지에 대해 여행자들과 자유롭게 이야기 나눠보세요.<br>
+            </p>
             <div class="slideshow-container" id="slideshow-1">
                 <div class="slides">
                     <div class="slide"><img src="{% static 'guidepage/photo/real_bae.png' %}" alt="Slide 1"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 2"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 3"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 4"></div>
-                    <div class="slide"><img src="{% static 'guidepage/photo/준비중이에요.png' %}" alt="Slide 5"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/real_bae1.png' %}" alt="Slide 2"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/real_bae2.png' %}" alt="Slide 3"></div>
+                    <div class="slide"><img src="{% static 'guidepage/photo/real_bae3.png' %}" alt="Slide 4"></div>
                 </div>
                 <a class="prev" onclick="prevSlide('slideshow-1')">&#10094;</a>
                 <a class="next" onclick="nextSlide('slideshow-1')">&#10095;</a>
@@ -33,8 +42,8 @@
             <div class="col-md-4 mb-4">
                 <br>
                 <br>
-                <a href="{% url 'baenangtalk:bae_main' %}" class="d-block">
-                    <span class="d-block mt-1"><strong>배낭톡 구경하러 가기</strong></span>
+                <a href="{% url 'baenangtalk:bae_main' %}" class="btn-link">
+                    <span><strong>배낭톡 구경하러 가기</strong></span>
                 </a>
             </div>
         </div>
@@ -44,16 +53,16 @@
             <div class="slideshow-container" id="slideshow-4">
                 <div class="slides">
                     <div class="slide">
-                        <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Slide 1">
+                        <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Slide 1">
+                        <button class="guide-button" onclick="navigateToGuide(3)">여행일정 가이드 보러가기</button>
+                    </div>
+                    <div class="slide">
+                        <img src="{% static 'guidepage/photo/all_reservation.png' %}" alt="Slide 2">
                         <button class="guide-button" onclick="navigateToGuide(1)">예약 가이드 보러가기</button>
                     </div>
                     <div class="slide">
-                        <img src="{% static 'guidepage/photo/travel_memory.png' %}" alt="Slide 2">
+                        <img src="{% static 'guidepage/photo/travel_memory.png' %}" alt="Slide 3">
                         <button class="guide-button" onclick="navigateToGuide(2)">여행기 가이드 보러가기</button>
-                    </div>
-                    <div class="slide">
-                        <img src="{% static 'guidepage/photo/travel_plan.png' %}" alt="Slide 3">
-                        <button class="guide-button" onclick="navigateToGuide(3)">일정짜기 가이드 보러가기</button>
                     </div>
 
                 </div>

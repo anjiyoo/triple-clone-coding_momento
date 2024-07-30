@@ -36,13 +36,11 @@ urlpatterns = [
     path('planrecommend/', include('apps.planrecommend.urls')),
     path('tour/', include('apps.tour.urls')),
     path('customer_service/', include('apps.customer_service.urls')),
+    path('travel_diary/',include('apps.travel_diary.urls')),
+    path('test_mypage/', include('apps.mypage.urls')),
     path('test_mypage/', include(('apps.mypage.urls', 'mypage'), namespace='mypage')),
     path('accommodation/', include("apps.accommodation.urls")),
     path('guidepage/', include("apps.guidepage.urls")),
     path('search/', include("apps.search.urls")),
 
-    
-
-
-  
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

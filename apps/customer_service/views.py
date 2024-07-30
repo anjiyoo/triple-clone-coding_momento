@@ -225,14 +225,11 @@ class FaqListView(ListView):
             context['faq_accommodations'] = Faq.objects.filter(
                 Q(faq_category_id='2') & (Q(faq_title__icontains=query) | Q(faq_answer__icontains=query))
             )
-            context['faq_tourticket'] = Faq.objects.filter(
+            context['faq_service'] = Faq.objects.filter(
                 Q(faq_category_id='3') & (Q(faq_title__icontains=query) | Q(faq_answer__icontains=query))
             )
-            context['faq_service'] = Faq.objects.filter(
-                Q(faq_category_id='4') & (Q(faq_title__icontains=query) | Q(faq_answer__icontains=query))
-            )
             context['faq_common'] = Faq.objects.filter(
-                Q(faq_category_id='5') & (Q(faq_title__icontains=query) | Q(faq_answer__icontains=query))
+                Q(faq_category_id='4') & (Q(faq_title__icontains=query) | Q(faq_answer__icontains=query))
             )
         else:
             context['faq_flight'] = Faq.objects.filter(faq_category_id='1')

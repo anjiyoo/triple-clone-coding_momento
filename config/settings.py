@@ -77,12 +77,13 @@ INSTALLED_APPS = [
     'apps.plan',
     'apps.planrecommend',
     'apps.customer_service',
+    'apps.travel_diary',
     'corsheaders',
     'apps.accommodation',
     'apps.mypage',
     'apps.tour',
     'apps.guidepage',
-    'apps.search'
+    'apps.search',
 ]
 
 MIDDLEWARE = [
