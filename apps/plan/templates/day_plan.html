@@ -423,7 +423,6 @@
 
   // 카카오맵 초기화
   try{
-    console.log('에러가 나기 직전까지의 코드는 잘 실행됩니다.');
     const place=document.querySelector('.place').dataset['xy'].split(',')
     if (!place) {
         throw new Error('place element not found');
@@ -454,7 +453,6 @@
   })
   console.log(map_xy)
   
-  var map = new kakao.maps.Map(container, options);
   // 지도에 교통정보를 표시
   map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);   
 

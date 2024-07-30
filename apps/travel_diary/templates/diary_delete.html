@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content%}
+<div class="container">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <p>정말로 {{diary.title}}을 삭제하시나요?</p>
+        <input type="submit" class="btn btn-outline-secondary" value="Confirm">
+    </form>
+</div>
+{% endblock %}

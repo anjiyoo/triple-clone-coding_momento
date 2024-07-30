@@ -193,7 +193,7 @@ margin-top: 2rem;
           <span class="sub-title">사진을 등록해주세요</span>
           <div class="media-container">
               <input type="file" class="custom-file-input" id="image" name="image" accept="image/*">
-              <label for="image" class="custom-file-label media-box">+</label>
+              <label for="image" class="custom-file-label media-box"><img src="{{form.image.value.url}}" alt="" style="height: 100%; width: 100%; margin-bottom: 10px;"></label>
               <!-- + 박스 더 필요하면 여기에 추가 -->
               <!-- <div class="media-box">+</div> -->
           </div>
@@ -202,11 +202,11 @@ margin-top: 2rem;
     
       <div class="form-group">
         <label class="label" for="content">여행기 제목(필수)</label>
-        <input id="content" class="input" name="title" placeholder="여행기 제목을 입력하세요" />
+        <input id="content" class="input" name="title" placeholder="여행기 제목을 입력하세요" value="{{form.title.value}}"/>
       </div>
       <div class="form-group">
         <label class="label" for="diary-title">여행기 내용</label>
-        <textarea id="diary-title" class="textarea" name="content" placeholder="이번 여행은 어떤 여행이었나요? 여행에 대한 한 줄 요약 또는 여행 꿀팁을 남겨보세요."></textarea>
+        <textarea id="diary-title" class="textarea" name="content" placeholder="이번 여행은 어떤 여행이었나요? 여행에 대한 한 줄 요약 또는 여행 꿀팁을 남겨보세요.">{{form.content.value}}</textarea>
       </div>
 
       <hr class="my-5" style="border: 5px gray solid;">
@@ -225,12 +225,7 @@ margin-top: 2rem;
       <div id="day_plan">
         
       </div>
-      <div class=" mt-4 ">
-        <div class="d-flex align-items-center">
-          <span style="color: #3b82f6;">●</span>
-          <h2 class="font-bold">메모</h2>
-        </div>
-      </div>
+   
     </div>
 
     
