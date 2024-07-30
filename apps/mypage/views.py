@@ -57,15 +57,25 @@ class SaveListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         likes = context['likes']
+
+        DOMESTIC_ACCOMMODATION_TYPES = {
+            'pension_pool_vila': '펜션, 풀빌라',
+            'camping_glamping': '캠핑, 글램핑',
+            'boutique_motel': '부티크 모텔',
+        }
         for like in likes:
             accommodation = like.accommodation
             first_image = accommodation.images.first()
             # 첫 번째 이미지 URL을 추가
             like.first_image_url = first_image.images.url if first_image else ''
             # 숙소의 좋아요 수를 계산하여 추가
-            like.likes_count = accommodation.likes.count()
+            like.likes_count = AccommodationLike.objects.filter(accommodation=accommodation).count()
             # 각 숙소의 리뷰 수를 추가
             like.reviews_count = Review.objects.filter(accommodation=accommodation).count()
+             # accommodation_type 값을 한글로 변환하여 추가
+            like.accommodation_type_display = DOMESTIC_ACCOMMODATION_TYPES.get(accommodation.accommodation_type, accommodation.accommodation_type)
+            # 현재 사용자가 해당 숙소를 좋아하는지 여부를 추가
+            like.is_liked = AccommodationLike.objects.filter(accommodation=accommodation, user=self.request.user).exists()
         
         return context
 
@@ -85,4 +95,5 @@ class ReviewListView(ListView):
             first_image = accommodation.images.first()
             # 첫 번째 이미지 URL을 추가
             review.first_image_url = first_image.images.url if first_image else ''
+            review.travel_date = review.travel_date
         return context
