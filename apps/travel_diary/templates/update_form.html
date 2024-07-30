@@ -326,20 +326,19 @@ margin-top: 2rem;
 </script>
 <script>
 
-    document.addEventListener('DOMContentLoaded', function() {
-    const day1 = document.getElementById('day1')
-    const day2 = document.getElementById('day2');
-    
-    day2.addEventListener('change', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn_day').forEach(btn =>{
+      btn.addEventListener('change', function() {
         if (this.checked) {
-            day1.checked = false;
+            // 현재 버튼을 제외한 모든 버튼의 체크를 해제합니다.
+            document.querySelectorAll('.btn_day').forEach(otherBtn => {
+                if (otherBtn !== this) {
+                    otherBtn.checked = false;
+                }
+            });
         }
     });
-    day1.addEventListener('change', function() {
-        if (this.checked) {
-            day2.checked = false;
-        }
-    });
+    })
 })
 </script>
 <script>

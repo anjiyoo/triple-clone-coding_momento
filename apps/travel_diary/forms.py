@@ -4,6 +4,7 @@ from django.db import models
 from .models import diary,DiaryComment
 
 class DiaryForm(forms.ModelForm):
+    
     class Meta :
         model = diary
         fields = ['title','content','image']
@@ -13,7 +14,7 @@ class DiaryForm(forms.ModelForm):
             'content': forms.Textarea(attrs={"class": "textarea","id":"diary-title"}),
             'image': forms.ClearableFileInput(attrs={"class":"image-form"})
         }
-
+    
 # 댓글 작성
 class CommentcreateForm(forms.ModelForm):
     class Meta:

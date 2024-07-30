@@ -43,18 +43,25 @@ class DiaryCreateView(CreateView):
         context['days'] = days
         context['plan'] = plan
         return context
+        
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.instance.trip_id = self.kwargs['trip_id']
-        # 먼저 폼을 저장하여 self.object를 초기화합니다.
-        response = super().form_valid(form)
-        # 태그 처리
-        tags = self.request.POST.getlist('tags')
-        for tag_name in tags:
-            Tag, created = tag.objects.get_or_create(name=tag_name)
-            self.object.tags.add(Tag)
-        return response
-    
+        try:
+            if self.request.FILES['image']:
+                form.instance.user = self.request.user
+                form.instance.trip_id = self.kwargs['trip_id']
+                # 먼저 폼을 저장하여 self.object를 초기화합니다.
+                response = super().form_valid(form)
+                # 태그 처리
+                tags = self.request.POST.getlist('tags')
+                for tag_name in tags:
+                    Tag, created = tag.objects.get_or_create(name=tag_name)
+                    self.object.tags.add(Tag)
+                return response
+        except:
+            # 적절한 오류 메시지와 함께 다른 페이지로 리다이렉트
+            messages.error(self.request, "입력 정보를 확인해주세요.")
+            # 폼이 유효하지 않으면 다시 폼을 보여줌
+            return redirect('travel_diary:create', trip_id=self.kwargs['trip_id'])
 class DiaryList(ListView):
     model = diary
     template_name = 'diary_list.html'

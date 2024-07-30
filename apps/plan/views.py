@@ -125,8 +125,14 @@ def day_plan(request, region, cigungu1=0, cigungu2=0, cigungu3=0):
         date = request.POST['datefilter'].split(' - ')
         start_date = date[0]
         end_date = date[1]
-        who = request.POST['who']
-        style = request.POST.getlist('style')
+        try:
+            who = request.POST['who']
+        except:
+            who = '혼자'
+        try:
+            style = request.POST.getlist('style')
+        except:
+            style = None
         
         # 수정 버튼 경로
         if request.POST['trip']:

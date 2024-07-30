@@ -210,22 +210,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# 정적 파일을 수집할 경로
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 정적 파일을 수집할 경로
 
 # 미디어 파일 저장 경로
-# 개발환경
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR/'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 배포환경
-# MEDIA_URL = '/media/'
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# TEMP_UPLOAD_DIR = os.path.join(MEDIA_ROOT, 'temp_uploads')
-
-# 임시데이터 저장 폴더
-# os.makedirs(TEMP_UPLOAD_DIR, exist_ok=True)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

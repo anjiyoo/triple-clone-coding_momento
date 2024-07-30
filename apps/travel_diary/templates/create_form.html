@@ -179,6 +179,14 @@ margin-top: 2rem;
   </style>
   {% endblock %}
   {% block content %}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger text-center">
+        {{ message }}
+    </div>
+    {% endfor %}
+    
+  {% endif %}
   <form action="{% url 'travel_diary:create' trip.id %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div id="writeSection" class="container">
@@ -190,8 +198,8 @@ margin-top: 2rem;
       </div>
       <div class="image-upload">
         <div class="form-group mb-3">
-          <span class="sub-title">사진을 등록해주세요</span>
-          <div class="media-container">
+          <span class="sub-title">사진을 등록해주세요(필수)</span>
+          <div class="media-container ms-3">
               <input type="file" class="custom-file-input" id="image" name="image" accept="image/*">
               <label for="image" class="custom-file-label media-box">+</label>
               <!-- + 박스 더 필요하면 여기에 추가 -->
@@ -200,12 +208,12 @@ margin-top: 2rem;
         </div>
       </div>  
     
-      <div class="form-group">
+      <div class="form-group ">
         <label class="label" for="content">여행기 제목(필수)</label>
         <input id="content" class="input" name="title" placeholder="여행기 제목을 입력하세요" />
       </div>
       <div class="form-group">
-        <label class="label" for="diary-title">여행기 내용</label>
+        <label class="label" for="diary-title">여행기 내용(필수)</label>
         <textarea id="diary-title" class="textarea" name="content" placeholder="이번 여행은 어떤 여행이었나요? 여행에 대한 한 줄 요약 또는 여행 꿀팁을 남겨보세요."></textarea>
       </div>
 
@@ -321,19 +329,18 @@ margin-top: 2rem;
 <script>
 
     document.addEventListener('DOMContentLoaded', function() {
-    const day1 = document.getElementById('day1')
-    const day2 = document.getElementById('day2');
-    
-    day2.addEventListener('change', function() {
+    document.querySelectorAll('.btn_day').forEach(btn =>{
+      btn.addEventListener('change', function() {
         if (this.checked) {
-            day1.checked = false;
+            // 현재 버튼을 제외한 모든 버튼의 체크를 해제합니다.
+            document.querySelectorAll('.btn_day').forEach(otherBtn => {
+                if (otherBtn !== this) {
+                    otherBtn.checked = false;
+                }
+            });
         }
     });
-    day1.addEventListener('change', function() {
-        if (this.checked) {
-            day2.checked = false;
-        }
-    });
+    })
 })
 </script>
 <script>
