@@ -317,7 +317,8 @@
         .star-ratingg {
             font-size: 1em;
             color: #f5b301;
-            margin: 20px 20px;
+            /* margin: 20px 20px; */
+            margin-right: 2px; 
         }
         .dropdown-content {
             width: 150px; /* 드롭다운 메뉴의 너비 조정 */
@@ -631,17 +632,19 @@
     {% if reviews %}
         <ul>
             {% for review in reviews %}
-                <a  href="{% url 'accommodation:review_detail' accommodation_pk=accommodation.pk review_pk=review.pk %}">
                 <li style="list-style: none; margin-bottom: 20px;">
                     <div style="border: 1px solid #e7e7e7; border-radius: 10px; padding: 15px; box-shadow: none; border: none; position: relative;">
                         <div style="display: flex; align-items: center;">
                             <img src="{{ MEDIA_URL }}{{ review.user.profile }}" alt="{{ review.user.username }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
                             <div>
+                            <a href="{% url 'accommodation:review_detail' accommodation_pk=accommodation.pk review_pk=review.pk %}">
                                 <p style="margin: 0; font-size: 15px; font-weight: bold;">{{ review.user.username }}</p>
+                            </a>
                                 <p style="margin: 0; font-size: 0.8em; color: #909090;">{{ review.user.review_set.count }}개의 리뷰</p>
+                               
                             </div>
                         </div>
-                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                        <div style="margin-top: 5px; display: flex; align-items: center;">
                             <div class="star-ratingg">
                                 {% for i in "12345" %}
                                     {% if i|add:0 <= review.rating %}
@@ -653,18 +656,20 @@
                             </div>
                             {% if review.travel_date %}
                                 <div style="font-size: 1em; color: #909090;">
-                                    {{ review.travel_date }} 여행
+                                    {{ review.travel_date }}
                                 </div>
                             {% endif %}
                         </div>
                         <div style="margin-top: 10px;">
+                            <a href="{% url 'accommodation:review_detail' accommodation_pk=accommodation.pk review_pk=review.pk %}">
                             <span>{{ review.content }}</span>
+                            </a>
                         </div>
                         {% if review.image_url %}
                             <div style="margin-top: 10px;">
                                 <img src="{{ MEDIA_URL }}{{ review.image_url }}" alt="Review Image" style="max-width: 100%; border-radius: 10px;">
                             </div>
-                        </a>
+                        <!-- </a> -->
                         {% endif %}
                         <div style="position: absolute; right: 15px; font-size: 0.8em; color: #909090; margin-right:30px; margin-top:10px;">
                             {{ review.created_at }}
@@ -680,6 +685,8 @@
                                         <a href="#" onclick="reportReview({{ review.id }})">신고하기</a>
                                     {% endif %}
                                 </div>
+                                </div>
+                            
 
                             </div>
                             

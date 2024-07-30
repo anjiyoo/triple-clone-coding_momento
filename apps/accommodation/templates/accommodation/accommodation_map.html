@@ -19,11 +19,11 @@
             border: 1px solid #ffffff; 
             background-color: white;
             border: 1px solid #ccc;
-            padding-left: 35px;
-            padding-right: 35px;
+            padding-left: 50px;
+            padding-right: 50px;
             padding-top: 10px;
-            margin: 10px;
-            width: 400px;
+            margin: 20px;
+            width: 500px;
             border-radius: 10px;
             position: absolute;
             bottom: 30px;
@@ -94,7 +94,7 @@
     {% if images %}
     <img src="{{ MEDIA_URL }}{{ images.0.images }}" 
          alt="숙소 이미지" 
-         style="float: left; margin-right: 20px; margin-top: 20px; margin-left: 10px; width: 100px; height: auto;">
+         style="float: left; margin-right: 20px; margin-top: 20px; margin-left: 5px; width: 120px; height: auto;">
     {% endif %}
         <h2 style="font-size: 18px;">
             <a href="{% url 'accommodation:accommodation_detail' pk=accommodation.pk %}" style="text-decoration: none; color: inherit;">

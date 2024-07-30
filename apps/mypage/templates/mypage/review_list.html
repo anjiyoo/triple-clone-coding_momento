@@ -17,10 +17,12 @@
     }
 
     .review-image {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 150px;
         object-fit: cover;
         margin-left: 20px;
+        margin-right : 40px;
+        border-radius: 8px;
     }
 
     .stars {
@@ -42,10 +44,13 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-left: 40px;
     }
 
     .card-title {
         margin-bottom: 5px;
+        font-weight: bold;
+
     }
 
     .card-text {
@@ -164,6 +169,26 @@
         border-bottom: 2px solid #007bff;
         font-weight: bold;
     }
+    .stars .gray-star {
+        color: rgb(186, 186, 186); 
+    }
+    .stars .star {
+        margin-right: -5px;
+    }
+    .stars .star i {
+        font-size: 16px; 
+    }
+    .review-info {
+        display: flex;
+        align-items: center;
+    }
+    .review-info .stars {
+        margin-right: 10px; 
+    }
+    .small-gray-text {
+        font-size: 0.875em; 
+        color: gray;
+    }
 </style>
 {% endblock %}
 
@@ -198,22 +223,26 @@
             <div class="review-content">
                 <div class="review_head_card"
                     onclick="goToUrl('{% url 'accommodation:accommodation_detail' review.accommodation.id %}')">
-                    <h5 class="card-title">{{ review.accommodation.name }}</h5>
-                    <p class="card-text">{{ review.accommodation.category }} · {{ review.accommodation.location }}</p>
-                    {% if review.first_image_url %}
-                    <img src="{{ review.first_image_url }}" alt="{{ review.accommodation.name }}" class="review-image">
-                    {% endif %}
+                    <h4 class="card-title">{{ review.accommodation.name }}</h4>
+                    <p class="card-text small-gray-text"> {{ review.accommodation.location }}</p>
+        
                 </div>
                 <div class="review_main_card"
                     onclick="goToUrl('{% url 'accommodation:review_detail' review.accommodation.id review.id %}')">
+                    <div class="review-info">
                     <div class="stars">
                         {% for i in "12345" %}
-                        {% if forloop.counter <= review.rating %} <span>★</span>
+                            {% if forloop.counter <= review.rating %}
+                                <span class="star"><i class="fas fa-star"></i></span>
                             {% else %}
-                            <span>☆</span>
+                                <span class="star"><i class="fas fa-star gray-star"></i></span>
                             {% endif %}
-                            {% endfor %}
+                        {% endfor %}
                     </div>
+                    {% if review.travel_date %}
+                        <p class="card-text small-gray-text">{{ review.travel_date}}</p> 
+                    {% endif %}
+                </div>
                     <p class="card-text truncate">{{ review.content|linebreaksbr }}</p>
                 </div>
             </div>
