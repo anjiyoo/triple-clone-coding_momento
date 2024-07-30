@@ -11,7 +11,7 @@
 
 <div class="container mt-3">
     <!-- 검색창 -->
-    <h1 style="text-align: center;">어디로 가시나요?</h1>
+    <h1 style="text-align: center;">어디로 떠나시나요?</h1>
     <a href="/search" style="display: flex; justify-content: center; align-items: center; margin: 50px;">
         <input class="form-control mr-sm-2" type="search" placeholder="어디로 떠나시나요?" aria-label="Search" name="q" style="width: 800px; height: 43px; border-color: rgb(16, 179, 144); margin-right: 10px;">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit" style="background-color: rgb(16, 179, 144); color: white; border: none; padding: 10px 20px;">검색</button>
@@ -67,6 +67,42 @@
         <a href="/chatbot/">
             <img src="{% static 'chatbot.png' %}" alt="Clickable Image" class="img-fluid custom-image">
         </a>
+    </div>
+    <!-- 여행기 -->
+    <div class="mt-5">
+        <h3 class="mb-4">여행기</h3>
+        <!-- 도시 선택 -->
+        <div class="btn-group mx-3 mb-3" style="display: block; padding: 0;">
+            <button type="button" class="btn btn-outline-light btn-custom dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #0BD0AF; margin-right: 10px;">
+                {% if county_id %}
+                    <strong>{{ selected_county.city_name }}</strong>
+                {% else %}
+                    도시 선택
+                {% endif %}
+            </button>
+            <div class="dropdown-menu">
+                {% for county in counties %}
+                    <a class="dropdown-item" href="?county_id={{ county.id }}{% if period_id %}&period_id={{ period_id }}{% endif %}{% if subject_id %}&subject_id={{ subject_id }}{% endif %}">
+                        {{ county.city_name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            {%for i in diary%}
+            <div class="mb-4">
+                <div class="card" style="margin-bottom: 20px;">
+                    <a href="{% url 'travel_diary:diary_detail' i.id %}">
+                        <img src="{{i.image.url}}" class="card-img-top" alt="여행 일정 이미지" style="height: 240px; object-fit: cover; object-position: center;">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{i.title}}</h5>
+                        <p class="card-text">{{i.content}}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
     </div>
 </div>
 

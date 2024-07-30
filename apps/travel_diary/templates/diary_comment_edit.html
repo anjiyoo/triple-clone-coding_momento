@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'baenangtalk/comment/edit.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>댓글 수정</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="submit-button btn-lg">저장</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
