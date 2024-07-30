@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -175,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div>
                 <label for="passenger_birthdate_${i}">생년월일:</label>
-                <input type="text" id="passenger_birthdate_${i}" name="passenger_birthdate_${i}"  required>
+                <input type="text" id="passenger_birthdate_${i}" name="passenger_birthdate_${i}" placeholder="19990101" pattern="\\d{8}" maxlength="8" required oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);">
             </div>
             <div>
                 <label for="passenger_nationality_${i}">국적:</label>
