@@ -12,12 +12,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // 자동 질문을 GPT에 보냄
     function sendQuery(query) {
         if (!query.trim()) {
+            console.log(query)
             // 입력 필드가 비어있을 경우 메시지 표시
             const recommendquestionDiv = document.createElement('div');
             recommendquestionDiv.className = 'recommend';
             chatMessages.appendChild(recommendquestionDiv);
             return; // 함수 실행 중지
         }
+        console.log(query)
 
         // 채팅창에 사용자 입력 바로 표시
         const questionDiv = document.createElement('div');
@@ -42,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             // 기존의 "..." 메시지 삭제
+            console.log(data)
             const existingWaitingDiv = document.querySelector('.waiting');
             if (existingWaitingDiv) {
                 existingWaitingDiv.remove();

@@ -536,6 +536,7 @@ def response(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
     try:
+        print(request.body)
         data = json.loads(request.body)
         user_query = data.get('user_query')
 
