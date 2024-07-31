@@ -170,6 +170,29 @@ print("테이블 ChatbotTravelInfo 생성 완료")
 
 # # 기존 테이블 데이터 삭제
 cursor.execute("DELETE FROM ChatbotTravelInfo")
+cursor.execute("DELETE FROM County")
+conn.commit()
+
+# 데이터 삽입 (초기 생성하고 주석처리)
+# County 데이터 삽입
+county_data = [
+    (1, '가평﹒양평', '가평', '양평', 'None', 'None', 123, 1, 2, 3),
+    (2, '강릉﹒속초', '강릉', '속초', 'None', 'None', 124, 1, 2, 3),
+    (3, '경주', '경주', 'None', 'None', 'None', 125, 1, 2, 3),
+    (4, '부산', '부산', 'None', 'None', 'None', 126, 1, 2, 3),
+    (5, '여수﹒순천', '여수', '순천', 'None', 'None', 127, 1, 2, 3),
+    (6, '인천', '인천', 'None', 'None', 'None', 128, 1, 2, 3),
+    (7, '전주', '전주', 'None', 'None', 'None', 129, 1, 2, 3),
+    (8, '제주', '제주', 'None', 'None', 'None', 130, 1, 2, 3),
+    (9, '춘천﹒홍천', '춘천', '홍천', 'None', 'None', 131, 1, 2, 3),
+    (10, '태안﹒당진﹒서산', '태안', '당진', '서산', 'None', 132, 1, 2, 3),
+    (11, '통영﹒거제﹒남해', '통영', '거제', '남해', 'None', 133, 1, 2, 3)
+]
+insert_county_query = '''
+    INSERT INTO County (id, city_name, first_town_name, second_town_name, third_town_name, title_image, area_code, cigungu1, cigungu2, cigungu3)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+'''
+cursor.executemany(insert_county_query, county_data)
 conn.commit()
 
 # 데이터 삽입 (초기 생성하고 주석처리)
@@ -273,11 +296,18 @@ tools = [
                 county_id 는 
                 가평﹒양평=1, 강릉﹒속초=2, 경주=3, 부산=4, 여수=5, 인천=6, 전주=7, 제주=8, 춘천﹒홍천=9, 태안﹒당진﹒서산=10, 통영﹒거제﹒남해=11, 포함﹒안동=12
 
+                info_location 는 위치
+                info_weather 는 날씨
+                info_tourist 는 관광지
+                info_food 는 지역음식
+                info_traffic 는 교통 정보
+
                 SQL 쿼리는 다음 스키마를 사용합니다:
                 {database_schema_string}
 
+
                 예시 쿼리:
-                SELECT info_location, info_weather, info_tourist, info_cultural, info_food, info_traffic 
+                SELECT county_id, info_location, info_weather, info_tourist, info_cultural, info_food, info_traffic 
                 FROM ChatbotTravelInfo 
                 WHERE county_id = 4;
                 """,
