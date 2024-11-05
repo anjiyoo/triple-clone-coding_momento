@@ -1,5 +1,5 @@
 
-![](https://velog.velcdn.com/images/yoiseau_/post/7e037c87-a017-4aa5-85fe-cba87d898c67/image.png)
+![momento 시연영상(배속)](https://github.com/user-attachments/assets/1a2f4c49-fa73-4f3b-ba2b-7143f852ee68)
 
 
 # MOMENTO 
