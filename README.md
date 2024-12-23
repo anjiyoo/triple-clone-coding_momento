@@ -57,13 +57,13 @@
 
 <br>
 
-## ERD
-[**ERD**](https://www.erdcloud.com/d/z8SRaoeiWuxRxhHBN) 를 보려면 클릭하세요.
+**ChatGPT 코드 리뷰 워크플로우 스크립트 작성**
+- GitHub Action은 통해 워크플로우 스크립트 작성
 
 <br>
 
-**ChatGPT 코드 리뷰 워크플로우 스크립트 작성**
-- GitHub Action은 통해 워크플로우 스크립트 작성
+## ERD
+[**ERD**](https://www.erdcloud.com/d/z8SRaoeiWuxRxhHBN) 를 보려면 클릭하세요.
 
 <br>
 
