@@ -63,7 +63,7 @@
 <br>
 
 ## ERD
-[**ERD**](https://www.erdcloud.com/d/z8SRaoeiWuxRxhHBN) 를 보려면 클릭하세요.
+[**ERD**](https://www.erdcloud.com/d/YX97eTZJkmhHMu6Gc) 를 보려면 클릭하세요.
 
 <br>
 
